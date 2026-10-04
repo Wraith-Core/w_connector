@@ -167,8 +167,10 @@ EFFECTS.trollWildAttack = function()
     TaskCombatHatedTargetsAroundPed(animal, 30.0, 0)
     ClearPedTasks(animal)
     TaskPutPedDirectlyIntoMelee(animal, ped, 0.0, -1.0, 0.0, 0)
-    SetRelationshipBetweenGroups(5, animalGroup, playerGroup)
-    SetRelationshipBetweenGroups(5, playerGroup, animalGroup)
+    -- RDR2 relation values are not GTA V's: 5 = WANTED, 6 = HATE (femga/rdr3_discoveries AI/RELATIONSHIP;
+    -- Rockstar's 1491.50 native3.ysc.c:32367-32368 sets 6 both ways with PLAYER). The animal attacks the player.
+    SetRelationshipBetweenGroups(6, animalGroup, playerGroup)
+    SetRelationshipBetweenGroups(6, playerGroup, animalGroup)
     SetModelAsNoLongerNeeded(model)
 
     -- Cleaned up so a prank does not leave a permanent animal on the map.
