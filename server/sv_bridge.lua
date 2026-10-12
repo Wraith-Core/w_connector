@@ -11,6 +11,17 @@
 local ENDPOINT = Config.endpoint
 local HDR = { ['Content-Type'] = 'application/json', ['x-api-key'] = Config.apiKey }
 
+-- The WebRTC relay's limits. A session id is opaque but never a document; an SDP offer is a few KB
+-- and ICE candidates are small; a real connection sends a handful of signals a second, never a flood.
+local SESSION_MAX  = 64
+local SIGNAL_MAX   = 32768
+local SIGNAL_WINDOW = 1000   -- ms
+local SIGNAL_BURST = 15      -- signals one player may spend inside that window
+local SIGNAL_KINDS = { offer = true, answer = true, candidate = true }
+
+local sessionOwner = {}   -- [sessionId] = the player the website opened it for
+local signalSeen = {}     -- [src] = { first = ms, count = n }
+
 local function report(id, ok, err, result)
     if not id then return end
     PerformHttpRequest(ENDPOINT .. '/result', function() end, 'POST',
@@ -81,10 +92,19 @@ local function runAction(a)
             return
         end
         if a.type == 'webrtc_start' then
-            TriggerClientEvent('w_connector:webrtcStart', target, data.sessionId, data.iceServers)
+            -- the session is opened for one named player; remember who, so that only they may answer
+            -- for it (see w_connector:webrtcSignalOut below)
+            local sid = data.sessionId
+            if type(sid) ~= 'string' or sid == '' or #sid > SESSION_MAX then
+                report(a.id, false, 'missing_session')
+                return
+            end
+            sessionOwner[sid] = target
+            TriggerClientEvent('w_connector:webrtcStart', target, sid, data.iceServers)
         elseif a.type == 'webrtc_deliver' then
             TriggerClientEvent('w_connector:webrtcSignal', target, data.sessionId, data.kind, data.data)
         else
+            if type(data.sessionId) == 'string' then sessionOwner[data.sessionId] = nil end
             TriggerClientEvent('w_connector:webrtcStop', target, data.sessionId)
         end
         report(a.id, true)
@@ -105,13 +125,58 @@ end
 
 --- The streamer's NUI bounces its offer and ICE candidates through the server to the website, which
 --- the admin's viewer then drains. Same base URL, same key.
+---
+--- This is the one inbound edge that a PLAYER, not the website, drives -- a RegisterNetEvent is
+--- reachable by any client script -- and every accepted call becomes an outbound request carrying
+--- this server's API key. Three things follow, and all three are closed below:
+---
+---   * without a rate limit one player in a loop turns this server into a request amplifier against
+---     the vendor API: from the server's own address, with the server's own key;
+---   * without a type and length test, `data` may be a table of any size and `sessionId` any string
+---     at all, and the lot of it is serialised into a JSON body;
+---   * without an owner test a player may name ANY session -- including one a third party is being
+---     streamed on -- and push their own offer or ICE into it.
+---
+--- The owner is known here, and did not need the website to tell us: `webrtc_start` above hands a
+--- session to one named player, so the bridge records that pairing and only lets that player speak
+--- for the session. The website still owns the guild check; this adds the server's own.
+
+local SESSION_MAX  = 64      -- opaque, but a session id is never a document
+local SIGNAL_MAX   = 32768   -- an SDP offer is a few KB, ICE candidates are small
+
+--- Whether this press may go out: right shape, right size, this player's own session, and not a flood.
+---@return boolean
+local function signalAllowed(src, sessionId, kind, data)
+    if type(sessionId) ~= 'string' or sessionId == '' or #sessionId > SESSION_MAX then return false end
+    if type(kind) ~= 'string' or not SIGNAL_KINDS[kind] then return false end
+    if type(data) ~= 'string' or #data > SIGNAL_MAX then return false end
+    -- the session must be one this server opened, and it must be the caller's
+    if sessionOwner[sessionId] ~= src then return false end
+
+    local now = GetGameTimer()
+    local seen = signalSeen[src]
+    if not seen or now - seen.first > SIGNAL_WINDOW then
+        signalSeen[src] = { first = now, count = 1 }
+        return true
+    end
+    seen.count = seen.count + 1
+    return seen.count <= SIGNAL_BURST
+end
+
 RegisterNetEvent('w_connector:webrtcSignalOut', function(sessionId, kind, data)
     if not Config.enabled or Config.base == '' then return end
-    -- The source is the player being spectated, and the website validates the session against the
-    -- guild, so a forged sessionId from another player reaches a session it does not own and is
-    -- answered with `no_session`.
+    if not signalAllowed(source, sessionId, kind, data) then return end
     PerformHttpRequest(Config.base .. '/webrtc/signal', function() end, 'POST',
         json.encode({ sessionId = sessionId, role = 'streamer', kind = kind, data = data }), HDR)
+end)
+
+--- A player leaving takes their sessions and their rate window with them.
+AddEventHandler('playerDropped', function()
+    local src = source
+    signalSeen[src] = nil
+    for sid, owner in pairs(sessionOwner) do
+        if owner == src then sessionOwner[sid] = nil end
+    end
 end)
 
 if not Config.enabled then
