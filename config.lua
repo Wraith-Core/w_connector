@@ -33,6 +33,16 @@ Config.heartbeatMs = 10000
 --- means that log category is not mirrored to Discord.
 Config.discordToken  = GetConvar('w_connector_discord_token', '')
 Config.discordGuild  = GetConvar('w_connector_discord_guild', '')
+
+--- Red River runs ONE Discord bot: w_logs'. When this resource has none of its own it borrows that
+--- one (the token from server.local.cfg, the guild from w_logs' convar or its config file), so the
+--- queue's Discord-role priority and the role pickers work without a second bot.
+if Config.discordToken == '' then Config.discordToken = GetConvar('w_logs_discord_token', '') end
+if Config.discordGuild == '' then Config.discordGuild = GetConvar('w_logs_discord_guild', '') end
+if Config.discordGuild == '' then
+    local cfg = LoadResourceFile('w_logs', 'config/config.lua') or ''
+    Config.discordGuild = cfg:match("guild%s*=%s*'(%d+)'") or cfg:match('guild%s*=%s*"(%d+)"') or ''
+end
 Config.steamKey      = GetConvar('w_connector_steam_key', '')
 
 --- One webhook per log category. Categories match the `action_type` column of wc_logs and the

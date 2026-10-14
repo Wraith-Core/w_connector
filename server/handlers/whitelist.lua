@@ -110,10 +110,5 @@ Registry.invoke('adminpanel:whitelistedplayeraction', 'whitelist.view', function
     return H.ok()
 end)
 
---- Is this account allowed in? Consulted by sv_connect.lua on join.
-function WhitelistAllows(steamHex)
-    if not Config.useWhitelist then return true end
-    if not steamHex or steamHex == '' then return false end
-    local row = MySQL.single.await('SELECT `status` FROM `wc_whitelist` WHERE `steam_hex` = ?', { steamHex })
-    return row ~= nil and row.status == 'active'
-end
+--- The join check itself (Steam OR Discord, switched on and off from the website) is
+--- server/sv_queue.lua's `whitelisted()`.

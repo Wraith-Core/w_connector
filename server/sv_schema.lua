@@ -208,6 +208,36 @@ local STATEMENTS = {
         `total_characters` INT NOT NULL DEFAULT 0,
         UNIQUE KEY `uniq_day` (`day`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci]],
+
+    --- The website's switches for the way in (sv_queue.lua): whitelist on/off, closed, the grace
+    --- minutes, each rank's and each Discord role's queue points. One row per key, the value is JSON,
+    --- so a switch flipped on the site survives a restart.
+    [[CREATE TABLE IF NOT EXISTS `wc_settings` (
+        `key` VARCHAR(64) NOT NULL PRIMARY KEY,
+        `value` TEXT,
+        `updated_by` VARCHAR(100) NOT NULL DEFAULT '',
+        `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci]],
+
+    --- One player's queue priority: given by hand on the site, or bought in the store (`order_id`
+    --- makes a delivery retried by the site land once). `identifier` is the one shown; `alt_ids`
+    --- holds the same person's other identifiers (comma separated), any of which matches at join.
+    --- `expires_at` is unix seconds, NULL = permanent.
+    [[CREATE TABLE IF NOT EXISTS `wc_priority` (
+        `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        `identifier` VARCHAR(100) NOT NULL,
+        `alt_ids` VARCHAR(255) NOT NULL DEFAULT '',
+        `name` VARCHAR(100) NOT NULL DEFAULT '',
+        `points` INT NOT NULL DEFAULT 0,
+        `expires_at` INT NULL DEFAULT NULL,
+        `source` ENUM('manual','shop') NOT NULL DEFAULT 'manual',
+        `order_id` VARCHAR(64) NULL DEFAULT NULL,
+        `note` VARCHAR(255) NOT NULL DEFAULT '',
+        `added_by` VARCHAR(100) NOT NULL DEFAULT '',
+        `created_at` INT NOT NULL DEFAULT 0,
+        UNIQUE KEY `uniq_order` (`order_id`),
+        INDEX `idx_identifier` (`identifier`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci]],
 }
 
 --- The permission vocabulary. This list IS the contract with the website: the Roles tab renders it
@@ -253,6 +283,10 @@ PERMISSION_NODES = {
         'close_server_for_players', 'admin.kickall',
         'server.time.control', 'server.weather.control', 'server.timescale.control',
         'server.wind.control', 'server.syncdelay.control',
+    } },
+    --- The way in (server/sv_queue.lua): the join queue, its priorities, the whitelist and closed switches.
+    { category = 'Queue', nodes = {
+        'queue.view', 'queue.manage',
     } },
     --- Read by the WEBSITE, not by the game. src/features/sites/siteRoles.ts maps each of these
     --- onto a site permission, which is what makes the game roles and the site roles one system

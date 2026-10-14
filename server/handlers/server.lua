@@ -63,6 +63,8 @@ Registry.invoke('adminpanel:closeServerForPlayers', 'close_server_for_players', 
     if want == nil then want = not ServerState.closed end
 
     ServerState.closed = want
+    -- kept in wc_settings (sv_queue.lua), so a closed server stays closed across a restart
+    if Entry and Entry.saveSetting then Entry.saveSetting('closed', want, actor.label or 'Web Admin') end
     TriggerClientEvent('w_connector:announce', -1,
         want and 'The server is now closed to new players.' or 'The server is open again.')
     Log.write(actor, 'server_event', want and 'Closed server to players' or 'Reopened server', nil,

@@ -50,7 +50,9 @@ server_scripts {
     'server/handlers/server.lua',
     'server/handlers/stats.lua',
     'server/handlers/whitelist.lua',
-    'server/sv_connect.lua',
+    'server/handlers/entry.lua',
+    -- the way in: closed, bans, whitelist, priority and the join queue (replaces connectqueue)
+    'server/sv_queue.lua',
     'server/sv_heartbeat.lua',
     'server/sv_bridge.lua',    -- LAST: dispatches into everything above
 }
