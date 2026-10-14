@@ -373,8 +373,9 @@ CreateThread(function()
     local owned = {}
     for _, sql in ipairs(STATEMENTS) do owned[#owned + 1] = sql:match('CREATE TABLE IF NOT EXISTS `([%w_]+)`') end
     alignCollation(MySQL, 'w_connector', owned)
-    seedRoles()
-    seedOwners()
+    -- (2026-10-14) No more seeding: the roles and the owners are w_core's staff ranks now (the master
+    -- comes from w_ranks:masters, see sv_perms.lua). wc_roles is no longer read; seedRoles/seedOwners
+    -- are kept below only so an older copy of this resource reading them still finds them.
     Schema.ready = true
     -- print('^2[w_connector]^0 schema ready.')
 end)

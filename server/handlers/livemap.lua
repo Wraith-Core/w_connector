@@ -8,10 +8,9 @@
 --- and avatars onto entries that the native list has already proven exist.
 local function mapPlayers()
     local out = {}
+    -- the staff: whoever holds a rank (w_core), under any identifier he plays with
     local roster = {}
-    for _, r in ipairs(MySQL.query.await('SELECT `identifier` FROM `wc_admins` WHERE `is_active` = 1') or {}) do
-        roster[r.identifier] = true
-    end
+    for identifier in pairs(Perms.members or {}) do roster[identifier] = true end
 
     for _, sid in ipairs(Players.online()) do
         local p = Players.get(sid) or {}
@@ -34,7 +33,7 @@ local function mapPlayers()
             username = p.username or GetPlayerName(sid),
             identifier = p.identifier,
             job = p.jobLabel or p.job or 'N/A',
-            isAdmin = (p.identifier and roster[p.identifier]) and true or false,
+            isAdmin = ((p.identifier and roster[p.identifier:lower()]) or (p.steamHex and roster['steam:' .. p.steamHex:lower()])) and true or false,
             avatar = av.avatar_url,
             coordinates = { x = x, y = y, z = z },
             x = x, y = y, z = z, heading = h,

@@ -10,99 +10,111 @@
 ---     the roster one entry at a time with `Citizen.Await` and a 100ms pause between lookups, so a
 ---     server with twenty admins turned one page load into a multi-second stall.
 
-local function onlineByIdentifier()
-    local out = {}
-    for _, sid in ipairs(Players.online()) do
-        local p = Players.get(sid)
-        if p and p.identifier then out[p.identifier] = p end
-        -- The account identifier is what wc_admins keys on for Steam-based installs, so index both.
-        if p and p.steamHex then out['steam:' .. p.steamHex] = p end
-    end
-    return out
+--- (2026-10-14) The roster IS the game's staff ranks: w_core keeps who holds what (w_rank_members,
+--- several ranks a person, by license or steam). The website still sees ONE role a staff member: his
+--- highest rank. Granting here adds a rank; changing swaps the shown (highest) one; removing takes them
+--- all -- every one of them the master only, as in game. A master from server.cfg (w_ranks:masters)
+--- cannot be changed or removed from here. wc_admins only keeps the resolved-report count.
+
+--- A stable number for a roster entry (the panel keys its rows on `id`)
+local function idOf(identifier)
+    local h = 5381
+    for i = 1, #identifier do h = (h * 33 + identifier:byte(i)) & 0x7FFFFFFF end
+    return h
 end
 
 Registry.invoke('adminpanel:GetAdminsData', 'admins.view', function()
-    local rows = MySQL.query.await(
-        'SELECT `id`, `identifier`, `group`, `username`, `discord_id`, `resolved_reports`, ' ..
-        '`assigned_date`, `last_updated` FROM `wc_admins` WHERE `is_active` = 1') or {}
-    local online = onlineByIdentifier()
-    local admins = {}
-    for _, r in ipairs(rows) do
-        local live = online[r.identifier]
-        local role = Perms.get(r.group)
-        local av = Players.avatars[r.identifier] or {}
-        admins[#admins + 1] = {
-            id = r.id,
-            source = live and live.source or nil,
-            steamHex = r.identifier,     -- the panel's name for "whichever identifier matched"
-            identifier = r.identifier,
-            username = r.username ~= '' and r.username or (av.discord_username or r.identifier),
-            realName = av.discord_username or r.username,
-            role = r.group,
-            roleLevel = role and role.lvl or 0,
-            avatar = av.avatar_url or '',
-            online = live ~= nil,
-            lastLogin = live and live.lastLogin or r.last_updated,
-            reportsFinalized = tonumber(r.resolved_reports) or 0,
-            discordId = r.discord_id,
-        }
+    Perms.load()
+    local reports = {}
+    for _, r in ipairs(MySQL.query.await('SELECT `identifier`, `resolved_reports` FROM `wc_admins`') or {}) do
+        reports[(r.identifier or ''):lower()] = tonumber(r.resolved_reports) or 0
     end
-    table.sort(admins, function(a, b) return (a.roleLevel or 0) > (b.roleLevel or 0) end)
+    local admins = {}
+    for identifier in pairs(Perms.members) do
+        local entry = Perms.adminOf(identifier)
+        if entry then
+            local role = Perms.get(entry.group)
+            local src = tonumber(entry.online)
+            local live = src and Players.get(src) or nil
+            local av = Players.avatars[identifier] or (live and live.identifier and Players.avatars[live.identifier]) or {}
+            admins[#admins + 1] = {
+                id = idOf(identifier),
+                source = src,
+                steamHex = identifier,     -- the panel's name for "whichever identifier matched"
+                identifier = identifier,
+                username = entry.username ~= '' and entry.username or (av.discord_username or identifier),
+                realName = av.discord_username or entry.username,
+                role = entry.group,
+                roles = entry.groups,      -- every rank he holds (the panel shows `role`, the highest)
+                roleLevel = role and role.lvl or 0,
+                avatar = av.avatar_url or '',
+                online = src ~= nil,
+                lastLogin = live and live.lastLogin or nil,
+                reportsFinalized = reports[identifier] or 0,
+                discordId = live and live.discordId or av.discord_id,
+            }
+        end
+    end
+    table.sort(admins, function(x, y) return (x.roleLevel or 0) > (y.roleLevel or 0) end)
     return { admins = admins }
 end)
 
---- Grant or change someone's role by identifier. Creates the roster row if it does not exist.
+--- Grant a rank by player or identifier (it is added to the ranks he already holds).
 Registry.invoke('adminpanel:setPermission', 'manage_permissions', function(actor, args)
     args = type(args) == 'table' and args or {}
+    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
+    local api = Perms.core()
+    if not api then return H.fail('ranks_unavailable') end
+
     local ref = H.playerRef(args)
-    local identifier = H.str(ref.identifier or args.identifier, 100)
-    if identifier == '' then return H.fail('missing_identifier') end
+    local group = Perms.canon(H.str(args.permission or args.role or args.group, 64))
+    if not Perms.get(group) then return H.fail('unknown_role') end
 
-    local group = H.str(args.permission or args.role or args.group, 64)
-    local role = Perms.get(group)
-    if not role then return H.fail('unknown_role') end
-
-    -- You cannot grant a role you do not outrank. Without this, `manage_permissions` is the only
-    -- permission that matters, because its holder can simply give themselves every other one.
-    if not Perms.outranks(actor, group) then return H.fail('cannot_grant_role_at_or_above_your_own') end
-
-    local existing = Perms.adminOf(identifier)
-    if existing and not Perms.outranks(actor, existing.group) then
-        return H.fail('cannot_modify_equal_or_higher_rank')
+    local src = H.liveSource(ref)
+    local identifier = Perms.normalizeIdentifier(H.str(ref.identifier or args.identifier, 100))
+    local target
+    if src then
+        target = { source = src }
+    elseif identifier then
+        target = { identifier = identifier, name = ref.username }
+    else
+        return H.fail('missing_identifier')
     end
 
-    local username = ref.username or ''
-    local live = ref.source and Players.get(ref.source) or nil
-    local av = Players.avatars[identifier] or {}
-
-    MySQL.insert.await(
-        'INSERT INTO `wc_admins` (`identifier`,`group`,`username`,`discord_id`) VALUES (?,?,?,?) ' ..
-        'ON DUPLICATE KEY UPDATE `group` = VALUES(`group`), `is_active` = 1, ' ..
-        '`username` = COALESCE(NULLIF(VALUES(`username`), \'\'), `username`)',
-        { identifier, group, username ~= '' and username or (av.discord_username or ''),
-          (live and live.discordId) or av.discord_id or '' })
-
-    Log.write(actor, 'admin_action', existing and 'Changed staff role' or 'Granted staff role',
-        ('%s -> %s'):format(identifier, group), { name = username, identifier = identifier, severity = 'high' })
+    local ok, err = api:RanksAssign(0, target, group)
+    if not ok then return H.fail(Perms.rankError(err)) end
+    Perms.load()
+    Log.write(actor, 'admin_action', 'Granted staff role',
+        ('%s -> %s'):format(identifier or ('#' .. tostring(src)), group),
+        { name = ref.username, identifier = identifier, severity = 'high' })
     return H.ok()
 end)
 
+--- Change the rank the panel shows (his highest) to another one; his other ranks stay.
 Registry.invoke('adminpanel:changeAdminRole', 'change.admin.role', function(actor, args)
     args = type(args) == 'table' and args or {}
-    local target = type(args.targetAdmin) == 'table' and args.targetAdmin or {}
-    local identifier = H.str(target.identifier or target.steamHex or args.identifier, 100)
-    if identifier == '' then return H.fail('missing_identifier') end
+    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
+    local api = Perms.core()
+    if not api then return H.fail('ranks_unavailable') end
 
-    local group = H.str(args.role or args.group, 64)
-    local role = Perms.get(group)
-    if not role then return H.fail('unknown_role') end
+    local target = type(args.targetAdmin) == 'table' and args.targetAdmin or {}
+    local identifier = Perms.normalizeIdentifier(H.str(target.identifier or target.steamHex or args.identifier, 100))
+    if not identifier then return H.fail('missing_identifier') end
+
+    local group = Perms.canon(H.str(args.role or args.group, 64))
+    if not Perms.get(group) then return H.fail('unknown_role') end
 
     local existing = Perms.adminOf(identifier)
     if not existing then return H.fail('not_an_admin') end
-    if not Perms.outranks(actor, existing.group) then return H.fail('cannot_modify_equal_or_higher_rank') end
-    if not Perms.outranks(actor, group) then return H.fail('cannot_grant_role_at_or_above_your_own') end
+    if existing.group == group then return H.ok() end
 
-    MySQL.update.await('UPDATE `wc_admins` SET `group` = ? WHERE `identifier` = ?', { group, identifier })
+    -- the new one first: a failed swap must never leave him with nothing
+    local ok, err = api:RanksAssign(0, { identifier = existing.identifier, name = existing.username }, group)
+    if not ok then return H.fail(Perms.rankError(err)) end
+    ok, err = api:RanksRevoke(0, existing.identifier, existing.group)
+    Perms.load()
+    if not ok then return H.fail(Perms.rankError(err)) end
+
     Log.write(actor, 'admin_action', 'Changed staff role',
         ('%s: %s -> %s%s'):format(identifier, existing.group, group,
             args.reason and (' (' .. H.str(args.reason, 200) .. ')') or ''),
@@ -110,17 +122,27 @@ Registry.invoke('adminpanel:changeAdminRole', 'change.admin.role', function(acto
     return H.ok()
 end)
 
+--- Take every rank from a staff member (a master from server.cfg keeps his).
 Registry.invoke('adminpanel:removeAdmin', 'manage_permissions', function(actor, args)
     args = type(args) == 'table' and args or {}
+    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
+    local api = Perms.core()
+    if not api then return H.fail('ranks_unavailable') end
+
     local target = type(args.targetAdmin) == 'table' and args.targetAdmin or {}
-    local identifier = H.str(args.identifier or target.identifier or target.steamHex, 100)
-    if identifier == '' then return H.fail('missing_identifier') end
+    local identifier = Perms.normalizeIdentifier(H.str(args.identifier or target.identifier or target.steamHex, 100))
+    if not identifier then return H.fail('missing_identifier') end
 
     local existing = Perms.adminOf(identifier)
     if not existing then return H.fail('not_an_admin') end
-    if not Perms.outranks(actor, existing.group) then return H.fail('cannot_modify_equal_or_higher_rank') end
+    local lastErr
+    for _, rank in ipairs(existing.groups or {}) do
+        local ok, err = api:RanksRevoke(0, existing.identifier, rank)
+        if not ok then lastErr = err end
+    end
+    Perms.load()
+    if lastErr then return H.fail(Perms.rankError(lastErr)) end
 
-    MySQL.update.await('DELETE FROM `wc_admins` WHERE `identifier` = ?', { identifier })
     Log.write(actor, 'admin_action', 'Removed staff member', identifier,
         { identifier = identifier, severity = 'high' })
     return H.ok()

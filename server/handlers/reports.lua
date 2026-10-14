@@ -139,9 +139,11 @@ Registry.invoke('adminpanel:resolveReport', 'admin.reports.resolve', function(ac
 
     addSystemMessage(id, ('Resolved by %s'):format(actor.label or 'Web Admin'))
     if actor.identifier then
-        MySQL.update.await(
-            'UPDATE `wc_admins` SET `resolved_reports` = `resolved_reports` + 1 WHERE `identifier` = ?',
-            { actor.identifier })
+        -- wc_admins only keeps this count now (the ranks are w_core's): a row is made for it when missing
+        MySQL.insert.await(
+            'INSERT INTO `wc_admins` (`identifier`, `group`, `username`, `resolved_reports`) VALUES (?, ?, ?, 1) ' ..
+            'ON DUPLICATE KEY UPDATE `resolved_reports` = `resolved_reports` + 1',
+            { tostring(actor.identifier):lower(), actor.group or 'staff', actor.label or '' })
     end
     Log.write(actor, 'admin_action', 'Resolved report', '#' .. id)
     return H.ok()

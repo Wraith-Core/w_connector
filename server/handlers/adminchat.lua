@@ -27,14 +27,17 @@ Registry.invoke('adminpanel:getAdminChatData', 'adminchat.view', function()
     --- Only staff who are actually connected. Sourced from the roster joined against the live player
     --- list rather than from a cache of "who was an admin once".
     local onlineAdmins = {}
-    local roster = MySQL.query.await(
-        'SELECT `identifier`, `group`, `username` FROM `wc_admins` WHERE `is_active` = 1') or {}
-    local byIdentifier = {}
-    for _, r in ipairs(roster) do byIdentifier[r.identifier] = r end
+    -- the staff are the rank holders (w_core), under whichever identifier holds the rank
+    local function staffOf(p)
+        if not p then return nil end
+        local entry = p.identifier and Perms.adminOf(p.identifier)
+        if not entry and p.steamHex then entry = Perms.adminOf('steam:' .. p.steamHex) end
+        return entry and { group = entry.group, username = entry.username or '' } or nil
+    end
 
     for _, sid in ipairs(Players.online()) do
         local p = Players.get(sid)
-        local row = p and p.identifier and byIdentifier[p.identifier]
+        local row = staffOf(p)
         if row then
             local av = Players.avatars[p.identifier] or {}
             onlineAdmins[#onlineAdmins + 1] = {
