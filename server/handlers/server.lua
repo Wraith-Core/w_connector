@@ -15,6 +15,24 @@ local function weathersyncReady()
     return GetResourceState(WEATHERSYNC) == 'started'
 end
 
+--- An announcement to every player (2026-10-17): on screen through w_hud -- white text at the top
+--- centre under the compass, for `seconds` (nil = w_hud's 10 s) -- and a chat line from the client
+--- event. Without w_hud the client shows its old notice instead (`shown` = false). Global: entry.lua
+--- announces the open / closed switch through it too.
+---@param message string
+---@param seconds number|nil
+---@param title string|nil
+function ConnectorAnnounce(message, seconds, title)
+    local shown = false
+    if GetResourceState('w_hud') == 'started' then
+        local ok, sent = pcall(function()
+            return exports.w_hud:Announce(message, seconds, { title = title, by = 'website' })
+        end)
+        shown = ok and sent == true
+    end
+    TriggerClientEvent('w_connector:announce', -1, message, shown)
+end
+
 local function forward(eventName, ...)
     if not weathersyncReady() then return H.fail('weathersync_missing') end
     TriggerEvent(eventName, ...)
@@ -22,12 +40,13 @@ local function forward(eventName, ...)
 end
 
 Registry.invoke('adminpanel:sendAnnouncement', 'send_announcement', function(actor, args)
-    -- Bare string OR { message }.
+    -- Bare string OR { message, seconds? }: seconds on screen (3-1800, w_hud clamps; nil = 10).
     local message = (type(args) == 'string') and args or H.str(type(args) == 'table' and (args.message or args.text) or nil, 500)
     message = H.str(message, 500)
     if message == '' then return H.fail('missing_message') end
+    local seconds = type(args) == 'table' and tonumber(args.seconds or args.duration) or nil
 
-    TriggerClientEvent('w_connector:announce', -1, message)
+    ConnectorAnnounce(message, seconds)
     -- txAdmin's own announcement channel, when the server runs it.
     TriggerEvent('txaBroadcast', { message = message, author = actor.label or 'Admin' })
 
@@ -42,8 +61,7 @@ Registry.invoke('adminpanel:scheduleRestart', 'schedule_restart', function(actor
     minutes = H.clamp(minutes, 1, 60, nil)
     if not minutes then return H.fail('invalid_minutes') end
 
-    TriggerClientEvent('w_connector:announce', -1,
-        ('Server restarting in %d minute(s).'):format(minutes))
+    ConnectorAnnounce(('Server restarting in %d minute(s).'):format(minutes), 30)
     Log.write(actor, 'server_event', 'Scheduled restart', ('%d minutes'):format(minutes),
         { severity = 'high' })
 
@@ -65,8 +83,7 @@ Registry.invoke('adminpanel:closeServerForPlayers', 'close_server_for_players', 
     ServerState.closed = want
     -- kept in wc_settings (sv_queue.lua), so a closed server stays closed across a restart
     if Entry and Entry.saveSetting then Entry.saveSetting('closed', want, actor.label or 'Web Admin') end
-    TriggerClientEvent('w_connector:announce', -1,
-        want and 'The server is now closed to new players.' or 'The server is open again.')
+    ConnectorAnnounce(want and 'The server is now closed to new players.' or 'The server is open again.')
     Log.write(actor, 'server_event', want and 'Closed server to players' or 'Reopened server', nil,
         { severity = 'high' })
     return { success = true, closed = want }

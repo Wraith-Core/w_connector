@@ -140,3 +140,9 @@ unless you turn on `w_connector_show_ip`.
 
 It opens no port. All traffic is outbound to the address in `wraith_site_endpoint`, so it works
 behind any firewall without a rule.
+
+## الإعلانات (1.1.0)
+
+إعلان الموقع (`adminpanel:sendAnnouncement`، ويقبل `seconds` اختياريًا) وتنبيه الريستارت وفتح/إغلاق السيرفر
+تظهر الآن أعلى الشاشة تحت البوصلة عبر `exports.w_hud:Announce` (الدالة `ConnectorAnnounce` في
+`server/handlers/server.lua`)، وسطر الشات باقٍ. إن كان `w_hud` متوقفًا يرجع الإشعار القديم.

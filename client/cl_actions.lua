@@ -308,8 +308,10 @@ RegisterNetEvent('w_connector:warning', function(data)
     end
 end)
 
-RegisterNetEvent('w_connector:announce', function(message)
-    notify(tostring(message or ''), 10000)
+-- `shown`: the server already put it on screen through w_hud (white text under the compass);
+-- only the chat line is left to do here. false / nil (no w_hud): the old notice.
+RegisterNetEvent('w_connector:announce', function(message, shown)
+    if shown ~= true then notify(tostring(message or ''), 10000) end
     -- Also into chat, when the server runs a chat resource. Harmless if it does not.
     pcall(function()
         TriggerEvent('chat:addMessage', { color = { 255, 180, 0 }, args = { 'Server', tostring(message or '') } })

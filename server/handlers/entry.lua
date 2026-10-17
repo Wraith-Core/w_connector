@@ -124,8 +124,7 @@ Registry.invoke('adminpanel:setEntrySettings', 'queue.manage', function(actor, a
         Entry.saveSetting('closed', closed, by)
         changed[#changed + 1] = closed and 'closed' or 'open'
         if was ~= closed then
-            TriggerClientEvent('w_connector:announce', -1,
-                closed and 'The server is now closed to new players.' or 'The server is open again.')
+            ConnectorAnnounce(closed and 'The server is now closed to new players.' or 'The server is open again.')
         end
     end
     if args.graceMinutes ~= nil then
