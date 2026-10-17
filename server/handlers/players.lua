@@ -576,6 +576,18 @@ Registry.invoke('adminpanel:xpAction', 'add.xp', function(actor, args)
 
     local live = H.liveSource(ref)
     local ok, reason
+    -- 1.1.1: on a server that runs w_level the player's level is w_level's (player_levels), not the
+    -- framework's `xp` metadata: on w_core that metadata is the per-skill table, and writing a number
+    -- over it broke every skill. The grant is exact and logged there (its trusted AdminAdjust export);
+    -- an offline character is refused (staff use /addxp in game, which reaches a saved row).
+    if GetResourceState('w_level') == 'started' then
+        if not live then return H.fail('player_not_online') end
+        local okL, done = pcall(function() return exports.w_level:AdminAdjust(live, delta, 'website') end)
+        if not okL or done ~= true then return H.fail('update_failed') end
+        Log.write(actor, 'economy', removing and 'Removed XP' or 'Added XP', tostring(amount),
+            { name = ref.username, identifier = ref.identifier })
+        return H.ok()
+    end
     if live then
         ok, reason = Vorp.addXp(live, delta)
     else

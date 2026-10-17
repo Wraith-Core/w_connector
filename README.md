@@ -1,5 +1,7 @@
 # w_connector
 
+1.1.1: إعطاء الخبرة وسحبها من الموقع يذهب إلى مستوى اللاعب في `w_level` (إذا كان يعمل) بالمقدار نفسه، بدل حقل `xp` في الشخصية الذي كان يكسر خبرات المهارات. اللاعب غير المتصل يُرفض (استعمل `/addxp` في اللعبة).
+
 The Wraith connector for RedM. It links your game server to your Wraith control panel and does
 nothing else.
 
