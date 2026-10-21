@@ -7,8 +7,9 @@
 ---   in wc_settings, set from the website's Entry tab, and survive a restart. The convar
 ---   `w_connector_whitelist` is only the default before the site ever set it.
 --- * A player's priority is the HIGHEST of: his ranks' points, his Discord roles' points, his own
----   priority given on the site, what he bought in the store (wc_priority), and a short grace after a
----   crash. Higher goes first; equal priority keeps the order of arrival.
+---   priority given on the site, what he bought in the store (wc_priority), his VIP tier (w_vip, by his
+---   Cfx.re account: queue_points 100..950, 1.1.2) and a short grace after a crash. Higher goes first;
+---   equal priority keeps the order of arrival. A VIP is never staff: Entry.isStaff reads the ranks only.
 --- * Seats are counted on the server (players in game + the ones let through and still connecting),
 ---   never from a client event the way connectqueue did.
 ---
@@ -231,7 +232,18 @@ function Entry.isStaff(ids)
     return #ranksOf(keysOf(ids)) > 0
 end
 
---- points, sources ({ 'rank:admin', 'discord:<roleId>', 'player', 'shop', 'grace' }).
+--- 1.1.2: the VIP tier's queue points (w_vip, a soft dependency): points, tier. A connecting player has no
+--- server id yet, so the tier is asked by his Cfx.re identifier; 0, 0 when w_vip does not run.
+local function vipPointsOf(ids)
+    if not ids.fivem or ids.fivem == '' or GetResourceState('w_vip') ~= 'started' then return 0, 0 end
+    local ok, tier = pcall(function() return exports.w_vip:TierOfIdentifiers({ 'fivem:' .. ids.fivem }) end)
+    tier = ok and tonumber(tier) or 0
+    if tier < 1 then return 0, 0 end
+    local okP, points = pcall(function() return exports.w_vip:PerkOfTier(tier, 'queue_points', 0) end)
+    return okP and tonumber(points) or 0, tier
+end
+
+--- points, sources ({ 'rank:admin', 'discord:<roleId>', 'player', 'shop', 'vip:<tier>', 'grace' }).
 function Entry.priorityOf(ids, discordRoles)
     local best, sources, now = 0, {}, os.time()
     local function offer(points, source)
@@ -259,6 +271,9 @@ function Entry.priorityOf(ids, discordRoles)
             offer(row.points, row.source == 'shop' and 'shop' or 'player')
         end
     end
+
+    local vipPoints, vipTier = vipPointsOf(ids)
+    offer(vipPoints, 'vip:' .. vipTier)
 
     local license = ids.license and ids.license:lower()
     if license and Entry.grace[license] and Entry.grace[license] > now then offer(GRACE_POINTS, 'grace') end
@@ -581,5 +596,10 @@ end)
 
 -- a rank given or taken on the site or in game moves the people already waiting
 AddEventHandler('w_core:ranks:changed', function()
+    SetTimeout(500, function() pcall(Entry.reprioritize) end)
+end)
+
+-- 1.1.2: so does a VIP tier gained, changed or ended (w_vip's server-local event)
+AddEventHandler('w_vip:changed', function()
     SetTimeout(500, function() pcall(Entry.reprioritize) end)
 end)

@@ -458,6 +458,7 @@ function Vorp.identifiers(src)
         if id:sub(1, 8) == 'discord:' then out.discord = id:sub(9)
         elseif id:sub(1, 6) == 'steam:' then out.steam = id:sub(7)
         elseif id:sub(1, 8) == 'license:' then out.license = id
+        elseif id:sub(1, 6) == 'fivem:' then out.fivem = id:sub(7)   -- 1.1.2: the Cfx.re account (w_vip)
         elseif id:sub(1, 3) == 'ip:' then out.ip = id:sub(4) end
     end
     return out
