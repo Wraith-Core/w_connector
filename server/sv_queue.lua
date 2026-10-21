@@ -234,13 +234,16 @@ end
 
 --- 1.1.2: the VIP tier's queue points (w_vip, a soft dependency): points, tier. A connecting player has no
 --- server id yet, so the tier is asked by his Cfx.re identifier; 0, 0 when w_vip does not run.
+--- 1.1.3: + the queue priority bought in the server store (w_vip 1.1.0 PerkOfIdentifiers: tier + extras), kept
+--- one point under MAX_POINTS so staff always stay first.
 local function vipPointsOf(ids)
     if not ids.fivem or ids.fivem == '' or GetResourceState('w_vip') ~= 'started' then return 0, 0 end
-    local ok, tier = pcall(function() return exports.w_vip:TierOfIdentifiers({ 'fivem:' .. ids.fivem }) end)
+    local list = { 'fivem:' .. ids.fivem }
+    local ok, tier = pcall(function() return exports.w_vip:TierOfIdentifiers(list) end)
     tier = ok and tonumber(tier) or 0
-    if tier < 1 then return 0, 0 end
-    local okP, points = pcall(function() return exports.w_vip:PerkOfTier(tier, 'queue_points', 0) end)
-    return okP and tonumber(points) or 0, tier
+    local okP, points = pcall(function() return exports.w_vip:PerkOfIdentifiers(list, 'queue_points', 0) end)
+    points = okP and tonumber(points) or 0
+    return math.min(points, MAX_POINTS - 1), tier
 end
 
 --- points, sources ({ 'rank:admin', 'discord:<roleId>', 'player', 'shop', 'vip:<tier>', 'grace' }).
@@ -273,7 +276,7 @@ function Entry.priorityOf(ids, discordRoles)
     end
 
     local vipPoints, vipTier = vipPointsOf(ids)
-    offer(vipPoints, 'vip:' .. vipTier)
+    offer(vipPoints, vipTier > 0 and ('vip:' .. vipTier) or 'store')   -- 'store' = priority bought alone (1.1.3)
 
     local license = ids.license and ids.license:lower()
     if license and Entry.grace[license] and Entry.grace[license] > now then offer(GRACE_POINTS, 'grace') end
