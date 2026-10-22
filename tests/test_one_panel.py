@@ -21,9 +21,16 @@ TABLES = ('wc_warnings', 'wc_reports', 'wc_report_messages', 'wc_logs')
 
 STUBS = r'''
 Config = { warnKickThreshold = 3, webhooks = {}, showIpAddress = false }
-EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT = {}, {}, {}, {}, {}
+EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT, CONSOLE = {}, {}, {}, {}, {}, {}
 exports = setmetatable({
-  w_admin = { SiteLog = function(_, e) SITE_LOG[#SITE_LOG + 1] = e end },
+  w_admin = {
+    SiteLog = function(_, e) SITE_LOG[#SITE_LOG + 1] = e end,
+    SitePlayerAction = function(_, verb, target, values)
+      CONSOLE[#CONSOLE + 1] = { verb = verb, target = target, values = values }
+      if verb == 'tpCoords' and not values.x then return { ok = false, error = 'err_invalid_coords' } end
+      return { ok = true, msg = 'done' }
+    end,
+  },
 }, { __call = function(_, name, fn) EXPORTS[name] = fn end })
 function GetResourceState(name) return 'started' end
 function GetCurrentResourceName() return 'w_connector' end
@@ -50,11 +57,14 @@ Players = { avatars = {}, get = function() return nil end }
 H = {
   ok = function(m) return { success = true, message = m } end,
   fail = function(m) return { success = false, message = m } end,
+  playerRef = function(a) local p = type(a) == 'table' and a.player or {} return { source = tonumber(p.source), username = p.username } end,
+  liveSource = function(ref) if ref.source and NAMES[ref.source] then return ref.source end end,
   int = function(v, d) local n = tonumber(v) return n and math.floor(n) or d end,
   clamp = function(v, lo, hi, d) local n = tonumber(v) or d if n < lo then return lo elseif n > hi then return hi end return n end,
   str = function(v, n) if v == nil then return '' end v = tostring(v) if n and #v > n then v = v:sub(1, n) end return v end,
 }
 REG = {}
+json = { encode = function(t) local parts = {} for k, v in pairs(t) do parts[#parts + 1] = k .. '=' .. tostring(v) end table.sort(parts) return table.concat(parts, ',') end }
 Registry = setmetatable({}, { __index = function(_, kind) return function(name, node, fn) REG[name] = fn end end })
 Log = Log or { write = function() end }
 '''
@@ -179,6 +189,28 @@ class OnePanel(unittest.TestCase):
         self.assertTrue(out['success'])
         self.assertEqual(self.L.eval('CHAT[1][1]'), 4)
         self.assertEqual(self.L.eval('CHAT[1][2].args[2]'), 'تم')
+
+    # -- the website runs w_admin's own player actions -------------------------------------------------
+
+    def test_teleport_and_needs_run_the_console_code(self):
+        out = self.L.eval("REG.teleportCoords({ label = 'Web' }, { player = { source = 4 }, x = 2645.11, y = -1214.66 })")
+        self.assertTrue(out['success'])
+        self.assertEqual(self.L.eval('CONSOLE[1].verb'), 'tpCoords')
+        self.assertEqual(self.L.eval('CONSOLE[1].target'), 4)
+        self.assertIsNone(self.L.eval('CONSOLE[1].values.z'))
+        out = self.L.eval("REG.setNeeds({ label = 'Web' }, { player = { source = 4 }, hunger = 100, thirst = 100 })")
+        self.assertTrue(out['success'])
+        self.assertEqual(self.L.eval('CONSOLE[2].verb'), 'needs')
+        self.assertEqual(len(self.sql("SELECT id FROM wc_logs WHERE action = 'Set food and water'")), 1)
+
+    def test_a_console_action_needs_the_player_in_game_and_good_values(self):
+        out = self.L.eval("REG.teleportCoords({ label = 'Web' }, { player = { source = 77 }, x = 1, y = 2 })")
+        self.assertEqual(out['message'], 'player_not_online')
+        out = self.L.eval("REG.teleportCoords({ label = 'Web' }, { player = { source = 4 }, x = 'a' })")
+        self.assertEqual(out['message'], 'err_invalid_coords')
+        out = self.L.eval("REG.setNeeds({ label = 'Web' }, { player = { source = 4 } })")
+        self.assertEqual(out['message'], 'err_invalid_value')
+        self.assertEqual(self.L.eval('#CONSOLE'), 0)
 
     # -- one log ------------------------------------------------------------------------------------------
 

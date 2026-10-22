@@ -701,8 +701,8 @@ local function consoleAction(actor, args, verb, values, what)
     if not live then return H.fail('player_not_online') end
     if GetResourceState('w_admin') ~= 'started' then return H.fail('not_supported_here') end
     local ok, res = pcall(function() return exports.w_admin:SitePlayerAction(verb, live, values) end)
-    if not ok or type(res) ~= 'table' then return H.fail('update_failed') end
-    if not res.ok then return H.fail(res.error or 'update_failed') end
+    if not ok or type(res) ~= 'table' then return H.fail('admin_console_error') end
+    if not res.ok then return H.fail(res.error or 'admin_console_error') end
     Log.write(actor, 'player_action', what, json.encode(values), { name = ref.username, identifier = ref.identifier })
     return H.ok()
 end
