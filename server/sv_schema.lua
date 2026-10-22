@@ -297,6 +297,7 @@ PERMISSION_NODES = {
         'close_server_for_players', 'admin.kickall',
         'server.time.control', 'server.weather.control', 'server.timescale.control',
         'server.wind.control', 'server.syncdelay.control',
+        'console.news', -- 2026-10-22: the pause menu's news (w_admin's News page)
     } },
     --- The way in (server/sv_queue.lua): the join queue, its priorities, the whitelist and closed switches.
     { category = 'Queue', nodes = {
