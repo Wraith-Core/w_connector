@@ -725,6 +725,42 @@ Registry.action('bring', 'player.teleport.bring', function(actor, args)
     return teleport(actor, args, true)
 end)
 
+--- THE warning store (2026-10-22): the website's warn and w_admin's /warn (export AddWarning) both write
+--- wc_warnings, so the panel's count and the kick at the threshold see every warning. -> total in force
+local function storeWarning(identifier, steamHex, reason, severity, by)
+    MySQL.insert.await(
+        'INSERT INTO `wc_warnings` (`player_identifier`,`steam_hex`,`reason`,`severity`,`warned_by`) VALUES (?,?,?,?,?)',
+        { identifier, steamHex or '', reason, severity, by or 'Web Admin' })
+    local counted = MySQL.single.await(
+        'SELECT COUNT(*) AS n FROM `wc_warnings` WHERE `player_identifier` = ? AND `is_active` = 1', { identifier })
+    return tonumber(counted and counted.n) or 1
+end
+
+local function kickAtThreshold(live, total, reason)
+    if Config.warnKickThreshold > 0 and total >= Config.warnKickThreshold and live then
+        DropPlayer(live, ('طُردت بعد %d تحذيرات. آخرها: %s'):format(total, reason))
+        return true
+    end
+    return false
+end
+
+--- w_admin's /warn (and any script): a warning to a player in game, stored like the website's. The caller
+--- tells the player and writes its own log line (w_admin's log reaches wc_logs through GameLog).
+--- -> total warnings in force, kicked | nil, err
+exports('AddWarning', function(src, reason, by, severity)
+    src = tonumber(src)
+    if not src or not GetPlayerName(src) then return nil, 'player_not_online' end
+    local snap = Vorp.snapshot(src)
+    local cached = Players.get(src) or {}
+    local identifier = (snap and snap.identifier) or cached.identifier
+    if not identifier then return nil, 'player_not_found' end
+    reason = H.str(reason, 300)
+    if reason == '' then return nil, 'missing_reason' end
+    if severity ~= 'low' and severity ~= 'medium' and severity ~= 'high' then severity = 'medium' end
+    local total = storeWarning(identifier, cached.steamHex, reason, severity, by or 'Admin')
+    return total, kickAtThreshold(src, total, reason)
+end)
+
 Registry.action('warn', 'player.warn', function(actor, args)
     args = type(args) == 'table' and args or {}
     local ref, live = targetOf(args)
@@ -741,13 +777,7 @@ Registry.action('warn', 'player.warn', function(actor, args)
     if severity ~= 'low' and severity ~= 'medium' and severity ~= 'high' then severity = 'medium' end
 
     local cached = live and Players.get(live) or {}
-    MySQL.insert.await(
-        'INSERT INTO `wc_warnings` (`player_identifier`,`steam_hex`,`reason`,`severity`,`warned_by`) VALUES (?,?,?,?,?)',
-        { identifier, cached.steamHex or '', reason, severity, actor.label or 'Web Admin' })
-
-    local counted = MySQL.single.await(
-        'SELECT COUNT(*) AS n FROM `wc_warnings` WHERE `player_identifier` = ? AND `is_active` = 1', { identifier })
-    local total = tonumber(counted and counted.n) or 1
+    local total = storeWarning(identifier, cached.steamHex, reason, severity, actor.label or 'Web Admin')
 
     -- A warning carries more than its text: who issued it, how serious it is, and how many the player
     -- now has. Sent as a generic tip ("[Warning] <reason>") all three were dropped, and "warning 3 of
@@ -765,8 +795,7 @@ Registry.action('warn', 'player.warn', function(actor, args)
     Log.write(actor, 'player_action', 'Warned player', ('%s (warning %d)'):format(reason, total),
         { name = ref.username, identifier = identifier, severity = severity })
 
-    if Config.warnKickThreshold > 0 and total >= Config.warnKickThreshold and live then
-        DropPlayer(live, ('Kicked after %d warnings. Latest: %s'):format(total, reason))
+    if kickAtThreshold(live, total, reason) then
         return H.ok(('warned_and_kicked_at_%d'):format(total))
     end
     return H.ok()

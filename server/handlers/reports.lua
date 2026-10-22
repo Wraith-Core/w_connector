@@ -1,14 +1,29 @@
 --- Player reports / tickets.
 ---
---- Read-only from the game's point of view: there is no in-game form to submit one, because there
---- is no in-game UI at all. Reports arrive from the website and staff work them from the website;
---- this file is what makes that possible against the server's own database.
+--- One report list for both panels (2026-10-22): a player's /report in game (w_admin) is stored here
+--- through the AddReport export, staff's /reportr answer joins its thread (AddReportReply), and an
+--- answer written on the website reaches the player's chat when he is in the game.
 ---
 --- The list result MUST embed each report's messages. The panel's detail modal has no per-report
 --- read — it re-runs `adminpanel:getReports` every 8 seconds and finds its report by id — so a
 --- thread that is not in the list result is a thread nobody can read.
 
 local PAGE_SIZE = 20
+
+--- The account a connected player's reports are filed under.
+local function identifierOf(src)
+    local snap = Vorp.snapshot(src)
+    return (snap and snap.identifier) or GetPlayerIdentifierByType(src, 'license') or ('player:' .. src)
+end
+
+--- The connected player whose reports are filed under this account, or nil.
+local function sourceOf(identifier)
+    for _, s in ipairs(GetPlayers()) do
+        local src = tonumber(s)
+        if identifierOf(src) == identifier then return src end
+    end
+    return nil
+end
 
 local function messagesFor(reportIds)
     local out = {}
@@ -186,5 +201,52 @@ Registry.invoke('adminpanel:addReportMessage', 'admin.reports.message', function
         '`message`,`image`) VALUES (?,?,?,?,?,?)',
         { id, 'admin', actor.label or 'Web Admin', actor.identifier or '', message, image })
     MySQL.update.await('UPDATE `wc_reports` SET `updated_at` = NOW() WHERE `id` = ?', { id })
+    -- the reporter reads the answer in his chat when he is in the game
+    local reporter = MySQL.scalar.await('SELECT `reporter_identifier` FROM `wc_reports` WHERE `id` = ?', { id })
+    local live = reporter and sourceOf(reporter)
+    if live then
+        TriggerClientEvent('chat:addMessage', live, { color = { 242, 242, 242 }, multiline = true,
+            args = { '[رد الإدارة] |', message } })
+    end
     return H.ok()
+end)
+
+--- w_admin's /report: a player's report in game, stored for the website. -> report id | nil, err
+exports('AddReport', function(src, message)
+    src = tonumber(src)
+    local name = src and GetPlayerName(src)
+    if not name then return nil, 'player_not_online' end
+    message = H.str(message, 2000)
+    if message == '' then return nil, 'missing_message' end
+    local identifier = identifierOf(src)
+    local title = message
+    if utf8.len(title) and utf8.len(title) > 60 then title = title:sub(1, utf8.offset(title, 61) - 1) .. '…' end
+    local av = Players.avatars[identifier] or {}
+    local id = MySQL.insert.await(
+        'INSERT INTO `wc_reports` (`title`,`description`,`report_type`,`priority`,`reporter_identifier`,' ..
+        '`reporter_username`,`reporter_avatar`) VALUES (?,?,?,?,?,?,?)',
+        { title, message, 'player', 'medium', identifier, name, av.avatar_url or '' })
+    if not id then return nil, 'database_error' end
+    MySQL.insert.await(
+        'INSERT INTO `wc_report_messages` (`report_id`,`sender_type`,`sender_name`,`sender_identifier`,`message`) ' ..
+        'VALUES (?,?,?,?,?)', { id, 'player', name, identifier, message })
+    return id
+end)
+
+--- w_admin's /reportr: staff's answer in game joins the player's newest report that is still open.
+--- -> report id | nil (the player has no open report)
+exports('AddReportReply', function(src, message, by)
+    src = tonumber(src)
+    if not src or not GetPlayerName(src) then return nil end
+    message = H.str(message, 2000)
+    if message == '' then return nil end
+    local id = MySQL.scalar.await(
+        'SELECT `id` FROM `wc_reports` WHERE `reporter_identifier` = ? AND `status` <> ? ' ..
+        'ORDER BY `id` DESC LIMIT 1', { identifierOf(src), 'resolved' })
+    if not id then return nil end
+    MySQL.insert.await(
+        'INSERT INTO `wc_report_messages` (`report_id`,`sender_type`,`sender_name`,`message`) VALUES (?,?,?,?)',
+        { id, 'admin', tostring(by or 'Admin'):sub(1, 100), message })
+    MySQL.update.await('UPDATE `wc_reports` SET `updated_at` = NOW() WHERE `id` = ?', { id })
+    return id
 end)

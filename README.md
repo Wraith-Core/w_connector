@@ -150,3 +150,17 @@ behind any firewall without a rule.
 إعلان الموقع (`adminpanel:sendAnnouncement`، ويقبل `seconds` اختياريًا) وتنبيه الريستارت وفتح/إغلاق السيرفر
 تظهر الآن أعلى الشاشة تحت البوصلة عبر `exports.w_hud:Announce` (الدالة `ConnectorAnnounce` في
 `server/handlers/server.lua`)، وسطر الشات باقٍ. إن كان `w_hud` متوقفًا يرجع الإشعار القديم.
+
+## نظام إدارة واحد مع w_admin (1.1.5)
+
+الموقع ولوحة الأدمن داخل اللعبة صارا نظامًا واحدًا:
+
+- **الحظر:** كل حظر يُحفظ في جدول `bans` الخاص بـ w_core (تصديرات `BanPlayer` / `BanIdentifiers` / `UnbanId` /
+  `EditBan` / `GetBans` / `GetBanHistory` / `CheckBan`). الحظر المرفوع أو المنتهي يبقى في السجل. حظر الموقع القديم
+  (`wc_bans`) نُقل مرة واحدة عند أول تشغيل (علامة `bans_in_core` في `wc_settings`).
+- **قفل السيرفر:** أمر w_core `/closeserver` وزر الموقع يستخدمان القفل نفسه (`SetServerClosed` / `IsServerClosed`).
+- **التحذيرات:** `/warn` داخل اللعبة يُحفظ في `wc_warnings` (تصدير `AddWarning`)، فالعدد واحد والطرد عند الحد يحسب الطرفين.
+- **البلاغات:** `/report` داخل اللعبة يظهر في صفحة البلاغات في الموقع (`AddReport`)، ورد `/reportr` ينضم لنفس البلاغ
+  (`AddReportReply`)، ورد الموقع يصل للاعب في الشات إن كان داخل اللعبة.
+- **السجل:** كل عملية في لوحة اللعبة تُكتب في سجل الموقع (`GameLog`، تبدأ بـ «In game:»)، وكل عملية من الموقع تظهر
+  في سجل اللعبة تحت النوع «الموقع» (`exports.w_admin:SiteLog`). لا يرجع السطر لمصدره.

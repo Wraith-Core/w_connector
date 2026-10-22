@@ -68,7 +68,7 @@ Registry.invoke('adminpanel:scheduleRestart', 'schedule_restart', function(actor
     minutes = H.clamp(minutes, 1, 60, nil)
     if not minutes then return H.fail('invalid_minutes') end
 
-    ConnectorAnnounce(('Server restarting in %d minute(s).'):format(minutes), 30)
+    ConnectorAnnounce(('سيُعاد تشغيل السيرفر بعد %d دقيقة.'):format(minutes), 30)
     Log.write(actor, 'server_event', 'Scheduled restart', ('%d minutes'):format(minutes),
         { severity = 'high' })
 
@@ -79,6 +79,23 @@ Registry.invoke('adminpanel:scheduleRestart', 'schedule_restart', function(actor
     return H.ok(('restart_in_%d_minutes'):format(minutes))
 end)
 
+--- THE switch that closes the server to players (2026-10-22: one for the website, w_admin and w_core's
+--- /closeserver -- w_core used to keep its own in memory). Kept in wc_settings (sv_queue.lua), so a
+--- closed server stays closed across a restart; staff still get in (the queue's gate).
+local function setClosed(want, by)
+    ServerState.closed = want
+    if Entry and Entry.saveSetting then Entry.saveSetting('closed', want, by or 'Web Admin') end
+    ConnectorAnnounce(want and 'السيرفر مغلق الآن أمام اللاعبين، والإدارة فقط تستطيع الدخول.' or 'السيرفر مفتوح للاعبين من جديد.')
+end
+
+exports('SetServerClosed', function(closed, by)
+    setClosed(closed == true, by)
+    Log.write({ label = by or 'console' }, 'server_event', closed and 'Closed server to players' or 'Reopened server', nil,
+        { severity = 'high' })
+    return true
+end)
+exports('IsServerClosed', function() return ServerState.closed == true end)
+
 Registry.invoke('adminpanel:closeServerForPlayers', 'close_server_for_players', function(actor, args)
     -- Accept an explicit value so the panel can set the state rather than only toggling it; a toggle
     -- against a state the page has not re-read is how a server ends up closed by accident.
@@ -87,10 +104,7 @@ Registry.invoke('adminpanel:closeServerForPlayers', 'close_server_for_players', 
     if type(args) == 'boolean' then want = args end
     if want == nil then want = not ServerState.closed end
 
-    ServerState.closed = want
-    -- kept in wc_settings (sv_queue.lua), so a closed server stays closed across a restart
-    if Entry and Entry.saveSetting then Entry.saveSetting('closed', want, actor.label or 'Web Admin') end
-    ConnectorAnnounce(want and 'The server is now closed to new players.' or 'The server is open again.')
+    setClosed(want, actor.label or 'Web Admin')
     Log.write(actor, 'server_event', want and 'Closed server to players' or 'Reopened server', nil,
         { severity = 'high' })
     return { success = true, closed = want }

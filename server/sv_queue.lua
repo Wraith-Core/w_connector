@@ -316,51 +316,21 @@ end
 --  Bans and whitelist
 -- ---------------------------------------------------------------------------
 
-local function activeBanFor(ids)
-    local clauses, values = {}, {}
-    -- One at a time rather than from a table literal: a nil in the middle of an array literal
-    -- truncates it, so half the identifiers would silently never be checked.
-    local function match(column, value)
-        if not value or value == '' then return end
-        clauses[#clauses + 1] = ('`%s` = ?'):format(column)
-        values[#values + 1] = value
-    end
-    match('identifier', ids.license)
-    match('identifier', ids.steam and ('steam:' .. ids.steam) or nil)
-    match('steam_hex', ids.steam)
-    match('discord_id', ids.discord)
-    if #clauses == 0 then return nil end
-
-    return MySQL.single.await(
-        'SELECT `id`, `reason`, `expiry_date`, `ban_type` FROM `wc_bans` WHERE `is_active` = 1 AND (' ..
-        table.concat(clauses, ' OR ') .. ') ORDER BY `ban_date` DESC LIMIT 1', values)
-end
-
---- nil when the join may go on, otherwise the text to refuse it with.
+--- nil when the join may go on, otherwise the text to refuse it with. The server's one ban store is
+--- w_core's `bans` (2026-10-22): a ban from the website, from w_admin or from the anti-cheat keeps the
+--- player out here, by license, Steam or Discord. An expired ban is closed there on contact.
 local function banCheck(ids)
-    local ok, ban = pcall(activeBanFor, ids)
+    if GetResourceState('w_core') ~= 'started' then return nil end
+    local ok, ban, text = pcall(function() return exports.w_core:CheckBan(ids) end)
     if not ok then
         print('^3[w_connector] [queue] ban check failed, allowing the join: ' .. tostring(ban) .. '^0')
         return nil
     end
     if not ban then return nil end
-
-    -- oxmysql hands a TIMESTAMP back as milliseconds; a text date is read too, in case.
-    local when
-    if tonumber(ban.expiry_date) then
-        when = math.floor(tonumber(ban.expiry_date) / 1000)
-    elseif ban.expiry_date then
-        local y, m, d, hh, mm, ss = tostring(ban.expiry_date):match('(%d+)-(%d+)-(%d+)[T ](%d+):(%d+):(%d+)')
-        when = y and os.time({ year = tonumber(y), month = tonumber(m), day = tonumber(d),
-                               hour = tonumber(hh), min = tonumber(mm), sec = tonumber(ss) })
-    end
-    -- An expired temporary ban is lifted on contact rather than left to a sweeper.
-    if ban.ban_type == 'temporary' and when and when <= os.time() then
-        pcall(MySQL.update.await, 'UPDATE `wc_bans` SET `is_active` = 0 WHERE `id` = ?', { ban.id })
-        return nil
-    end
-    local tail = when and t('ban_until'):format(os.date('%Y-%m-%d %H:%M', when)) or t('ban_perm')
-    return t('banned'):format(ban.reason ~= nil and ban.reason ~= '' and ban.reason or t('no_reason'), tail)
+    local reason = ban.reason ~= nil and ban.reason ~= '' and ban.reason or t('no_reason')
+    local when = tonumber(ban.expire)
+    local tail = (when and when < 2147483647) and t('ban_until'):format(os.date('%Y-%m-%d %H:%M', when)) or t('ban_perm')
+    return t('banned'):format(reason, tail)
 end
 
 --- true / false, or nil when the database could not answer. Matches by Steam OR Discord.
