@@ -88,7 +88,11 @@ local function runAction(a)
                 return
             end
         end
+        local started = GetGameTimer()
         local ok, result, err = Registry.callInvoke(actor, rd.name, rd.args)
+        -- a slow handler is named (the website times out at 15-30 s; "the panel is slow" needs a culprit)
+        local took = GetGameTimer() - started
+        if took > 3000 then print(('^3[w_connector] warn: %s took %d ms^0'):format(tostring(rd.name), took)) end
         if rid then
             local delivered = ok and not (type(result) == 'table' and result.success == false)
             if delivered then

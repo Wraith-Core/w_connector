@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '1.1.8'
+version '1.1.9'
 description 'Red River Connector — executes what the Red River website asks, and reports what it needs. No in-game interface.'
 
 -- There is deliberately no `ui_page` and no `files {}` here.
@@ -37,6 +37,7 @@ server_scripts {
     'server/sv_perms.lua',
     'server/sv_log.lua',
     'server/sv_players.lua',
+    'server/sv_discordranks.lua', -- a rank bound to a Discord role goes to its holders in game too (roles from the site)
     'server/sv_registry.lua',  -- the handler table, before anything registers into it
     'server/handlers/admins.lua',
     'server/handlers/adminchat.lua',

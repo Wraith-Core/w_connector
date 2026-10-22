@@ -59,12 +59,19 @@ Registry.invoke('adminpanel:saveRole', 'manage_permissions', function(actor, arg
     local sent = type(args.permissions) == 'table' and args.permissions or {}
     for _, node in ipairs(sent) do
         if node == '*' then
-            -- the website's "everything": every website node (in-game power is given in game)
-            for _, cat in ipairs(PERMISSION_NODES) do for _, n in ipairs(cat.nodes) do add(n) end end
+            -- the website's "everything": every website node and the in-game panel (group.mod); the in-game
+            -- admin and god levels are given only when ticked one by one
+            for _, cat in ipairs(PERMISSION_NODES) do
+                for _, n in ipairs(cat.nodes) do
+                    if n ~= 'group.admin' and n ~= 'group.god' then add(n) end
+                end
+            end
         elseif web[node] then
             add(node)
         end
     end
+    -- staff who may use the website panel open the in-game one too (owner, 2026-10-23)
+    if seen['access_admin_panel'] and not seen['group.admin'] and not seen['group.god'] then add('group.mod') end
 
     local ok, err = api:RanksSave(0, {
         name = name,
@@ -129,72 +136,12 @@ Registry.invoke('adminpanel:getDiscordRoles', 'manage_permissions', function()
     return { roles = roles }
 end)
 
---- The Discord role a member holds, translated into the highest-ranked matching w_connector role.
-local function roleFromDiscord(discordId)
-    if Config.discordToken == '' or Config.discordGuild == '' or not discordId or discordId == '' then
-        return nil
-    end
-    local p = promise.new()
-    local settled = false
-    local function done(v) if not settled then settled = true; p:resolve(v) end end
-    PerformHttpRequest(('%s/guilds/%s/members/%s'):format(DISCORD_API, Config.discordGuild, discordId),
-        function(code, body)
-            if code == 200 and body and body ~= '' then
-                local ok, data = pcall(json.decode, body)
-                done(ok and data or nil)
-            else
-                done(nil)
-            end
-        end, 'GET', '', { ['Authorization'] = 'Bot ' .. Config.discordToken })
-    SetTimeout(8000, function() done(nil) end)
-
-    local member = Citizen.Await(p)
-    if type(member) ~= 'table' or type(member.roles) ~= 'table' then return nil end
-
-    local held = {}
-    for _, id in ipairs(member.roles) do held[tostring(id)] = true end
-
-    local best
-    for _, role in ipairs(Perms.list()) do
-        if role.discordRoleId ~= '' and held[role.discordRoleId] then
-            if not best or role.lvl > best.lvl then best = role end
-        end
-    end
-    return best
-end
-
 Registry.invoke('adminpanel:syncDiscordRoles', 'manage_permissions', function(actor)
     if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
-    if Config.discordToken == '' or Config.discordGuild == '' then
-        return H.fail('discord_not_configured')
-    end
-    local api = Perms.core()
-    if not api then return H.fail('ranks_unavailable') end
-
-    -- Only adds: a rank tied to a Discord role is given to the online players holding that role.
-    -- It takes nothing away (a rank may also have been given by hand, in game or here).
-    local changed, checked = 0, 0
-    for _, sid in ipairs(Players.online()) do
-        local p = Players.get(sid)
-        if p and p.discordId then
-            checked = checked + 1
-            local role = roleFromDiscord(p.discordId)
-            if role then
-                local okR, held = pcall(function() return api:RanksOfPlayer(sid) end)
-                local has = false
-                for _, r in ipairs(okR and held or {}) do if r == role.name then has = true end end
-                if not has then
-                    local ok = api:RanksAssign(0, { source = sid }, role.name)
-                    if ok then changed = changed + 1 end
-                end
-            end
-            -- Spaced so a full server does not become a burst of member lookups against Discord.
-            Wait(200)
-        end
-    end
-    Perms.load()
-
-    Log.write(actor, 'admin_action', 'Synced Discord roles',
-        ('%d checked, %d updated'):format(checked, changed))
-    return H.ok(('%d checked, %d updated'):format(checked, changed))
+    if not Perms.core() then return H.fail('ranks_unavailable') end
+    -- the same sync as on join and every 10 minutes (sv_discordranks.lua): the roles come from the website,
+    -- whose bot is in the panel's Discord; a rank a role gave is taken back when the role is gone
+    local checked, given, taken = DiscordRanks.syncAll()
+    Log.write(actor, 'admin_action', 'Synced Discord roles', ('%d checked, +%d -%d'):format(checked, given, taken))
+    return H.ok(('%d checked, +%d -%d'):format(checked, given, taken))
 end)

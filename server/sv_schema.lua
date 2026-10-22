@@ -305,6 +305,11 @@ PERMISSION_NODES = {
         'system.tribes', 'system.kingdoms', 'system.stables', 'system.stores', 'system.planes', 'system.doors',
         'system.pets', 'system.baloot', 'system.guard',
     } },
+    --- 2026-10-23 (owner): the in-game admin level a rank gives, set from the website too, so staff with
+    --- website permissions also open w_admin in game (group.mod is the panel; admin and god go further).
+    { category = 'Game', nodes = {
+        'group.mod', 'group.admin', 'group.god', 'wraithadmin.join',
+    } },
     --- The way in (server/sv_queue.lua): the join queue, its priorities, the whitelist and closed switches.
     { category = 'Queue', nodes = {
         'queue.view', 'queue.manage',
