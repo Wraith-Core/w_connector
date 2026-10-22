@@ -70,7 +70,34 @@ local function runAction(a)
     -- `adminpanel:scheduleRestart` and a string to `adminpanel:sendAnnouncement`.
     if a.type == 'invoke' then
         local rd = type(data) == 'table' and data or {}
+        -- A call with a requestId runs once: a store delivery retried after a timeout that had in fact
+        -- run must not grant twice (2026-10-22). The first one claims the id; a second answers from
+        -- the stored result, or 'in_progress' while the first still runs (the site retries later).
+        local rid = type(rd.requestId) == 'string' and rd.requestId ~= '' and #rd.requestId <= 80 and rd.requestId or nil
+        if rid then
+            -- affected rows: 1 = this call claimed the id, 0 = it was there already
+            local claimed = MySQL.update.await(
+                'INSERT IGNORE INTO `wc_requests` (`id`, `name`, `state`, `created_at`) VALUES (?, ?, ?, ?)',
+                { rid, H.str(rd.name, 64), 'running', os.time() })
+            local row = (not claimed or claimed == 0) and MySQL.single.await(
+                'SELECT `state`, `result` FROM `wc_requests` WHERE `id` = ?', { rid }) or nil
+            if row then
+                if row.state ~= 'done' then report(a.id, false, 'in_progress') return end
+                local okDec, prev = pcall(json.decode, row.result or 'null')
+                report(a.id, true, nil, okDec and prev or nil)
+                return
+            end
+        end
         local ok, result, err = Registry.callInvoke(actor, rd.name, rd.args)
+        if rid then
+            local delivered = ok and not (type(result) == 'table' and result.success == false)
+            if delivered then
+                MySQL.update.await('UPDATE `wc_requests` SET `state` = ?, `result` = ? WHERE `id` = ?',
+                    { 'done', result ~= nil and json.encode(result) or 'null', rid })
+            else
+                MySQL.update.await('DELETE FROM `wc_requests` WHERE `id` = ?', { rid })
+            end
+        end
         report(a.id, ok, err, result)
         return
     end
@@ -188,6 +215,11 @@ end
 
 CreateThread(function()
     Schema.await()
+    -- requestIds are kept 30 days; one left 'running' by a crash mid-call is released for a retry
+    pcall(function()
+        MySQL.update.await('DELETE FROM `wc_requests` WHERE `created_at` < ? OR (`state` = ? AND `created_at` < ?)',
+            { os.time() - 30 * 86400, 'running', os.time() - 600 })
+    end)
     Wait(3000)
 
     local masked = (#Config.apiKey > 10)
@@ -203,10 +235,12 @@ CreateThread(function()
     -- print(('^2[w_connector]^0 %d callbacks, %d reads, %d actions registered.')
         -- :format(count(Registry.invokes), count(Registry.reads), count(Registry.actions)))
 
+    local backoff = 0
     while true do
-        local done = false
+        local done, lastCode = false, nil
         PerformHttpRequest(ENDPOINT .. '/next?wait=' .. Config.pollWait, function(code, body)
             done = true
+            lastCode = code
             if code == 200 and body and body ~= '' then
                 local ok, data = pcall(json.decode, body)
                 if ok and type(data) == 'table' and data.action then
@@ -231,6 +265,13 @@ CreateThread(function()
             Wait(500)
             guard = guard + 0.5
         end
-        Wait(150)
+        -- the site down or refusing: wait longer each time (1 s up to 30 s) instead of every 150 ms
+        if done and lastCode == 200 then
+            backoff = 0
+            Wait(150)
+        else
+            backoff = backoff == 0 and 1000 or math.min(30000, backoff * 2)
+            Wait(backoff)
+        end
     end
 end)

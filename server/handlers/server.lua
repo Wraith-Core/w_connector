@@ -39,6 +39,13 @@ local function forward(eventName, ...)
     return H.ok()
 end
 
+--- Red River runs w_weathersync (exports setTime / setWeather / setTimeFreeze), not weathersync: the
+--- website's weather and time buttons answered weathersync_missing there (2026-10-22). Its setters
+--- answer false for a value they refuse.
+local function wsync()
+    return GetResourceState('w_weathersync') == 'started' and exports.w_weathersync or nil
+end
+
 Registry.invoke('adminpanel:sendAnnouncement', 'send_announcement', function(actor, args)
     -- Bare string OR { message, seconds? }: seconds on screen (3-1800, w_hud clamps; nil = 10).
     local message = (type(args) == 'string') and args or H.str(type(args) == 'table' and (args.message or args.text) or nil, 500)
@@ -128,8 +135,16 @@ Registry.invoke('adminpanel:server:setTime', 'server.time.control', function(act
     local hour = H.clamp(args.hour, 0, 23, 12)
     local min = H.clamp(args.min, 0, 59, 0)
     local sec = H.clamp(args.sec, 0, 59, 0)
-    local res = forward('weathersync:setTime', day, hour, min, sec,
-        H.int(args.transition, 0) or 0, args.freeze and true or false)
+    local res
+    local ws = wsync()
+    if ws then
+        local ok, set = pcall(function() return ws:setTime(hour, min) end)
+        res = (ok and set ~= false) and H.ok() or H.fail('invalid_time')
+        if res.success and args.freeze ~= nil then pcall(function() ws:setTimeFreeze(args.freeze and true or false) end) end
+    else
+        res = forward('weathersync:setTime', day, hour, min, sec,
+            H.int(args.transition, 0) or 0, args.freeze and true or false)
+    end
     if res.success then
         Log.write(actor, 'server_event', 'Set time', ('%02d:%02d:%02d'):format(hour, min, sec))
     end
@@ -140,8 +155,15 @@ Registry.invoke('adminpanel:server:setWeather', 'server.weather.control', functi
     args = type(args) == 'table' and args or {}
     local weather = H.str(args.weather, 64)
     if weather == '' then return H.fail('missing_weather') end
-    local res = forward('weathersync:setWeather', weather, H.int(args.transition, 0) or 0,
-        args.freeze and true or false, args.permanentSnow and true or false)
+    local res
+    local ws = wsync()
+    if ws then
+        local ok, set = pcall(function() return ws:setWeather(weather) end)
+        res = (ok and set ~= false) and H.ok() or H.fail('unknown_weather')
+    else
+        res = forward('weathersync:setWeather', weather, H.int(args.transition, 0) or 0,
+            args.freeze and true or false, args.permanentSnow and true or false)
+    end
     if res.success then Log.write(actor, 'server_event', 'Set weather', weather) end
     return res
 end)
@@ -150,6 +172,7 @@ Registry.invoke('adminpanel:server:setTimescale', 'server.timescale.control', fu
     args = type(args) == 'table' and args or {}
     local scale = H.clamp(args.timescale, 0, 100, nil)
     if not scale then return H.fail('invalid_timescale') end
+    if wsync() and not weathersyncReady() then return H.fail('not_supported_here') end
     local res = forward('weathersync:setTimescale', scale)
     if res.success then Log.write(actor, 'server_event', 'Set timescale', tostring(scale)) end
     return res
@@ -157,6 +180,7 @@ end)
 
 Registry.invoke('adminpanel:server:setWind', 'server.wind.control', function(actor, args)
     args = type(args) == 'table' and args or {}
+    if wsync() and not weathersyncReady() then return H.fail('not_supported_here') end
     local res = forward('weathersync:setWind',
         H.clamp(args.windDirection, 0, 360, 0), H.clamp(args.windSpeed, 0, 100, 0),
         args.freeze and true or false)
@@ -168,6 +192,7 @@ Registry.invoke('adminpanel:server:setSyncDelay', 'server.syncdelay.control', fu
     args = type(args) == 'table' and args or {}
     local delay = H.clamp(args.syncDelay, 0, 600000, nil)
     if not delay then return H.fail('invalid_delay') end
+    if wsync() and not weathersyncReady() then return H.fail('not_supported_here') end
     local res = forward('weathersync:setSyncDelay', delay)
     if res.success then Log.write(actor, 'server_event', 'Set sync delay', tostring(delay)) end
     return res

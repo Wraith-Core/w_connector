@@ -134,7 +134,10 @@ function Perms.actorFrom(raw)
         group = role.name,
         level = role.lvl,
         label = raw.label or raw.name or 'Web Admin',
-        identifier = raw.identifier or raw.license,
+        -- the site sends no license: its Discord id names the staff member in wc_logs (2026-10-22, web
+        -- actions had an empty admin_identifier, so per-admin logs never found them)
+        identifier = raw.identifier or raw.license
+            or (raw.discord and ('discord:' .. tostring(raw.discord):gsub('%D', ''))) or nil,
         discord = raw.discord and tostring(raw.discord):gsub('%D', '') or nil,
     }
 end

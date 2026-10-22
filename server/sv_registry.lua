@@ -42,11 +42,59 @@ function Registry.invoke(name, node, fn) define(Registry.invokes, name, node, fn
 function Registry.read(name, node, fn)   define(Registry.reads,   name, node, fn) end
 function Registry.action(name, node, fn) define(Registry.actions, name, node, fn) end
 
+--- The rank a call's target player holds, or nil (no target, or not staff). Every identifier we can
+--- name for him counts: the one the website sent, and all of the live player's.
+local PLAYER_KEYS = { 'source', 'target', 'citizenid', 'citizenId', 'identifier', 'playerId', 'characterId', 'charId' }
+local function targetRank(args)
+    if type(args) ~= 'table' or type(H) ~= 'table' or not H.playerRef then return nil, {} end
+    -- the player reference the panel sends ({player = {...}}), or only the player fields of the args:
+    -- a bare `id` is a warning, a ban or a report as often as a character, so it never names a target
+    local probe = args
+    if type(args.player) ~= 'table' and type(args.targetPlayer) ~= 'table' then
+        probe = {}
+        for _, k in ipairs(PLAYER_KEYS) do probe[k] = args[k] end
+    end
+    local ok, ref = pcall(H.playerRef, probe)
+    if not ok or type(ref) ~= 'table' then return nil, {} end
+    local ids = {}
+    if type(ref.identifier) == 'string' and ref.identifier ~= '' then ids[#ids + 1] = ref.identifier end
+    local okSrc, src = pcall(H.liveSource, ref)
+    if okSrc and src then
+        for _, id in ipairs(GetPlayerIdentifiers(src) or {}) do ids[#ids + 1] = id end
+    end
+    local best
+    for _, id in ipairs(ids) do
+        local admin = Perms.adminOf(id)
+        if admin and (not best or Perms.level(admin.group) > Perms.level(best.group)) then best = admin end
+    end
+    return best, ids
+end
+
+--- A staff member acts on players below his own rank only (2026-10-22: a helper could ban, freeze or
+--- wipe the master from the site; only adminAction checked). The master acts on anyone, anyone acts on
+--- himself, and reads (get*, lookups) are not limited. Answers the error string, or nil to go on.
+local function rankGuard(actor, name, args)
+    if Perms.isMaster(actor) then return nil end
+    local bare = tostring(name or ''):gsub('^adminpanel:', '')
+    if bare:lower():find('^get') or bare:find('Lookup') then return nil end
+    local target, ids = targetRank(args)
+    if not target then return nil end
+    if actor.discord then
+        for _, id in ipairs(ids) do
+            if id == 'discord:' .. actor.discord then return nil end
+        end
+    end
+    if Perms.outranks(actor, target.group) then return nil end
+    return 'target_outranks_you'
+end
+
 --- Run one entry under an actor.
 --- Returns `ok, result, err` where `err` is one of the website's documented error strings.
-local function run(entry, actor, args, missing)
+local function run(entry, actor, args, missing, name)
     if not entry then return false, nil, missing end
     if not Perms.has(actor, entry.node) then return false, nil, 'no_permission' end
+    local refused = rankGuard(actor, name, args)
+    if refused then return false, nil, refused end
     local ok, res = pcall(entry.fn, actor, args)
     if not ok then
         print(('^1[w_connector] handler error:^0 %s'):format(tostring(res)))
@@ -56,15 +104,15 @@ local function run(entry, actor, args, missing)
 end
 
 function Registry.callInvoke(actor, name, args)
-    return run(Registry.invokes[name], actor, args, 'unknown_callback')
+    return run(Registry.invokes[name], actor, args, 'unknown_callback', name)
 end
 
 function Registry.callRead(actor, name, args)
-    return run(Registry.reads[name], actor, args, 'unknown_read')
+    return run(Registry.reads[name], actor, args, 'unknown_read', 'get')
 end
 
 function Registry.callAction(actor, name, args)
-    return run(Registry.actions[name], actor, args, 'unsupported')
+    return run(Registry.actions[name], actor, args, 'unsupported', name)
 end
 
 function Registry.hasInvoke(name) return Registry.invokes[name] ~= nil end

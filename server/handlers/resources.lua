@@ -6,6 +6,10 @@ local PROTECTED = {
     [GetCurrentResourceName()] = true,
     oxmysql = true, vorp_core = true, sessionmanager = true,
     ['sessionmanager-rdr3'] = true, hardcap = true, spawnmanager = true,
+    -- the server's own core (2026-10-22): stopping one of these from the site takes the server down
+    -- with it (every script depends on w_lib / w_core / w_inventory; w_guard and w_deploy guard it)
+    w_lib = true, w_core = true, w_inventory = true, w_centralbank = true, w_guard = true,
+    w_deploy = true, ['pma-voice'] = true,
 }
 
 Registry.invoke('GetResourceLookupData', Registry.OPEN, function()

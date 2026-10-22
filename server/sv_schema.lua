@@ -238,6 +238,18 @@ local STATEMENTS = {
         UNIQUE KEY `uniq_order` (`order_id`),
         INDEX `idx_identifier` (`identifier`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci]],
+
+    --- Calls the website sends with a requestId (store deliveries, 2026-10-22): a retry after a timeout
+    --- that had in fact run is answered from here instead of granting twice. `state` 'running' while
+    --- it runs, 'done' with the answer after; a failed call is deleted so a retry may run it again.
+    [[CREATE TABLE IF NOT EXISTS `wc_requests` (
+        `id` VARCHAR(80) NOT NULL PRIMARY KEY,
+        `name` VARCHAR(64) NOT NULL DEFAULT '',
+        `state` VARCHAR(10) NOT NULL DEFAULT 'running',
+        `result` TEXT,
+        `created_at` INT NOT NULL DEFAULT 0,
+        INDEX `idx_created` (`created_at`)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci]],
 }
 
 --- The permission vocabulary. This list IS the contract with the website: the Roles tab renders it
