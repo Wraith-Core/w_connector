@@ -72,9 +72,19 @@ Registry.invoke('adminpanel:scheduleRestart', 'schedule_restart', function(actor
     Log.write(actor, 'server_event', 'Scheduled restart', ('%d minutes'):format(minutes),
         { severity = 'high' })
 
-    SetTimeout(minutes * 60000, function()
-        print('^3[w_connector]^0 scheduled restart firing now.')
-        ExecuteCommand('quit Scheduled restart')
+    -- 2026-10-22: through the deploy agent when it runs here (w_deploy RequestRestart): its own restart --
+    -- the players' 3-minute countdown, then quit, then txAdmin brings the server back -- asked for so it
+    -- ends when the announced time does. A bare quit only on a server without it.
+    local COUNTDOWN = 180
+    SetTimeout(math.max(0, minutes * 60 - COUNTDOWN) * 1000, function()
+        if GetResourceState('w_deploy') == 'started' then
+            local ok, taken = pcall(function() return exports.w_deploy:RequestRestart('scheduled by ' .. tostring(actor.label or 'website')) end)
+            if ok and taken then return end
+        end
+        SetTimeout(math.min(minutes * 60, COUNTDOWN) * 1000, function()
+            print('^3[w_connector]^0 scheduled restart firing now (no deploy agent: plain quit).')
+            ExecuteCommand('quit Scheduled restart')
+        end)
     end)
     return H.ok(('restart_in_%d_minutes'):format(minutes))
 end)
