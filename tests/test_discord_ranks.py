@@ -16,7 +16,8 @@ DB = 'w_connector_dranks_test'
 STUBS = r'''
 Config = { endpoint = 'https://site/api/fivem/devadmin', apiKey = 'k' }
 Schema = { await = function() end }
-function CreateThread(fn) if not SKIP_THREADS then fn() end end
+THREADS = 0
+function CreateThread(fn) THREADS = THREADS + 1; if THREADS == 1 then fn() end end  -- the table, not the 10-minute loop
 function SetTimeout() end
 function Wait() end
 function AddEventHandler() end
