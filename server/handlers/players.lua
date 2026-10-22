@@ -75,6 +75,7 @@ local function onlineRow(sid)
         jobGrade = (snap and snap.jobGrade) or cached.jobGrade or 0,
         money = (snap and snap.money) or 0,
         gold = (snap and snap.gold) or 0,
+        bank = (snap and snap.rol) or 0,
         level = (snap and snap.xp) or 0,
         playtime = playtimeOf((snap and snap.charId) or cached.id),
         lastLogin = cached.lastLogin,
@@ -106,6 +107,7 @@ local function offlineRow(r, playtimes)
         jobGrade = tonumber(r.jobgrade) or 0,
         money = tonumber(r.money) or 0,
         gold = tonumber(r.gold) or 0,
+        bank = tonumber(r.rol) or 0,
         level = tonumber(r.xp) or 0,
         playtime = playtimes[tonumber(r.charidentifier)] or 0,
         lastLogin = r.LastLogin,
@@ -348,7 +350,8 @@ Registry.invoke('getAvailableJobs', 'set.jobwithgrade', function()
     local out = {}
     for name, def in pairs(jobs) do
         if type(def) == 'table' then
-            out[#out + 1] = { name = name, label = def.label or name, grades = def.grades or def.Grades }
+            -- the Arabic name first (Wraith Core's jobs carry label_ar; the panel speaks Arabic)
+            out[#out + 1] = { name = name, label = def.label_ar or def.label or name, grades = def.grades or def.Grades }
         else
             out[#out + 1] = { name = name, label = tostring(def) }
         end
@@ -689,6 +692,36 @@ Registry.action('message', 'player.message', function(actor, args)
     Log.write(actor, 'admin_action', 'Sent private message', message,
         { name = ref.username, identifier = ref.identifier })
     return H.ok()
+end)
+
+--- The same code as w_admin's console runs these (exports.w_admin:SitePlayerAction, 2026-10-22): one
+--- implementation for both panels. The registry already checked the node and the rank guard.
+local function consoleAction(actor, args, verb, values, what)
+    local ref, live = targetOf(args)
+    if not live then return H.fail('player_not_online') end
+    if GetResourceState('w_admin') ~= 'started' then return H.fail('not_supported_here') end
+    local ok, res = pcall(function() return exports.w_admin:SitePlayerAction(verb, live, values) end)
+    if not ok or type(res) ~= 'table' then return H.fail('update_failed') end
+    if not res.ok then return H.fail(res.error or 'update_failed') end
+    Log.write(actor, 'player_action', what, json.encode(values), { name = ref.username, identifier = ref.identifier })
+    return H.ok()
+end
+
+--- Move a player to a point on the map (the website's town list, or typed coordinates). No height:
+--- the player is put on the ground there.
+Registry.action('teleportCoords', 'player.teleport.bring', function(actor, args)
+    args = type(args) == 'table' and args or {}
+    local x, y = tonumber(args.x), tonumber(args.y)
+    if not x or not y then return H.fail('err_invalid_coords') end
+    return consoleAction(actor, args, 'tpCoords', { x = x, y = y, z = tonumber(args.z) }, 'Teleported player')
+end)
+
+--- Food and water to a value (0-100); the panel's button fills both. Under the heal node: it is care.
+Registry.action('setNeeds', 'player.heal', function(actor, args)
+    args = type(args) == 'table' and args or {}
+    local hunger, thirst = tonumber(args.hunger), tonumber(args.thirst)
+    if not hunger and not thirst then return H.fail('err_invalid_value') end
+    return consoleAction(actor, args, 'needs', { hunger = hunger, thirst = thirst }, 'Set food and water')
 end)
 
 --- Teleports run server-side. `SetEntityCoords` works on a server-owned entity handle, so there is
