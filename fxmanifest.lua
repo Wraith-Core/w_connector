@@ -45,7 +45,8 @@ server_scripts {
     'server/handlers/logs.lua',
     'server/handlers/players.lua',
     'server/handlers/characters.lua',
-    'server/handlers/console.lua',     -- w_admin's own pages the website runs: news, the world's cycle -- a character's record: block, citizen id, delete, level (w_admin / w_level code)
+    'server/handlers/console.lua',     -- w_admin's own pages the website runs: news, the world's cycle
+    'server/handlers/systems.lua',     -- each system's board (its SiteAdmin export) and the economy -- a character's record: block, citizen id, delete, level (w_admin / w_level code)
     'server/handlers/reports.lua',
     'server/handlers/resources.lua',
     'server/handlers/roles.lua',

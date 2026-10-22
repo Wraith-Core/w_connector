@@ -299,6 +299,12 @@ PERMISSION_NODES = {
         'server.wind.control', 'server.syncdelay.control',
         'console.news', -- 2026-10-22: the pause menu's news (w_admin's News page)
     } },
+    --- 2026-10-22: each system's admin board on the website (handlers/systems.lua), one node per system
+    { category = 'Systems', nodes = {
+        'system.economy', 'system.farms', 'system.livestock', 'system.heists', 'system.missions', 'system.jobs',
+        'system.tribes', 'system.kingdoms', 'system.stables', 'system.stores', 'system.planes', 'system.doors',
+        'system.pets', 'system.baloot', 'system.guard',
+    } },
     --- The way in (server/sv_queue.lua): the join queue, its priorities, the whitelist and closed switches.
     { category = 'Queue', nodes = {
         'queue.view', 'queue.manage',
