@@ -66,12 +66,12 @@ end
 
 --- { account = 'society:<job>' | 'gang:<gang>', delta = dollars (+ from the reserve, - back to it), reason }
 function ECONOMY.adjust(args, by)
-    local cb = bank()
-    if not cb then return { ok = false, error = 'not_supported_here' } end
     local id = sharedAccount(args.account)
     if not id then return { ok = false, error = 'err_invalid_value' } end
     local delta = tonumber(args.delta)
     if not delta or delta ~= delta or delta == 0 or math.abs(delta) > 100000000 then return { ok = false, error = 'invalid_amount' } end
+    local cb = bank()
+    if not cb then return { ok = false, error = 'not_supported_here' } end
     delta = math.floor(delta * 100 + (delta >= 0 and 0.5 or -0.5)) / 100
     local reason = ('website %s: %s'):format(tostring(by or 'admin'), H.str(args.reason, 120))
     pcall(function() return cb:EnsureAccount(id, id:match(':(.+)$'), id:match('^(%w+):')) end)

@@ -21,8 +21,17 @@ TABLES = ('wc_warnings', 'wc_reports', 'wc_report_messages', 'wc_logs')
 
 STUBS = r'''
 Config = { warnKickThreshold = 3, webhooks = {}, showIpAddress = false }
-EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT, CONSOLE, CHARS, LEVEL, RUNS = {}, {}, {}, {}, {}, {}, {}, {}, {}
+EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT, CONSOLE, CHARS, LEVEL, RUNS, SYS = {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
+Perms = { has = function(actor, node) return node ~= 'system.guard' end }
 exports = setmetatable({
+  w_heists = {
+    SiteAdmin = function(_, op, args, by)
+      SYS[#SYS + 1] = { op = op, args = args, by = by }
+      if op == 'list' then return { ok = true, read = true, data = { { id = 1, name = 'Valentine bank' } } } end
+      if op == 'enable' then return { ok = true, data = { id = args.id } } end
+      return { ok = false, error = 'unknown_action' }
+    end,
+  },
   w_level = {
     AdminCitizen = function(_, cid, op, a, b, by)
       LEVEL[#LEVEL + 1] = { cid = cid, op = op, a = a, b = b, by = by }
@@ -87,7 +96,10 @@ H = {
 }
 REG = {}
 json = { encode = function(t) local parts = {} for k, v in pairs(t) do parts[#parts + 1] = k .. '=' .. tostring(v) end table.sort(parts) return table.concat(parts, ',') end }
-Registry = setmetatable({}, { __index = function(_, kind) return function(name, node, fn) REG[name] = fn end end })
+Registry = setmetatable({ invokes = {} }, { __index = function(_, kind) return function(name, node, fn)
+  REG[name] = fn
+  if kind == 'invoke' then rawget(Registry, 'invokes')[name] = { node = node, fn = fn } end
+end end })
 Log = Log or { write = function() end }
 '''
 
@@ -144,7 +156,7 @@ class OnePanel(unittest.TestCase):
             }
         ''')
         for f in ('server/sv_log.lua', 'server/handlers/reports.lua', 'server/handlers/players.lua',
-                  'server/handlers/characters.lua', 'server/handlers/console.lua'):
+                  'server/handlers/characters.lua', 'server/handlers/console.lua', 'server/handlers/systems.lua'):
             with open(os.path.join(ROOT, f), encoding='utf-8') as fh:
                 L.execute(fh.read())
 
@@ -289,6 +301,48 @@ class OnePanel(unittest.TestCase):
         self.assertTrue(self.L.eval('RUNS[1].payload.args.state'))
         self.assertEqual(self.L.eval("REG.setWorldCycle({ label = 'Web' }, { what = 'quit', state = true }).message"), 'err_invalid_value')
         self.assertEqual(self.L.eval("REG.setWorldCycle({ label = 'Web' }, { what = 'blackout', state = 'yes' }).message"), 'err_invalid_value')
+
+    # -- w_admin's Reports page runs the website's report handlers -----------------------------------
+
+    def test_game_reports_run_the_site_handlers_for_w_admin_only(self):
+        self.L.eval("EXPORTS.AddReport(4, 'help')")
+        self.L.execute("function GetInvokingResource() return INVOKER end")
+        self.L.execute("INVOKER = 'w_farming'")
+        self.assertEqual(self.L.eval("EXPORTS.GameReports('adminpanel:getReports', {}, 'Ali', 'license:ali').message"), 'forbidden')
+        self.L.execute("INVOKER = 'w_admin'")
+        out = self.L.eval("EXPORTS.GameReports('adminpanel:getReports', { status = 'all' }, 'Ali', 'license:ali')")
+        self.assertEqual(out['totalReports'], 1)
+        rid = out['reports'][1]['id']
+        out = self.L.eval("EXPORTS.GameReports('adminpanel:claimReport', { reportId = %d }, 'Ali', 'license:ali')" % rid)
+        self.assertTrue(out['success'])
+        self.assertEqual(self.sql('SELECT claimed_by FROM wc_reports')[0]['claimed_by'], 'Ali')
+        self.assertEqual(self.L.eval("EXPORTS.GameReports('adminpanel:saveRole', {}, 'Ali').message"), 'unknown_callback')
+        self.assertEqual(self.L.eval('SITE_LOG[#SITE_LOG].kind'), 'reports', "the game's own line, not the website's")
+
+    # -- the systems gateway ----------------------------------------------------------------------------
+
+    def test_systems_list_and_gateway(self):
+        listed = list(self.L.eval("REG.systemsList({ label = 'Web' }).systems").values())
+        self.assertIn('heists', listed)
+        self.assertNotIn('guard', listed, 'a system the staff member has no node for is left out')
+        out = self.L.eval("REG.systemAdmin({ label = 'Web' }, { system = 'heists', op = 'list' })")
+        self.assertTrue(out['success'])
+        self.assertEqual(out['data'][1]['name'], 'Valentine bank')
+        self.assertEqual(self.L.eval('SYS[1].by'), 'Web')
+        logs = len(self.sql('SELECT id FROM wc_logs'))
+        self.assertEqual(logs, 0, 'a read writes no log line')
+        out = self.L.eval("REG.systemAdmin({ label = 'Web' }, { system = 'heists', op = 'enable', args = { id = 3, on = false } })")
+        self.assertTrue(out['success'])
+        self.assertEqual(len(self.sql("SELECT id FROM wc_logs WHERE action = 'heists: enable'")), 1)
+        self.assertEqual(self.L.eval("REG.systemAdmin({ label = 'Web' }, { system = 'guard', op = 'state' }).message"), 'no_permission')
+        self.assertEqual(self.L.eval("REG.systemAdmin({ label = 'Web' }, { system = 'nope', op = 'x' }).message"), 'unknown_action')
+        self.assertEqual(self.L.eval("REG.systemAdmin({ label = 'Web' }, { system = 'heists', op = 'boom' }).message"), 'unknown_action')
+
+    def test_economy_only_touches_job_and_gang_accounts(self):
+        out = self.L.eval("REG.systemAdmin({ label = 'Web' }, { system = 'economy', op = 'adjust', args = { account = 'player:12:cash', delta = 5 } })")
+        self.assertEqual(out['message'], 'err_invalid_value')
+        out = self.L.eval("REG.systemAdmin({ label = 'Web' }, { system = 'economy', op = 'adjust', args = { account = 'central:reserve', delta = 5 } })")
+        self.assertEqual(out['message'], 'err_invalid_value')
 
     # -- one log ------------------------------------------------------------------------------------------
 
