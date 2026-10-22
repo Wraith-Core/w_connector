@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '1.1.6'
+version '1.1.7'
 description 'Red River Connector — executes what the Red River website asks, and reports what it needs. No in-game interface.'
 
 -- There is deliberately no `ui_page` and no `files {}` here.
@@ -44,6 +44,7 @@ server_scripts {
     'server/handlers/livemap.lua',
     'server/handlers/logs.lua',
     'server/handlers/players.lua',
+    'server/handlers/characters.lua', -- a character's record: block, citizen id, delete, level (w_admin / w_level code)
     'server/handlers/reports.lua',
     'server/handlers/resources.lua',
     'server/handlers/roles.lua',

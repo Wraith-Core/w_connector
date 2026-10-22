@@ -96,7 +96,8 @@ function Log.write(actor, actionType, action, details, target)
     end
 end
 
---- w_admin's in-game log line, stored for the website's Logs tab. Not sent back to w_admin, and not
+--- w_admin's in-game log line, stored for the website's Logs tab (via 'site': w_admin's own code run for
+--- the website, named after its staff member). Not sent back to w_admin, and not
 --- posted to Discord here (w_admin's own logger does that).
 local KIND_TYPE = { server = 'server_event', scripts = 'server_event', settings = 'server_event' }
 
@@ -114,7 +115,7 @@ exports('GameLog', function(e)
         admin_username    = clip(e.by or 'console', 100),
         admin_identifier  = clip(e.byIdentifier, 100),
         action_type       = (target.name or target.citizenid) and 'player_action' or KIND_TYPE[kind] or 'admin_action',
-        action            = clip(('In game: %s'):format(e.action ~= nil and e.action ~= '' and e.action or kind), 200),
+        action            = clip((e.via == 'site' and 'Website: %s' or 'In game: %s'):format(e.action ~= nil and e.action ~= '' and e.action or kind), 200),
         details           = tostring(e.text or ''),
         target_player     = clip(target.name or target.citizenid, 100),
         target_identifier = clip(target.citizenid, 100),

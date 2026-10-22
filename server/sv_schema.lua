@@ -276,6 +276,8 @@ PERMISSION_NODES = {
         'set.nickname', 'set.firstname', 'set.lastname', 'set.age', 'set.chardescription',
         'set.jobwithgrade', 'set.joblabel', 'set.jobgrade',
         'currency.addorremove', 'add.xp', 'remove.xp',
+        -- 2026-10-22: the character's record (w_admin's characters page) and the level (w_level)
+        'character.block', 'character.reassign', 'character.delete', 'set.level', 'xp.boost',
     } },
     { category = 'Whitelist', nodes = {
         'whitelist.view', 'whitelist.add', 'whitelist.edit',

@@ -56,6 +56,15 @@ end)
 --  Reads
 -- ---------------------------------------------------------------------------
 
+--- The player's level: w_level's when it runs (the framework's `xp` metadata is w_core's per-skill table).
+local function levelOf(sid, snap)
+    if GetResourceState('w_level') == 'started' then
+        local ok, n = pcall(function() return exports.w_level:GetPlayerLevel(sid) end)
+        if ok and tonumber(n) then return tonumber(n) end
+    end
+    return tonumber(snap and snap.xp) or 0
+end
+
 local function onlineRow(sid)
     local snap = Vorp.snapshot(sid)
     local cached = Players.get(sid) or {}
@@ -76,7 +85,7 @@ local function onlineRow(sid)
         money = (snap and snap.money) or 0,
         gold = (snap and snap.gold) or 0,
         bank = (snap and snap.rol) or 0,
-        level = (snap and snap.xp) or 0,
+        level = levelOf(sid, snap),
         playtime = playtimeOf((snap and snap.charId) or cached.id),
         lastLogin = cached.lastLogin,
         online = true,
@@ -108,7 +117,8 @@ local function offlineRow(r, playtimes)
         money = tonumber(r.money) or 0,
         gold = tonumber(r.gold) or 0,
         bank = tonumber(r.rol) or 0,
-        level = tonumber(r.xp) or 0,
+        -- with w_level the level is its own table: the profile reads it (getCharacterInfo), the list leaves it out
+        level = GetResourceState('w_level') ~= 'started' and (tonumber(r.xp) or 0) or nil,
         playtime = playtimes[tonumber(r.charidentifier)] or 0,
         lastLogin = r.LastLogin,
         online = false,
@@ -584,9 +594,19 @@ Registry.invoke('adminpanel:xpAction', 'add.xp', function(actor, args)
     -- over it broke every skill. The grant is exact and logged there (its trusted AdminAdjust export);
     -- an offline character is refused (staff use /addxp in game, which reaches a saved row).
     if GetResourceState('w_level') == 'started' then
-        if not live then return H.fail('player_not_online') end
-        local okL, done = pcall(function() return exports.w_level:AdminAdjust(live, delta, 'website') end)
-        if not okL or done ~= true then return H.fail('update_failed') end
+        local okL, done
+        if live then
+            okL, done = pcall(function() return exports.w_level:AdminAdjust(live, delta, 'website') end)
+        else
+            -- 2026-10-22: offline too, his saved row by the citizen id (w_level AdminCitizen, as /addxp)
+            local p = type(args.player) == 'table' and args.player or {}
+            local cid = p.citizenid or args.citizenid or ref.citizenid
+            if not cid then return H.fail('player_not_online') end
+            okL, done = pcall(function()
+                return exports.w_level:AdminCitizen(tostring(cid), removing and 'remove' or 'add', amount, nil, actor.label)
+            end)
+        end
+        if not okL or done ~= true then return H.fail('admin_console_error') end
         Log.write(actor, 'economy', removing and 'Removed XP' or 'Added XP', tostring(amount),
             { name = ref.username, identifier = ref.identifier })
         return H.ok()

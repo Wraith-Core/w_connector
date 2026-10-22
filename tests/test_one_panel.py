@@ -21,10 +21,25 @@ TABLES = ('wc_warnings', 'wc_reports', 'wc_report_messages', 'wc_logs')
 
 STUBS = r'''
 Config = { warnKickThreshold = 3, webhooks = {}, showIpAddress = false }
-EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT, CONSOLE = {}, {}, {}, {}, {}, {}
+EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT, CONSOLE, CHARS, LEVEL = {}, {}, {}, {}, {}, {}, {}, {}
 exports = setmetatable({
+  w_level = {
+    AdminCitizen = function(_, cid, op, a, b, by)
+      LEVEL[#LEVEL + 1] = { cid = cid, op = op, a = a, b = b, by = by }
+      if op == 'get' then return { level = 7, xp = 10, online = false } end
+      if op == 'boost' and cid == '12' then return false, 'player_not_online' end
+      return true
+    end,
+    AdminAdjust = function() return true end,
+  },
   w_admin = {
     SiteLog = function(_, e) SITE_LOG[#SITE_LOG + 1] = e end,
+    SiteCharacterAction = function(_, action, payload, by)
+      CHARS[#CHARS + 1] = { action = action, payload = payload, by = by }
+      if action == 'get' then return { ok = true, data = { citizenid = payload.citizenid, name = 'Saad' } } end
+      if action == 'delete' and payload.citizenid == '99' then return { ok = false, error = 'err_char_online' } end
+      return { ok = true, msg = 'toast_' .. action }
+    end,
     SitePlayerAction = function(_, verb, target, values)
       CONSOLE[#CONSOLE + 1] = { verb = verb, target = target, values = values }
       if verb == 'tpCoords' and not values.x then return { ok = false, error = 'err_invalid_coords' } end
@@ -121,7 +136,8 @@ class OnePanel(unittest.TestCase):
               update = { await = function(s, p) return py_update(s, p) end },
             }
         ''')
-        for f in ('server/sv_log.lua', 'server/handlers/reports.lua', 'server/handlers/players.lua'):
+        for f in ('server/sv_log.lua', 'server/handlers/reports.lua', 'server/handlers/players.lua',
+                  'server/handlers/characters.lua'):
             with open(os.path.join(ROOT, f), encoding='utf-8') as fh:
                 L.execute(fh.read())
 
@@ -211,6 +227,42 @@ class OnePanel(unittest.TestCase):
         out = self.L.eval("REG.setNeeds({ label = 'Web' }, { player = { source = 4 } })")
         self.assertEqual(out['message'], 'err_invalid_value')
         self.assertEqual(self.L.eval('#CONSOLE'), 0)
+
+    # -- a character's record: w_admin's characters page and w_level, offline too ----------------------
+
+    def test_character_actions_run_the_admin_page_with_the_staff_name(self):
+        out = self.L.eval("REG.getCharacterInfo({ label = 'Web' }, { player = { citizenid = '12' } })")
+        self.assertTrue(out['success'])
+        self.assertEqual(out['data']['name'], 'Saad')
+        self.assertEqual(out['data']['level']['level'], 7, 'the level comes from w_level')
+        out = self.L.eval("REG.blockCharacter({ label = 'Web' }, { player = { citizenid = '12' }, reason = 'cheat' })")
+        self.assertTrue(out['success'])
+        self.assertEqual(self.L.eval('CHARS[2].action'), 'block')
+        self.assertEqual(self.L.eval('CHARS[2].payload.reason'), 'cheat')
+        self.assertEqual(self.L.eval('CHARS[2].by'), 'Web')
+        out = self.L.eval("REG.deleteCharacter({ label = 'Web' }, { player = { citizenid = '99' }, token = 'abc123' })")
+        self.assertEqual(out['message'], 'err_char_online')
+        self.assertEqual(self.L.eval('CHARS[3].payload.token'), 'abc123')
+        out = self.L.eval("REG.deleteCharacter({ label = 'Web' }, { player = { citizenid = '99' }, token = 'bad token!' })")
+        self.assertIsNone(self.L.eval('CHARS[4].payload.token'), 'a token that is not plain letters is dropped')
+        out = self.L.eval("REG.blockCharacter({ label = 'Web' }, { player = {} })")
+        self.assertEqual(out['message'], 'player_not_found')
+
+    def test_level_and_boost_by_citizen_id(self):
+        out = self.L.eval("REG.setPlayerLevel({ label = 'Web' }, { player = { citizenid = '12' }, level = 9 })")
+        self.assertTrue(out['success'])
+        self.assertEqual((self.L.eval('LEVEL[1].op'), self.L.eval('LEVEL[1].a')), ('setlevel', 9))
+        out = self.L.eval("REG.xpBoost({ label = 'Web' }, { player = { citizenid = '12' }, multiplier = 2, minutes = 30 })")
+        self.assertEqual(out['message'], 'player_not_online')
+        self.assertEqual(self.L.eval('LEVEL[2].b'), 1800)
+        out = self.L.eval("REG.xpBoost({ label = 'Web' }, { player = { citizenid = '12' }, multiplier = 50, minutes = 30 })")
+        self.assertEqual(out['message'], 'err_invalid_value')
+
+    def test_offline_xp_goes_to_the_saved_row(self):
+        self.L.execute("Perms = { has = function() return true end }")
+        out = self.L.eval("REG['adminpanel:xpAction']({ label = 'Web' }, { player = { citizenid = '77' }, amount = 50, action = 'add' })")
+        self.assertTrue(out['success'])
+        self.assertEqual((self.L.eval('LEVEL[1].cid'), self.L.eval('LEVEL[1].op'), self.L.eval('LEVEL[1].a')), ('77', 'add', 50))
 
     # -- one log ------------------------------------------------------------------------------------------
 
