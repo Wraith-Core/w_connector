@@ -21,7 +21,7 @@ TABLES = ('wc_warnings', 'wc_reports', 'wc_report_messages', 'wc_logs')
 
 STUBS = r'''
 Config = { warnKickThreshold = 3, webhooks = {}, showIpAddress = false }
-EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT, CONSOLE, CHARS, LEVEL = {}, {}, {}, {}, {}, {}, {}, {}
+EXPORTS, SITE_LOG, CHAT, DROPPED, CLIENT, CONSOLE, CHARS, LEVEL, RUNS = {}, {}, {}, {}, {}, {}, {}, {}, {}
 exports = setmetatable({
   w_level = {
     AdminCitizen = function(_, cid, op, a, b, by)
@@ -34,6 +34,13 @@ exports = setmetatable({
   },
   w_admin = {
     SiteLog = function(_, e) SITE_LOG[#SITE_LOG + 1] = e end,
+    SiteRun = function(_, kind, payload, by)
+      RUNS[#RUNS + 1] = { kind = kind, payload = payload, by = by }
+      if kind == 'news' and payload.action == 'newsSave' and payload.rev ~= 'r1' then
+        return { ok = false, error = 'err_news_changed', data = { list = {}, rev = 'r2' } }
+      end
+      return { ok = true, msg = 'done', data = { list = {}, rev = 'r1', timeFrozen = false } }
+    end,
     SiteCharacterAction = function(_, action, payload, by)
       CHARS[#CHARS + 1] = { action = action, payload = payload, by = by }
       if action == 'get' then return { ok = true, data = { citizenid = payload.citizenid, name = 'Saad' } } end
@@ -137,7 +144,7 @@ class OnePanel(unittest.TestCase):
             }
         ''')
         for f in ('server/sv_log.lua', 'server/handlers/reports.lua', 'server/handlers/players.lua',
-                  'server/handlers/characters.lua'):
+                  'server/handlers/characters.lua', 'server/handlers/console.lua'):
             with open(os.path.join(ROOT, f), encoding='utf-8') as fh:
                 L.execute(fh.read())
 
@@ -263,6 +270,25 @@ class OnePanel(unittest.TestCase):
         out = self.L.eval("REG['adminpanel:xpAction']({ label = 'Web' }, { player = { citizenid = '77' }, amount = 50, action = 'add' })")
         self.assertTrue(out['success'])
         self.assertEqual((self.L.eval('LEVEL[1].cid'), self.L.eval('LEVEL[1].op'), self.L.eval('LEVEL[1].a')), ('77', 'add', 50))
+
+    # -- the console's own pages: news and the world's cycle ----------------------------------------
+
+    def test_news_runs_the_console_page_and_returns_a_changed_list(self):
+        out = self.L.eval("REG.getNews({ label = 'Web' }, {})")
+        self.assertTrue(out['success'])
+        self.assertEqual((self.L.eval('RUNS[1].kind'), self.L.eval('RUNS[1].payload.action'), self.L.eval('RUNS[1].by')), ('news', 'newsList', 'Web'))
+        out = self.L.eval("REG.saveNews({ label = 'Web' }, { list = {}, rev = 'old' })")
+        self.assertEqual(out['message'], 'err_news_changed')
+        self.assertEqual(out['data']['rev'], 'r2', 'the fresh list comes back with the refusal')
+        self.assertEqual(self.L.eval("REG.saveNews({ label = 'Web' }, { rev = 'r1' }).message"), 'err_invalid_value')
+
+    def test_world_cycle_takes_only_known_switches(self):
+        out = self.L.eval("REG.setWorldCycle({ label = 'Web' }, { what = 'blackout', state = true })")
+        self.assertTrue(out['success'])
+        self.assertEqual(self.L.eval('RUNS[1].payload.action'), 'blackout')
+        self.assertTrue(self.L.eval('RUNS[1].payload.args.state'))
+        self.assertEqual(self.L.eval("REG.setWorldCycle({ label = 'Web' }, { what = 'quit', state = true }).message"), 'err_invalid_value')
+        self.assertEqual(self.L.eval("REG.setWorldCycle({ label = 'Web' }, { what = 'blackout', state = 'yes' }).message"), 'err_invalid_value')
 
     # -- one log ------------------------------------------------------------------------------------------
 
