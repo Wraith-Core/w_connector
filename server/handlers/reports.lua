@@ -211,6 +211,26 @@ Registry.invoke('adminpanel:addReportMessage', 'admin.reports.message', function
     return H.ok()
 end)
 
+--- w_admin's Reports page (2026-10-22): the website's own report handlers, run for a staff member in the
+--- game. w_admin checked its own area for him; his name and license go where the website's would. The
+--- log line is marked as the game's (Log.write -> w_admin's log under its 'reports' kind).
+local GAME_REPORT_CALLS = {
+    ['adminpanel:getReports'] = true, ['adminpanel:getReportStatistics'] = true, ['adminpanel:claimReport'] = true,
+    ['adminpanel:resolveReport'] = true, ['adminpanel:reopenReport'] = true, ['adminpanel:addReportMessage'] = true,
+}
+exports('GameReports', function(name, args, by, identifier)
+    if GetInvokingResource() ~= 'w_admin' then return { success = false, message = 'forbidden' } end
+    local entry = GAME_REPORT_CALLS[name] and Registry.invokes[name]
+    if not entry then return { success = false, message = 'unknown_callback' } end
+    local actor = { label = tostring(by or 'Admin'):sub(1, 96), identifier = identifier, group = 'staff', fromGame = true }
+    local ok, res = pcall(entry.fn, actor, type(args) == 'table' and args or {})
+    if not ok then
+        print(('^1[w_connector] game report call %s failed: %s^0'):format(name, tostring(res)))
+        return { success = false, message = 'exception' }
+    end
+    return res
+end)
+
 --- w_admin's /report: a player's report in game, stored for the website. -> report id | nil, err
 exports('AddReport', function(src, message)
     src = tonumber(src)

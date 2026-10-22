@@ -91,7 +91,9 @@ function Log.write(actor, actionType, action, details, target)
     if GetResourceState('w_admin') == 'started' then
         pcall(function()
             exports.w_admin:SiteLog({ by = entry.admin_username, action = entry.action, details = entry.details,
-                target = entry.target_player, severity = entry.severity })
+                target = entry.target_player, severity = entry.severity,
+                -- a staff member in the game working the website's records (w_admin's Reports page)
+                kind = actor and actor.fromGame and 'reports' or nil })
         end)
     end
 end
