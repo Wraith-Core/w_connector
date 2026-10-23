@@ -134,6 +134,15 @@ class DiscordRanks(unittest.TestCase):
         self.L.eval('DiscordRanks.sync(4)')
         self.assertEqual(list(self.L.eval('REVOKED').values()), ['mod'], 'a rank given by hand is never taken')
 
+    def test_a_role_change_syncs_that_member_at_once(self):
+        added, removed = self.L.eval("DiscordRanks.syncDiscord('111')")
+        self.assertEqual((added, removed), (1, 0))
+        self.L.execute('SITE_ROLES = {}')
+        added, removed = self.L.eval("DiscordRanks.syncDiscord('111')")
+        self.assertEqual((added, removed), (0, 1), 'the role is gone: the rank goes now')
+        self.assertEqual(self.L.eval("DiscordRanks.syncDiscord('222')")[1], 'player_not_online')
+        self.assertEqual(self.L.eval("DiscordRanks.syncDiscord('x; drop')")[1], 'invalid_value')
+
     def test_unknown_roles_change_nothing(self):
         self.L.execute('SITE_OK = false')
         added, reason = self.L.eval('DiscordRanks.sync(4)')

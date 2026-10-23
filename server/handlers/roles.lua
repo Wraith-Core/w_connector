@@ -72,6 +72,14 @@ Registry.invoke('adminpanel:saveRole', 'manage_permissions', function(actor, arg
     end
     -- staff who may use the website panel open the in-game one too (owner, 2026-10-23)
     if seen['access_admin_panel'] and not seen['group.admin'] and not seen['group.god'] then add('group.mod') end
+    -- and without it the in-game panel goes too: no in-game admin level is left ticked on its own
+    if not seen['access_admin_panel'] then
+        local kept = {}
+        for _, node in ipairs(permissions) do
+            if node ~= 'group.mod' and node ~= 'group.admin' and node ~= 'group.god' then kept[#kept + 1] = node end
+        end
+        permissions = kept
+    end
 
     local ok, err = api:RanksSave(0, {
         name = name,
@@ -134,6 +142,16 @@ Registry.invoke('adminpanel:getDiscordRoles', 'manage_permissions', function()
         if type(r) == 'table' and r.id then roles[#roles + 1] = { id = r.id, name = r.name } end
     end
     return { roles = roles }
+end)
+
+--- One member's roles just changed in Discord (the website's bot saw it): his ranks follow at once, so taking
+--- the role takes the rank and the in-game admin with it (owner, 2026-10-23).
+Registry.invoke('adminpanel:syncDiscordMember', 'manage_permissions', function(actor, args)
+    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
+    if not Perms.core() then return H.fail('ranks_unavailable') end
+    local given, taken = DiscordRanks.syncDiscord(type(args) == 'table' and args.discord or nil)
+    if not given then return H.fail(taken or 'error') end
+    return H.ok(('+%d -%d'):format(given, taken))
 end)
 
 Registry.invoke('adminpanel:syncDiscordRoles', 'manage_permissions', function(actor)

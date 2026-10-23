@@ -4,7 +4,8 @@
 ---
 --- The roles come from the WEBSITE (GET /devadmin/member-roles, the server key), whose bot sits in the
 --- panel's own Discord; this resource's bot may be another (Red River's borrows the logs bot, in the logs
---- server). Checked when a player joins and every 10 minutes for everyone online.
+--- server). Checked when a player joins, at once when the website's bot sees his roles change
+--- (adminpanel:syncDiscordMember, 2026-10-23), and every 2 minutes for everyone online in case one was missed.
 ---
 --- Only what Discord gave is taken back: a rank given here is remembered in wc_discord_ranks, and taken
 --- away when its role is gone. A rank given by hand (in game or on the website) is never touched, and
@@ -14,7 +15,7 @@ DiscordRanks = {}
 
 local ENDPOINT = Config.endpoint
 local HDR = { ['x-api-key'] = Config.apiKey }
-local EVERY = 10 * 60 * 1000
+local EVERY = 2 * 60 * 1000
 
 CreateThread(function()
     Schema.await()
@@ -99,6 +100,17 @@ function DiscordRanks.sync(src)
             { name = GetPlayerName(src), identifier = license })
     end
     return added, removed
+end
+
+--- The online player with this Discord account, synced now (his roles just changed). -> given, taken | nil, reason
+function DiscordRanks.syncDiscord(discordId)
+    discordId = tostring(discordId or ''):match('^(%d+)$')
+    if not discordId then return nil, 'invalid_value' end
+    for _, s in ipairs(GetPlayers()) do
+        local id = GetPlayerIdentifierByType(tonumber(s), 'discord')
+        if id and id:match('(%d+)$') == discordId then return DiscordRanks.sync(tonumber(s)) end
+    end
+    return nil, 'player_not_online'
 end
 
 --- Everyone online, spaced so a full server is not a burst of requests. -> checked, given, taken

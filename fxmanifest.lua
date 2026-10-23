@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '1.1.10'
+version '1.1.11'
 description 'Red River Connector — executes what the Red River website asks, and reports what it needs. No in-game interface.'
 
 -- There is deliberately no `ui_page` and no `files {}` here.
