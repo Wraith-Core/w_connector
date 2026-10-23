@@ -20,7 +20,8 @@ Config.enabled  = GetConvar('wraith_bridge_enabled', 'true') == 'true'
 --- Heartbeat and ingest base — the endpoint minus the `/devadmin` suffix.
 Config.base = (Config.endpoint or ''):gsub('/devadmin/?$', '')
 
---- How long the website is asked to hold a poll open. The site clamps this to 1–30 server-side.
+--- How long the website is asked to hold a poll open. The site holds at most 2 s (2026-10-23: FXServer drops a
+--- parked request whenever this server sends the site another one, so long holds were nearly always lost).
 Config.pollWait = 25
 
 --- Heartbeat interval, milliseconds. The website treats a guild as connected if it has either a

@@ -242,6 +242,7 @@ CreateThread(function()
     local backoff = 0
     while true do
         local done, lastCode = false, nil
+        local started = GetGameTimer()
         PerformHttpRequest(ENDPOINT .. '/next?wait=' .. Config.pollWait, function(code, body)
             done = true
             lastCode = code
@@ -271,6 +272,11 @@ CreateThread(function()
         end
         -- the site down or refusing: wait longer each time (1 s up to 30 s) instead of every 150 ms
         if done and lastCode == 200 then
+            backoff = 0
+            Wait(150)
+        elseif done and (lastCode or 0) < 400 and GetGameTimer() - started >= 1000 then
+            -- a parked poll that FXServer dropped (it does so when this server sends the site another
+            -- request: the heartbeat, a result): the site is up, so poll again at once (2026-10-23)
             backoff = 0
             Wait(150)
         else
