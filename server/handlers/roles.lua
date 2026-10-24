@@ -1,8 +1,10 @@
 --- Roles — the single permission system, shared by the game and the website.
 ---
 --- (2026-10-14) The roles ARE the game's staff ranks now: w_core server/ranks.lua keeps them
---- (w_ranks), the in-game Ranks page and this file both edit them, and the master -- the website's
---- `owner` -- is the only one who may. A rank's website permissions (PERMISSION_NODES) sit beside its
+--- (w_ranks), the in-game Ranks page and this file both edit them. The master -- the website's `owner` --
+--- manages every rank; since 2026-10-24 (owner) staff holding `manage_permissions` manage the ranks below
+--- their own level from the site too, with only the permissions they hold (Perms.managesLevel/mayGive).
+--- A rank's website permissions (PERMISSION_NODES) sit beside its
 --- in-game ones: saving from here replaces the website ones and keeps the in-game ones untouched.
 ---
 --- `adminpanel:getRolesAndPermissions` is the most load-bearing call in the whole resource. It is
@@ -35,10 +37,9 @@ end
 
 Registry.invoke('adminpanel:saveRole', 'manage_permissions', function(actor, args)
     args = type(args) == 'table' and args or {}
-    -- the master only: the ranks are one system, and in game only the master manages them
-    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
     local api = Perms.core()
     if not api then return H.fail('ranks_unavailable') end
+    local master = Perms.isMaster(actor)
 
     -- Sanitised to the vocabulary the rest of the system assumes: the name is a primary key, it is
     -- interpolated into log lines, and it is compared against `actor.group` on every request.
@@ -47,6 +48,15 @@ Registry.invoke('adminpanel:saveRole', 'manage_permissions', function(actor, arg
     if Perms.canon(name) == 'master' then return H.fail('role_is_protected') end
 
     local existing = Perms.get(name)
+    -- below the master: a rank under one's own level, before and after the change
+    if existing and not Perms.managesLevel(actor, existing.lvl) then return H.fail('rank_not_below_yours') end
+    local lvl = H.clamp(args.lvl, 0, 999, existing and existing.lvl or 1)
+    if not Perms.managesLevel(actor, lvl) then return H.fail('rank_not_below_yours') end
+    -- and only the permissions one holds (those the rank already had may stay)
+    local had = {}
+    for _, node in ipairs(existing and existing.permissions or {}) do had[node] = true end
+    local function mayGive(node) return master or had[node] or Perms.mayGive(actor, node) end
+
     local web = webNodeSet()
     -- the rank's in-game permissions stay as they are; the website's are the list the site sent
     local permissions, seen = {}, {}
@@ -63,15 +73,18 @@ Registry.invoke('adminpanel:saveRole', 'manage_permissions', function(actor, arg
             -- admin and god levels are given only when ticked one by one
             for _, cat in ipairs(PERMISSION_NODES) do
                 for _, n in ipairs(cat.nodes) do
-                    if n ~= 'group.admin' and n ~= 'group.god' then add(n) end
+                    if n ~= 'group.admin' and n ~= 'group.god' and mayGive(n) then add(n) end
                 end
             end
         elseif web[node] then
+            if not mayGive(node) then return H.fail('permission_not_yours') end
             add(node)
         end
     end
     -- staff who may use the website panel open the in-game one too (owner, 2026-10-23)
-    if seen['access_admin_panel'] and not seen['group.admin'] and not seen['group.god'] then add('group.mod') end
+    if seen['access_admin_panel'] and not seen['group.admin'] and not seen['group.god'] and mayGive('group.mod') then
+        add('group.mod')
+    end
     -- and without it the in-game panel goes too: no in-game admin level is left ticked on its own
     if not seen['access_admin_panel'] then
         local kept = {}
@@ -85,7 +98,7 @@ Registry.invoke('adminpanel:saveRole', 'manage_permissions', function(actor, arg
         name = name,
         label = H.str(args.label, 400),
         color = H.str(args.color, 16),
-        sort = H.clamp(args.lvl, 0, 999, existing and existing.lvl or 1),
+        sort = lvl,
         permissions = permissions,
         discord_role_id = H.str(args.discordRoleId or args.discord_role_id, 32),
     })
@@ -98,7 +111,6 @@ end)
 
 Registry.invoke('adminpanel:deleteRole', 'manage_permissions', function(actor, args)
     args = type(args) == 'table' and args or {}
-    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
     local api = Perms.core()
     if not api then return H.fail('ranks_unavailable') end
     local name = tostring(args.name or ''):lower():gsub('[^a-z0-9_]', '')
@@ -108,6 +120,7 @@ Registry.invoke('adminpanel:deleteRole', 'manage_permissions', function(actor, a
     local role = Perms.get(name)
     if not role then return H.fail('role_not_found') end
     if role.protected then return H.fail('role_is_protected') end
+    if not Perms.managesLevel(actor, role.lvl) then return H.fail('rank_not_below_yours') end
 
     -- w_core takes the rank from every member with it (their other ranks stay)
     local ok, err = api:RanksDelete(0, name)
@@ -155,7 +168,6 @@ Registry.invoke('adminpanel:syncDiscordMember', 'manage_permissions', function(a
 end)
 
 Registry.invoke('adminpanel:syncDiscordRoles', 'manage_permissions', function(actor)
-    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
     if not Perms.core() then return H.fail('ranks_unavailable') end
     -- the same sync as on join and every 10 minutes (sv_discordranks.lua): the roles come from the website,
     -- whose bot is in the panel's Discord; a rank a role gave is taken back when the role is gone

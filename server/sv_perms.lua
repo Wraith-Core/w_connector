@@ -102,7 +102,7 @@ function Perms.has(actor, node)
     return false
 end
 
---- Is this actor the master? (the only one who manages the ranks, in game and on the website)
+--- Is this actor the master? (every rank is his to manage; others manage only the ranks below them)
 function Perms.isMaster(actor)
     return type(actor) == 'table' and Perms.canon(actor.group) == MASTER
 end
@@ -117,6 +117,29 @@ end
 function Perms.outranks(actor, targetGroup)
     if type(actor) ~= 'table' then return false end
     return Perms.level(actor.group) > Perms.level(targetGroup)
+end
+
+--- The master manages every rank. Staff holding `manage_permissions` manage the ranks strictly below their
+--- own level, and give only what they hold themselves (owner, 2026-10-24: an admin with every permission
+--- could not make a rank from the site).
+function Perms.managesLevel(actor, lvl)
+    if Perms.isMaster(actor) then return true end
+    if type(actor) ~= 'table' then return false end
+    return (tonumber(lvl) or 0) < Perms.level(actor.group)
+end
+
+-- the in-game admin levels: god holds admin, admin holds mod (permissions.cfg add_principal)
+local GAME_LEVELS = { ['group.mod'] = 1, ['group.admin'] = 2, ['group.god'] = 3 }
+
+--- May `actor` put this node into a rank? Only a node he holds (an in-game level covers the ones below it).
+function Perms.mayGive(actor, node)
+    if Perms.has(actor, node) then return true end
+    local want = GAME_LEVELS[node]
+    if not want then return false end
+    for other, lv in pairs(GAME_LEVELS) do
+        if lv > want and Perms.has(actor, other) then return true end
+    end
+    return false
 end
 
 --- Build the actor the dispatcher passes to handlers, or nil if the website named a rank this server

@@ -13,7 +13,8 @@
 --- (2026-10-14) The roster IS the game's staff ranks: w_core keeps who holds what (w_rank_members,
 --- several ranks a person, by license or steam). The website still sees ONE role a staff member: his
 --- highest rank. Granting here adds a rank; changing swaps the shown (highest) one; removing takes them
---- all -- every one of them the master only, as in game. A master from server.cfg (w_ranks:masters)
+--- all. The master does any of it; since 2026-10-24 (owner) staff holding the node do it too, for ranks and
+--- people below their own level only (Perms.managesLevel). A master from server.cfg (w_ranks:masters)
 --- cannot be changed or removed from here. wc_admins only keeps the resolved-report count.
 
 --- A stable number for a roster entry (the panel keys its rows on `id`)
@@ -62,13 +63,14 @@ end)
 --- Grant a rank by player or identifier (it is added to the ranks he already holds).
 Registry.invoke('adminpanel:setPermission', 'manage_permissions', function(actor, args)
     args = type(args) == 'table' and args or {}
-    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
     local api = Perms.core()
     if not api then return H.fail('ranks_unavailable') end
 
     local ref = H.playerRef(args)
     local group = Perms.canon(H.str(args.permission or args.role or args.group, 64))
-    if not Perms.get(group) then return H.fail('unknown_role') end
+    local role = Perms.get(group)
+    if not role then return H.fail('unknown_role') end
+    if not Perms.managesLevel(actor, role.lvl) then return H.fail('rank_not_below_yours') end
 
     local src = H.liveSource(ref)
     local identifier = Perms.normalizeIdentifier(H.str(ref.identifier or args.identifier, 100))
@@ -93,7 +95,6 @@ end)
 --- Change the rank the panel shows (his highest) to another one; his other ranks stay.
 Registry.invoke('adminpanel:changeAdminRole', 'change.admin.role', function(actor, args)
     args = type(args) == 'table' and args or {}
-    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
     local api = Perms.core()
     if not api then return H.fail('ranks_unavailable') end
 
@@ -102,10 +103,13 @@ Registry.invoke('adminpanel:changeAdminRole', 'change.admin.role', function(acto
     if not identifier then return H.fail('missing_identifier') end
 
     local group = Perms.canon(H.str(args.role or args.group, 64))
-    if not Perms.get(group) then return H.fail('unknown_role') end
+    local role = Perms.get(group)
+    if not role then return H.fail('unknown_role') end
+    if not Perms.managesLevel(actor, role.lvl) then return H.fail('rank_not_below_yours') end
 
     local existing = Perms.adminOf(identifier)
     if not existing then return H.fail('not_an_admin') end
+    if not Perms.managesLevel(actor, Perms.level(existing.group)) then return H.fail('target_outranks_you') end
     if existing.group == group then return H.ok() end
 
     -- the new one first: a failed swap must never leave him with nothing
@@ -125,7 +129,6 @@ end)
 --- Take every rank from a staff member (a master from server.cfg keeps his).
 Registry.invoke('adminpanel:removeAdmin', 'manage_permissions', function(actor, args)
     args = type(args) == 'table' and args or {}
-    if not Perms.isMaster(actor) then return H.fail('only_the_master_manages_ranks') end
     local api = Perms.core()
     if not api then return H.fail('ranks_unavailable') end
 
@@ -135,6 +138,7 @@ Registry.invoke('adminpanel:removeAdmin', 'manage_permissions', function(actor, 
 
     local existing = Perms.adminOf(identifier)
     if not existing then return H.fail('not_an_admin') end
+    if not Perms.managesLevel(actor, Perms.level(existing.group)) then return H.fail('target_outranks_you') end
     local lastErr
     for _, rank in ipairs(existing.groups or {}) do
         local ok, err = api:RanksRevoke(0, existing.identifier, rank)
