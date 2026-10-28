@@ -48,7 +48,11 @@ CreateThread(function()
         end
         waited = waited + 1
         if waited >= 150 then -- ~30 seconds
-            print('^1[w_connector] ERROR:^0 vorp_core did not start. Ensure vorp_core is started before w_connector.')
+            -- another framework (RSG, Wraith Core) is not a fault: sv_framework.lua answers there
+            local okName, fw = pcall(function() return exports.w_lib:FwName() end)
+            if okName and fw == 'vorp' then
+                print('^1[w_connector] ERROR:^0 vorp_core did not start. Ensure vorp_core is started before w_connector.')
+            end
             break
         end
         Wait(200)

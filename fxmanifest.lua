@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '1.1.12'
+version '1.1.13'
 description 'Red River Connector — executes what the Red River website asks, and reports what it needs. No in-game interface.'
 
 -- There is deliberately no `ui_page` and no `files {}` here.
@@ -69,7 +69,8 @@ client_scripts {
     'client/cl_webrtc.lua',
 }
 
+-- vorp_core is NOT required (2026-10-28): on RSG (and Wraith Core) server/sv_framework.lua answers every Vorp.* call
+-- from the citizenid schema; sv_vorp.lua only finds a VORP core when one runs
 dependencies {
     'oxmysql',
-    'vorp_core',
 }
