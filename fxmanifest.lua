@@ -1,76 +1,74 @@
 fx_version 'cerulean'
-game 'rdr3'
+games { 'rdr3', 'gta5' }
 lua54 'yes'
 rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aware my resources *will* become incompatible once RedM ships.'
 
 name 'w_connector'
 author 'Wraith Studio'
-version '1.1.13'
-description 'Red River Connector — executes what the Red River website asks, and reports what it needs. No in-game interface.'
+version '2.0.0'
+description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith control panel.'
 
--- There is deliberately no `ui_page` and no `files {}` here.
+-- No commands and no platform secret. The client files run the RedM troll effects (cl_actions.lua,
+-- ported unchanged from v1), report the player's deaths (cl_death.lua), relay spectate to the hidden
+-- capture page (cl_spectate.lua + nui/) and draw the website's FiveM blips and zones (cl_map.lua).
+-- The whole product lives on the website; this resource executes what the website asks and reports
+-- what it needs.
 --
--- This resource is handed to customers. Anything shipped inside it can be extracted, so nothing
--- worth extracting is shipped: no panel, no menus, no NUI bundle, no keybinds, no commands. The
--- entire product surface lives on the website, on our servers, where it cannot be copied.
+-- server.cfg — paste the token from your panel:
+--     set wraith_token "wc2.k…"
+--     ensure w_connector        (after your framework and inventory)
 --
--- server.cfg — paste the key from your RedM panel and nothing else:
---     set wraith_apikey "fvm_....."
---
--- Optional, only for self-hosting or testing:
---     set wraith_site_endpoint "https://.../api/fivem/devadmin"
---     set wraith_bridge_enabled "false"
+-- Optional:
+--     set wraith_framework "vorp"    (wcore, vorp, rsg, esx, qbcore, qbox — skips detection)
+--     set wraith_inventory "ox_inventory"
+--     set wraith_endpoint "https://…/api/connector/v2"   (staging only)
+--     add_ace resource.w_connector command allow    (lets the panel run console commands)
+--     set wraith_join_fail_closed "true"                 (refuse joins while the panel is unreachable)
+--     set wraith_report_command "report"                 (the in-game report command; "off" disables it)
+
+dependencies { 'oxmysql' }
+
+-- The in-game Wraith menu (/wadmin; F10 on FiveM) and the spectate streamer share the one ui_page:
+-- nui/index.html loads both (docs/admin-platform/08-ingame-menu.md). capture.html stays as the streamer alone.
+ui_page 'nui/index.html'
+files { 'nui/index.html', 'nui/menu.css', 'nui/menu.js', 'nui/capture.html', 'nui/spectate.js' }
+
+client_scripts { 'client/cl_actions.lua', 'client/cl_death.lua', 'client/cl_spectate.lua', 'client/cl_map.lua', 'client/cl_menu.lua', 'client/cl_menu_self.lua' }
 
 server_scripts {
-    -- sv_framework.lua reads the database through w.database.*, so the library loads first.
-    -- Nothing client-side needs it: cl_actions.lua talks to w_lib by export, inside w_lib's own VM.
-    '@w_lib/init.lua',
     '@oxmysql/lib/MySQL.lua',
-    'config.lua',
-    'server/sv_schema.lua',    -- tables first: everything below assumes they exist
-    'server/sv_vorp.lua',
-    -- AFTER sv_vorp.lua and before every consumer: it defines CoreBridge, and its tail repoints
-    -- the Vorp.* functions that speak VORP's own tables at the citizenid schema when the host is
-    -- not VORP. Load it earlier and there is no Vorp table yet to repoint.
-    'server/sv_framework.lua',
-    'server/sv_inventory.lua',
-    'server/sv_perms.lua',
-    'server/sv_log.lua',
-    'server/sv_players.lua',
-    'server/sv_discordranks.lua', -- a rank bound to a Discord role goes to its holders in game too (roles from the site)
-    'server/sv_registry.lua',  -- the handler table, before anything registers into it
-    'server/handlers/admins.lua',
-    'server/handlers/adminchat.lua',
-    'server/handlers/bans.lua',
-    'server/handlers/livemap.lua',
-    'server/handlers/logs.lua',
-    'server/handlers/players.lua',
-    'server/handlers/characters.lua',
-    'server/handlers/console.lua',     -- w_admin's own pages the website runs: news, the world's cycle
-    'server/handlers/systems.lua',     -- each system's board (its SiteAdmin export) and the economy -- a character's record: block, citizen id, delete, level (w_admin / w_level code)
-    'server/handlers/reports.lua',
-    'server/handlers/resources.lua',
-    'server/handlers/roles.lua',
-    'server/handlers/server.lua',
-    'server/handlers/stats.lua',
-    'server/handlers/whitelist.lua',
-    'server/handlers/entry.lua',
-    -- the way in: closed, bans, whitelist, priority and the join queue (replaces connectqueue)
-    'server/sv_queue.lua',
-    'server/sv_heartbeat.lua',
-    'server/sv_bridge.lua',    -- LAST: dispatches into everything above
-}
-
--- Two client files, both headless. cl_actions.lua receives commands from the server and runs the
--- natives that only exist on a game client (freeze, ragdoll, the troll effects). cl_webrtc.lua is
--- the spectate relay. Neither draws anything, listens for a key, or registers a command.
-client_scripts {
-    'client/cl_actions.lua',
-    'client/cl_webrtc.lua',
-}
-
--- vorp_core is NOT required (2026-10-28): on RSG (and Wraith Core) server/sv_framework.lua answers every Vorp.* call
--- from the citizenid schema; sv_vorp.lua only finds a VORP core when one runs
-dependencies {
-    'oxmysql',
+    'core/sha256.lua',
+    'core/util.lua',
+    'core/registry.lua',
+    -- Adapters register in detection order; the first whose detect() succeeds is used.
+    -- Order matters where one resource `provide`s another's name: qbx_core provides qb-core,
+    -- w_core provides rsg-core and vorp_core, w_inventory provides vorp/rsg-inventory and
+    -- ox_inventory answers as vorp_inventory.
+    'adapters/framework/wcore.lua',
+    'adapters/framework/qbox.lua',
+    'adapters/framework/esx.lua',
+    'adapters/framework/qbcore.lua',
+    'adapters/framework/rsg.lua',
+    'adapters/framework/vorp.lua',
+    'adapters/inventory/w_inventory.lua',
+    'adapters/inventory/ox_inventory.lua',
+    'adapters/inventory/qb_inventory.lua',
+    'adapters/inventory/rsg_inventory.lua',
+    'adapters/inventory/vorp_inventory.lua',
+    'adapters/inventory/esx_builtin.lua',
+    'ops/players.lua',
+    'ops/inventory.lua',
+    'ops/server.lua',
+    'ops/character.lua',
+    'ops/world.lua',
+    'ops/modules.lua',
+    'ops/migrate.lua',
+    'ops/control.lua',
+    'ops/wraith_admin.lua',
+    'ops/live.lua',
+    'ops/ingame.lua',
+    'core/transport.lua',
+    'core/join.lua',
+    'core/events.lua',
+    'core/main.lua',
 }

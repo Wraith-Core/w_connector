@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<!-- w_connector's ui_page: the in-game Wraith menu (menu.js, hidden until opened) and the spectate
+     streamer (spectate.js, a hidden 1px canvas). Both listen to the same NUI messages; the menu ignores
+     webrtc*, spectate.js ignores menu:*. Nothing here is loaded from the network. -->
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>Wraith</title>
+    <link rel="stylesheet" href="./menu.css">
+</head>
+<body>
+    <div id="app"></div>
+    <div id="wm-root" hidden></div>
+    <div id="wm-toasts" aria-live="polite"></div>
+    <script src="./spectate.js"></script>
+    <script src="./menu.js"></script>
+</body>
+</html>

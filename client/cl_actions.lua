@@ -21,22 +21,10 @@ local function coords()
     return GetEntityCoords(myPed())
 end
 
---- Notifications go through w_lib's notification (the same look on every framework). If the
---- library is not up yet, the framework's own event: vorp:TipRight on VORP, RSGCore:Notify
---- on RSG / QBR.
+--- Notifications go through VORP's own notification events, which every VORP client already
+--- listens for. No UI of our own is involved.
 local function notify(text, duration)
-    duration = duration or 5000
-    if GetResourceState('w_lib') == 'started' then
-        local ok = pcall(function() exports.w_lib:Notify('', text, 'info', duration) end)
-        if ok then return end
-    end
-    if GetResourceState('vorp_core') == 'started' then
-        TriggerEvent('vorp:TipRight', text, duration)
-    elseif GetResourceState('rsg-core') == 'started' then
-        TriggerEvent('RSGCore:Notify', text, 'primary', duration)
-    else
-        TriggerEvent('QBCore:Notify', text, 'primary', duration)
-    end
+    TriggerEvent('vorp:TipRight', text, duration or 5000)
 end
 
 local EFFECTS = {}
@@ -167,10 +155,8 @@ EFFECTS.trollWildAttack = function()
     TaskCombatHatedTargetsAroundPed(animal, 30.0, 0)
     ClearPedTasks(animal)
     TaskPutPedDirectlyIntoMelee(animal, ped, 0.0, -1.0, 0.0, 0)
-    -- RDR2 relation values are not GTA V's: 5 = WANTED, 6 = HATE (femga/rdr3_discoveries AI/RELATIONSHIP;
-    -- Rockstar's 1491.50 native3.ysc.c:32367-32368 sets 6 both ways with PLAYER). The animal attacks the player.
-    SetRelationshipBetweenGroups(6, animalGroup, playerGroup)
-    SetRelationshipBetweenGroups(6, playerGroup, animalGroup)
+    SetRelationshipBetweenGroups(5, animalGroup, playerGroup)
+    SetRelationshipBetweenGroups(5, playerGroup, animalGroup)
     SetModelAsNoLongerNeeded(model)
 
     -- Cleaned up so a prank does not leave a permanent animal on the map.
@@ -308,10 +294,8 @@ RegisterNetEvent('w_connector:warning', function(data)
     end
 end)
 
--- `shown`: the server already put it on screen through w_hud (white text under the compass);
--- only the chat line is left to do here. false / nil (no w_hud): the old notice.
-RegisterNetEvent('w_connector:announce', function(message, shown)
-    if shown ~= true then notify(tostring(message or ''), 10000) end
+RegisterNetEvent('w_connector:announce', function(message)
+    notify(tostring(message or ''), 10000)
     -- Also into chat, when the server runs a chat resource. Harmless if it does not.
     pcall(function()
         TriggerEvent('chat:addMessage', { color = { 255, 180, 0 }, args = { 'Server', tostring(message or '') } })

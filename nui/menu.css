@@ -1,0 +1,114 @@
+/* The in-game Wraith menu. Wraith's kit (admin/src/styles/wraith-kit.css): green-black ink, mint paper,
+   Wraith green, square corners. System serif faces only: the page must work offline in game. */
+:root {
+    --ink: #06100c; --ink-2: #0b1913; --ink-3: #10231b; --ink-4: #183428;
+    --paper: #eaf6ef; --paper-dim: #a9c4b7; --paper-faint: #6f8c80;
+    --rule: rgba(234, 246, 239, .13); --rule-2: rgba(234, 246, 239, .28);
+    --green: #22b981; --green-bright: #34d399; --green-deep: #0f8a5f; --green-soft: rgba(34, 185, 129, .16);
+    --red: #e5484d; --red-soft: rgba(229, 72, 77, .16); --amber: #f5a524;
+    --f-text: "EB Garamond", Georgia, "Times New Roman", serif;
+    --f-ar: "Tahoma", "Segoe UI", "Arial", sans-serif;
+    --ease: cubic-bezier(.2, .7, .2, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: transparent; overflow: hidden; width: 100%; height: 100%; }
+body { font: 15px/1.4 var(--f-text); color: var(--paper); font-variant-numeric: lining-nums tabular-nums; user-select: none; }
+[dir="rtl"] body, body.rtl { font-family: var(--f-ar); }
+[hidden] { display: none !important; }
+
+#wm-root {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(1040px, 92vw); height: min(640px, 86vh);
+    display: grid; grid-template-columns: 188px 1fr; grid-template-rows: 48px 1fr;
+    background: var(--ink); border: 1px solid var(--rule-2); box-shadow: 0 24px 80px rgba(0, 0, 0, .65);
+    animation: wm-in .16s var(--ease);
+}
+@keyframes wm-in { from { opacity: 0; transform: translate(-50%, -48%); } }
+
+.wm-head { grid-column: 1 / 3; display: flex; align-items: center; gap: 12px; padding: 0 14px; border-bottom: 1px solid var(--rule); background: var(--ink-2); }
+.wm-mark { font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--green-bright); }
+.wm-role { font-size: 12px; padding: 2px 8px; border: 1px solid var(--rule-2); color: var(--paper-dim); text-transform: uppercase; letter-spacing: .08em; }
+.wm-spacer { flex: 1; }
+
+.wm-side { border-inline-end: 1px solid var(--rule); background: var(--ink-2); padding: 8px 0; overflow-y: auto; }
+.wm-tab { display: flex; width: 100%; align-items: center; gap: 10px; padding: 9px 16px; background: none; border: 0; color: var(--paper-dim); font: inherit; text-align: start; cursor: pointer; border-inline-start: 3px solid transparent; }
+.wm-tab:hover { background: var(--ink-3); color: var(--paper); }
+.wm-tab.on { color: var(--paper); background: var(--green-soft); border-inline-start-color: var(--green); }
+
+.wm-main { overflow-y: auto; padding: 16px 18px; position: relative; }
+.wm-main h2 { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+.wm-main h3 { font-size: 14px; font-weight: 600; color: var(--paper-dim); text-transform: uppercase; letter-spacing: .08em; margin: 16px 0 8px; }
+
+button.wm-btn, .wm-btn {
+    font: inherit; font-size: 13px; padding: 6px 12px; cursor: pointer; color: var(--paper);
+    background: var(--ink-3); border: 1px solid var(--rule-2); transition: background .12s;
+}
+.wm-btn:hover { background: var(--ink-4); }
+.wm-btn.primary { background: var(--green-deep); border-color: var(--green); }
+.wm-btn.primary:hover { background: var(--green); color: var(--ink); }
+.wm-btn.danger { border-color: var(--red); color: #ffb4b6; }
+.wm-btn.danger:hover { background: var(--red-soft); }
+.wm-btn.on { background: var(--green); color: var(--ink); border-color: var(--green-bright); }
+.wm-btn:disabled { opacity: .45; cursor: default; }
+.wm-x { background: none; border: 0; color: var(--paper-dim); font-size: 20px; cursor: pointer; padding: 0 6px; }
+.wm-x:hover { color: var(--paper); }
+
+input.wm-in, select.wm-in, textarea.wm-in {
+    font: inherit; font-size: 14px; color: var(--paper); background: var(--ink-2); border: 1px solid var(--rule-2);
+    padding: 6px 10px; outline: none; user-select: text;
+}
+input.wm-in:focus, select.wm-in:focus, textarea.wm-in:focus { border-color: var(--green); }
+textarea.wm-in { width: 100%; resize: vertical; min-height: 60px; }
+
+.wm-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.wm-grow { flex: 1; min-width: 120px; }
+.wm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.wm-card { background: var(--ink-2); border: 1px solid var(--rule); padding: 10px 12px; }
+.wm-card .k { font-size: 12px; color: var(--paper-faint); text-transform: uppercase; letter-spacing: .06em; }
+.wm-card .v { font-size: 17px; margin-top: 2px; word-break: break-word; }
+
+table.wm-t { width: 100%; border-collapse: collapse; font-size: 14px; }
+.wm-t th { text-align: start; font-weight: 600; color: var(--paper-faint); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding: 6px 8px; border-bottom: 1px solid var(--rule-2); }
+.wm-t td { padding: 7px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.wm-t tr.click { cursor: pointer; }
+.wm-t tr.click:hover td { background: var(--ink-3); }
+.wm-t tr.sel td { background: var(--green-soft); }
+.wm-muted { color: var(--paper-faint); }
+.wm-mono { font-family: Consolas, "Courier New", monospace; font-size: 12px; user-select: text; word-break: break-all; }
+.wm-pill { display: inline-block; font-size: 11px; padding: 1px 6px; border: 1px solid var(--rule-2); color: var(--paper-dim); text-transform: uppercase; letter-spacing: .05em; }
+.wm-pill.ok { border-color: var(--green); color: var(--green-bright); }
+.wm-pill.bad { border-color: var(--red); color: #ffb4b6; }
+.wm-empty { color: var(--paper-faint); padding: 18px 0; text-align: center; }
+.wm-pager { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-top: 10px; font-size: 13px; color: var(--paper-dim); }
+
+.wm-split { display: grid; grid-template-columns: 1fr 340px; gap: 14px; height: 100%; }
+.wm-detail { border-inline-start: 1px solid var(--rule); padding-inline-start: 14px; overflow-y: auto; }
+.wm-detail .name { font-size: 18px; font-weight: 600; }
+.wm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
+.wm-subtabs { display: flex; gap: 4px; margin: 12px 0 8px; border-bottom: 1px solid var(--rule); }
+.wm-subtabs button { background: none; border: 0; border-bottom: 2px solid transparent; color: var(--paper-dim); font: inherit; font-size: 13px; padding: 6px 10px; cursor: pointer; }
+.wm-subtabs button.on { color: var(--paper); border-bottom-color: var(--green); }
+
+.wm-chat { display: flex; flex-direction: column; height: calc(100% - 40px); }
+.wm-chat .log { flex: 1; overflow-y: auto; border: 1px solid var(--rule); padding: 8px 10px; background: var(--ink-2); margin-bottom: 8px; }
+.wm-chat .msg { margin-bottom: 6px; user-select: text; }
+.wm-chat .msg b { color: var(--green-bright); font-weight: 600; margin-inline-end: 6px; }
+
+/* confirm dialog */
+.wm-modal { position: absolute; inset: 0; background: rgba(0, 0, 0, .55); display: flex; align-items: center; justify-content: center; z-index: 5; }
+.wm-dialog { width: min(420px, 90%); background: var(--ink-2); border: 1px solid var(--rule-2); padding: 16px; }
+.wm-dialog p { margin: 6px 0 12px; color: var(--paper-dim); }
+.wm-dialog .wm-row { justify-content: flex-end; margin: 12px 0 0; }
+.wm-dialog label { display: block; font-size: 12px; color: var(--paper-faint); margin: 8px 0 4px; text-transform: uppercase; letter-spacing: .06em; }
+.wm-dialog .wm-in { width: 100%; }
+
+/* toasts: visible even while the menu is closed (no focus is taken) */
+#wm-toasts { position: fixed; top: 18px; inset-inline-end: 18px; display: flex; flex-direction: column; gap: 6px; z-index: 10; pointer-events: none; }
+.wm-toast { min-width: 220px; max-width: 360px; padding: 9px 12px; background: var(--ink-2); border: 1px solid var(--rule-2); border-inline-start: 3px solid var(--green); color: var(--paper); font-size: 14px; box-shadow: 0 8px 30px rgba(0, 0, 0, .5); animation: wm-in-t .16s var(--ease); }
+.wm-toast.error { border-inline-start-color: var(--red); }
+.wm-toast.info { border-inline-start-color: var(--amber); }
+@keyframes wm-in-t { from { opacity: 0; transform: translateY(-6px); } }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--ink-4); }
+::-webkit-scrollbar-track { background: transparent; }
