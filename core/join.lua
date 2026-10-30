@@ -7,7 +7,24 @@
 --- When the website can't be reached the player is let in, unless `set wraith_join_fail_closed "true"`:
 --- a ban list that locks everyone out whenever the internet blips would be worse than the bans.
 
-local FAIL = 'This server cannot check your access right now. Please try again shortly.'
+local joinText = {
+    ar = {
+        unavailable = 'تعذر التحقق من صلاحية دخولك الآن. حاول مجددًا بعد قليل.',
+        checking = 'جارٍ التحقق من صلاحية دخولك…',
+        denied = 'لا يمكنك دخول السيرفر. راجع الإدارة لمعرفة السبب.',
+        queued = 'السيرفر ممتلئ. ترتيبك %d من %d في قائمة الانتظار. انتظر؛ سيدخلك السيرفر تلقائيًا عند توفر مكان.',
+    },
+    en = {
+        unavailable = 'Access could not be checked. Please try again shortly.',
+        checking = 'Checking your access…',
+        denied = 'You cannot join this server. Contact staff for the reason.',
+        queued = 'The server is full. You are %d of %d in the queue. Please wait; you will join automatically when a slot opens.',
+    },
+}
+local function joinMessage(key, ...)
+    local lang = GetConvar('w_lib:locale', 'ar') == 'ar' and 'ar' or 'en'
+    return joinText[lang][key]:format(...)
+end
 local queue = {} -- { src, prio, at }
 
 local function failClosed() return GetConvar('wraith_join_fail_closed', 'false') == 'true' end
@@ -34,18 +51,18 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
     Wait(0)
     -- (Not `a and done(x) or done()`: done returns nothing, so that form calls done twice.)
     if not WC.linked() then
-        if failClosed() then return deferrals.done(FAIL) end
+        if failClosed() then return deferrals.done(joinMessage('unavailable')) end
         return deferrals.done()
     end
 
-    deferrals.update('Checking your access…')
+    deferrals.update(joinMessage('checking'))
     local status, body = WC.request('POST', '/join', { name = tostring(name or ''):sub(1, 64), identifiers = WC.identifiers(src) })
     if status ~= 200 or type(body) ~= 'table' then
-        if failClosed() then return deferrals.done(FAIL) end
+        if failClosed() then return deferrals.done(joinMessage('unavailable')) end
         return deferrals.done()
     end
     if body.allow == false then
-        return deferrals.done(type(body.message) == 'string' and body.message:sub(1, 500) or 'You may not join this server.')
+        return deferrals.done(type(body.message) == 'string' and body.message:sub(1, 500) or joinMessage('denied'))
     end
 
     if slotsFree() and #queue == 0 then return deferrals.done() end
@@ -59,7 +76,7 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
             leave(src)
             return deferrals.done()
         end
-        deferrals.update(('The server is full. You are %d of %d in the queue.'):format(pos or 0, #queue))
+        deferrals.update(joinMessage('queued', pos or 0, #queue))
         Wait(2000)
     end
 end)

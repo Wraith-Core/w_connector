@@ -1,8 +1,9 @@
 # w_connector (v2)
 
-Links a FiveM or RedM server to its Wraith control panel. Everything you manage lives on the website;
-this resource carries out what the panel asks and reports who is online. It has no menu, no commands
-and no in-game interface.
+يربط سيرفر FiveM أو RedM بلوحة Wraith، وينفذ أوامر الإدارة ويعرض حالة اللاعبين.
+تتوفر قائمة الإدارة داخل اللعبة بالأمر `/wadmin`، وبالمفتاح F10 في FiveM.
+تظهر الصفحات والأفعال حسب صلاحيات الحساب؛ إدارة الربط والصلاحيات تبقى من لوحة الموقع.
+توجد أيضًا أوامر البلاغات بحسب الإعدادات. يتطلب المورد `oxmysql` وإطارًا مدعومًا.
 
 > This is v2, shipped under the name `w_connector` so the Wraith systems (which answer only that
 > name) work unchanged. It replaces v1, whose source is kept in `game/w_connector_v1` for rollback:
@@ -41,3 +42,10 @@ Detected automatically. To force one: `set wraith_framework "vorp"` / `set wrait
 - Every request is signed (HMAC-SHA256, timestamp and one-time nonce) and goes out over HTTPS. The
   server opens no port.
 - The token cannot change who has access to your panel.
+
+## 2.0.1 — 2026-10-30
+
+- تعريب التحقق من الدخول والانتظار، مع توضيح أن الدخول يتم تلقائيًا عند توفر مكان.
+- تصحيح وصف القائمة `/wadmin` والصلاحيات المطلوبة، وتسمية العربة في RedM.
+- تنبيه نشر: هذا المصدر المحلي من فرع 2.0، بينما الإصدار التجاري السابق 1.1.13؛ لا ينشر كترقية نصوص دون مراجعة نطاق v2.
+- تجربة اللعبة المطلوبة: انتظار سيرفر ممتلئ وفتح قائمة الإدارة بحساب مسموح وآخر مرفوض.

@@ -5,14 +5,11 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '2.0.0'
+version '2.0.1'
 description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith control panel.'
 
--- No commands and no platform secret. The client files run the RedM troll effects (cl_actions.lua,
--- ported unchanged from v1), report the player's deaths (cl_death.lua), relay spectate to the hidden
--- capture page (cl_spectate.lua + nui/) and draw the website's FiveM blips and zones (cl_map.lua).
--- The whole product lives on the website; this resource executes what the website asks and reports
--- what it needs.
+-- The website bridge, join queue and /wadmin menu share this resource.
+-- Menu actions are authorised again on the server and control panel.
 --
 -- server.cfg — paste the token from your panel:
 --     set wraith_token "wc2.k…"

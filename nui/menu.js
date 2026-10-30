@@ -80,12 +80,20 @@
     var lang = "en";
     try { lang = localStorage.getItem("wm-lang") === "ar" ? "ar" : "en"; } catch (e) {}
     function t(k, vars) {
-        var s = (T[lang] && T[lang][k]) || T.en[k] || k;
+        var redm = lang === "ar" && S && S.game === "redm" ? {
+            vehicle: "العربة", model: "طراز العربة", repair: "إصلاح العربة الحالية", del: "حذف العربة الحالية",
+            confirmDelete: "حذف العربة التي أنت فيها؟"
+        } : null;
+        var s = (redm && redm[k]) || (T[lang] && T[lang][k]) || T.en[k] || k;
         if (vars) Object.keys(vars).forEach(function (v) { s = s.split("{" + v + "}").join(String(vars[v])); });
         return s;
     }
     function errText(e) {
         var k = String(e || "refused").replace(/^err_/, "");
+        if (lang === "ar" && S && S.game === "redm") {
+            if (k === "no_vehicle") return "لست في عربة.";
+            if (k === "no_control") return "تعذر التحكم بالعربة.";
+        }
         return (ERR[lang] && ERR[lang][k]) || ERR.en[k] || (T[lang] && T[lang]["err_" + k]) || k;
     }
 
