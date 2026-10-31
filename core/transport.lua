@@ -55,19 +55,30 @@ function WC.signedHeaders(method, fullPath, body, ts, n)
 end
 
 --- Send one signed request and wait for the answer. Returns status, decoded body (or nil).
-function WC.request(method, path, payload)
+function WC.request(method, path, payload, timeoutMs)
     local body = payload ~= nil and json.encode(payload) or ''
     local fullPath = cfg.basePath .. path
     local headers = WC.signedHeaders(method, fullPath, body, tostring(os.time() * 1000), nonce())
 
     local p = promise.new()
+    local settled = false
+    local function finish(value)
+        if settled then return end
+        settled = true
+        p:resolve(value)
+    end
+    -- Native permission leases use a bounded request. Other protocol callers retain their behaviour.
+    if type(timeoutMs) == 'number' and timeoutMs > 0 and timeoutMs <= 60000 then
+        SetTimeout(math.floor(timeoutMs), function() finish({ status = 0, body = nil }) end)
+    end
     PerformHttpRequest(cfg.origin .. fullPath, function(status, resp)
+        if settled then return end
         local decoded = nil
         if type(resp) == 'string' and resp ~= '' then
             local ok, v = pcall(json.decode, resp)
             if ok then decoded = v end
         end
-        p:resolve({ status = status, body = decoded })
+        finish({ status = status, body = decoded })
     end, method, body, headers)
     local r = Citizen.Await(p)
     return r.status, r.body
@@ -81,7 +92,8 @@ local function helloPayload()
         local ok, list = pcall(fw.accounts)
         if ok then accounts = list end
     end
-    return {
+    local catalog = WC.ScriptPermissions and WC.ScriptPermissions.catalog() or nil
+    local payload = {
         protocol = PROTOCOL,
         connector = GetResourceMetadata(GetCurrentResourceName(), 'version', 0),
         game = WC.gameName(),
@@ -91,7 +103,10 @@ local function helloPayload()
         accounts = accounts,
         ops = WC.Ops.available(),
         modules = WC.modules and WC.modules() or {},
+        -- Lua's empty table can encode as {}, so omit the optional catalogue on generic servers.
+        permissionCatalog = catalog and #catalog.groups > 0 and catalog or nil,
     }
+    return payload, catalog
 end
 
 --- Why a refused hello was refused, in words for the server console.
@@ -104,10 +119,13 @@ local REFUSALS = {
 
 --- What this server can do right now, as one comparable string: its ops and its running modules.
 --- When it changes the connector says hello again at once.
-function WC.capabilities()
+local function capabilitiesOf(ops, modules, fingerprint)
     local mods = {}
-    for _, m in ipairs(WC.modules and WC.modules() or {}) do mods[#mods + 1] = m.id end
-    return table.concat(WC.Ops.available(), ',') .. '|' .. table.concat(mods, ',')
+    for _, m in ipairs(modules) do mods[#mods + 1] = m.id end
+    return table.concat(ops, ',') .. '|' .. table.concat(mods, ',') .. '|' .. fingerprint
+end
+function WC.capabilities()
+    return capabilitiesOf(WC.Ops.available(), WC.modules and WC.modules() or {}, WC.ScriptPermissions and WC.ScriptPermissions.fingerprint() or '')
 end
 
 function WC.linked()
@@ -115,7 +133,10 @@ function WC.linked()
 end
 
 function WC.hello()
-    local payload = helloPayload()
+    local payload, catalog = helloPayload()
+    -- Remember what was sent. Changes while HTTP yields must trigger a second hello afterwards.
+    local sentCapabilities = capabilitiesOf(payload.ops, payload.modules,
+        WC.ScriptPermissions and WC.ScriptPermissions.fingerprint(catalog) or '')
     local status, body = WC.request('POST', '/hello', payload)
     if status == 200 and type(body) == 'table' and body.ok then
         -- Said once when the link comes up (not on every 10-minute re-hello): the owner's sign it worked.
@@ -124,7 +145,7 @@ function WC.hello()
             WC.log('linked — framework %s, inventory %s, %d ops', fw and fw.id or 'none', inv and inv.id or 'none', #payload.ops)
         end
         link.up = true
-        link.ops = WC.capabilities()
+        link.ops = sentCapabilities
         link.server = body.server
         link.pollWait = math.max(1, math.min(25, tonumber(body.pollWait) or 25))
         link.heartbeat = math.max(5, math.min(60, tonumber(body.heartbeat) or 15))
@@ -137,7 +158,10 @@ end
 
 --- Anything but 200 on a running link means the website stopped accepting this server.
 local function lost(status)
-    if status == 401 or status == 402 or status == 404 or status == 409 then link.up = false end
+    if status == 401 or status == 402 or status == 404 or status == 409 then
+        link.up = false
+        if WC.ScriptPermissions then WC.ScriptPermissions.reset() end
+    end
 end
 
 -- Commands are executed at most once. The website hands a command out once, but a poll that closed
