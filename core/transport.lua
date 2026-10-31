@@ -202,6 +202,8 @@ end
 WC.runCommand = runCommand
 
 function WC.start()
+    local version = GetResourceMetadata(GetCurrentResourceName(), 'version', 0)
+    WC.log('w_connector v%s', type(version) == 'string' and version ~= '' and version or 'unknown')
     local _, why = WC.loadConfig()
     if not cfg then
         WC.log('not starting: %s. Put `set wraith_token "wc2.…"` from your panel in server.cfg.', why)
