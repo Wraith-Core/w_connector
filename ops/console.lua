@@ -1,6 +1,6 @@
 -- The imported console has no authority of its own. Every request crosses the signed website
 -- boundary; a queued result is accepted only for a request this connection actually issued.
-WC.Console = { sessions = {}, issued = {}, handlers = {}, clientPending = {} }
+WC.Console = { sessions = {}, issued = {}, handlers = {}, clientPending = {}, refreshHooks = {} }
 local C = WC.Console
 local LEASE, REFRESH, TIMEOUT = 45000, 15000, 18000
 local rates, opening, modes = {}, {}, {}
@@ -99,7 +99,10 @@ local function refresh(src, old)
     opening[src] = nil
     if identity(src) ~= bound or now() - at >= LEASE or (old and C.sessions[src] ~= old) then return nil, 'no_session' end
     if status ~= 200 or type(body) ~= 'table' or not body.ok or type(body.actions) ~= 'table' then
-        retire(old, 'no_access'); return nil, type(body) == 'table' and body.error or 'offline'
+        retire(old, 'no_access')
+        -- 2.2.2: a refusal also takes back his chat suggestions (ops/native_commands.lua)
+        if status == 403 then for _, fn in ipairs(C.refreshHooks) do pcall(fn, src, nil) end end
+        return nil, type(body) == 'table' and body.error or 'offline'
     end
     local s = old or { source = src, identity = bound, nonce = nonce() }
     s.allowed, s.at, s.refreshAt, s.role, s.permissions = {}, at, now(), body.role, body.permissions or {}
@@ -112,6 +115,7 @@ local function refresh(src, old)
     -- Modes use their exact action, not a broad area; a revoked mode stops on the next watchdog tick.
     for name in pairs(modes[src] or {}) do if not s.allowed[name] then modes[src][name] = nil end end
     TriggerClientEvent('w_connector:console:permissions', src, package(s))
+    for _, fn in ipairs(C.refreshHooks) do pcall(fn, src, s) end -- 2.2.2: ops/native_commands.lua (chat suggestions)
     return s
 end
 local function limited(src)
@@ -191,48 +195,89 @@ RegisterNetEvent('w_connector:console:request', function(id, name, data, session
         end)
         return
     end
-    CreateThread(function()
-        local target, targetIdentity
-        if name:sub(1, 7) == 'player.' or name == 'map.teleport' or name == 'hud.setNeed' then
-            local selector = data
-            if name == 'map.teleport' then selector = { id = data.target == 'self' and src or data.target or src, citizenid = data.citizenid } end
-            local found, resolved = pcall(targetOf, src, selector)
-            target = found and resolved or nil; targetIdentity = target and identity(target)
-            if not targetIdentity then answer({ ok = false, error = 'player_offline' }); return end
-            if name == 'map.teleport' then data.target, data.citizenid = target, nil
-            else data.id, data.citizenid = target, nil end
-        end
-        local t = nonce()
-        local issue = { session = s, name = name, target = target, targetIdentity = targetIdentity, at = now() }
-        C.issued[t] = issue
-        local w = { src = src, p = promise.new() }; WC.Menu.pending[t] = w
-        local body = who(src)
-        body.consoleAction, body.data, body.ticket, body.session, body.targetSource = name, data, t, s.nonce, target
-        if target then body.targetIdentity = { source = target, name = GetPlayerName(target), identifiers = WC.identifiers(target), charId = WC.playerView(target).charId } end
-        if name:sub(1, 6) == 'ranks.' then
-            body.subjects = {}
-            for _, id in ipairs(GetPlayers()) do
-                local n = tonumber(id)
-                body.subjects[#body.subjects + 1] = { source = n, name = GetPlayerName(n), charId = WC.playerView(n).charId, discord = WC.identifiers(n).discord }
-            end
-        end
-        local status, res = WC.request('POST', '/ingame/console', body, 8000)
-        if not C.valid(s) then C.issued[t], WC.Menu.pending[t] = nil, nil; answer({ ok = false, error = 'no_session' }); return end
-        if status ~= 200 or type(res) ~= 'table' or not res.ok or not res.queued then
-            C.issued[t], WC.Menu.pending[t] = nil, nil
-            if status == 403 then retire(s, 'no_access') end
-            answer(type(res) == 'table' and res or { ok = false, error = 'offline' }); return
-        end
-        if WC.Menu.pending[t] then SetTimeout(math.max(1, TIMEOUT - (now() - issue.at)), function()
-            if WC.Menu.pending[t] == w then WC.Menu.pending[t] = nil; C.issued[t] = nil; w.p:resolve({ ok = false, error = 'timeout' }) end
-        end) end
-        local result = Citizen.Await(w.p)
-        if name == 'player.ban' and type(res.banId) == 'number' then
-            result = { ok = true, data = { banId = res.banId, kicked = result.ok == true } }
-        end
-        answer(result)
-    end)
+    CreateThread(function() C.dispatch(src, s, name, data, answer) end)
 end)
+-- One checked request on its way to the website: target bound, ticket issued, signed POST, the
+-- queued result awaited. The page's request above and a chat command (C.runAs) both end here.
+-- Runs inside a thread; `answer` is called exactly once.
+function C.dispatch(src, s, name, data, answer)
+    local target, targetIdentity
+    -- 2.2.2: /reportr names the reporter, not the report; the website finds his open report
+    local reportTarget = name == 'reports.message' and (data.citizenid ~= nil or data.id ~= nil)
+    if name:sub(1, 7) == 'player.' or name == 'map.teleport' or name == 'hud.setNeed' or reportTarget then
+        local selector = data
+        if name == 'map.teleport' then selector = { id = data.target == 'self' and src or data.target or src, citizenid = data.citizenid } end
+        local found, resolved = pcall(targetOf, src, selector)
+        target = found and resolved or nil; targetIdentity = target and identity(target)
+        if not targetIdentity then answer({ ok = false, error = 'player_offline' }); return end
+        if name == 'map.teleport' then data.target, data.citizenid = target, nil
+        else data.id, data.citizenid = target, nil end
+    end
+    local t = nonce()
+    local issue = { session = s, name = name, target = target, targetIdentity = targetIdentity, at = now() }
+    C.issued[t] = issue
+    local w = { src = src, p = promise.new() }; WC.Menu.pending[t] = w
+    local body = who(src)
+    body.consoleAction, body.data, body.ticket, body.session, body.targetSource = name, data, t, s.nonce, target
+    if target then body.targetIdentity = { source = target, name = GetPlayerName(target), identifiers = WC.identifiers(target), charId = WC.playerView(target).charId } end
+    -- 2.2.2: staff.chat too: the website picks who among the players online may read it
+    if name:sub(1, 6) == 'ranks.' or name == 'staff.chat' then
+        body.subjects = {}
+        for _, id in ipairs(GetPlayers()) do
+            local n = tonumber(id)
+            body.subjects[#body.subjects + 1] = { source = n, name = GetPlayerName(n), charId = WC.playerView(n).charId, discord = WC.identifiers(n).discord }
+        end
+    end
+    local status, res = WC.request('POST', '/ingame/console', body, 8000)
+    if not C.valid(s) then C.issued[t], WC.Menu.pending[t] = nil, nil; answer({ ok = false, error = 'no_session' }); return end
+    if status ~= 200 or type(res) ~= 'table' or not res.ok or not res.queued then
+        C.issued[t], WC.Menu.pending[t] = nil, nil
+        if status == 403 then retire(s, 'no_access') end
+        answer(type(res) == 'table' and res or { ok = false, error = 'offline' }); return
+    end
+    if WC.Menu.pending[t] then SetTimeout(math.max(1, TIMEOUT - (now() - issue.at)), function()
+        if WC.Menu.pending[t] == w then WC.Menu.pending[t] = nil; C.issued[t] = nil; w.p:resolve({ ok = false, error = 'timeout' }) end
+    end) end
+    local result = Citizen.Await(w.p)
+    if name == 'player.ban' and type(res.banId) == 'number' then
+        result = { ok = true, data = { banId = res.banId, kicked = result.ok == true } }
+    end
+    -- 2.2.2: like a ban, the warning is already stored; the live part (shown to him, the kick) may still fail
+    if name == 'player.warn' and type(res.warningId) == 'number' then
+        local live = result.ok == true and type(result.data) == 'table' and result.data or {}
+        result = { ok = true, data = { warningId = res.warningId, count = tonumber(res.count), delivered = result.ok == true, kicked = live.kicked == true } }
+    end
+    answer(result)
+end
+-- 2.2.2: a chat command (ops/native_commands.lua) runs one console action as the admin who typed it:
+-- the same lease (renewed by the website when older than 2 s), the same allowed list, availability,
+-- target binding, ticket and signed request as the page. There is no other way in. Call it from a thread.
+---@return table result { ok, data?, error? } as the page gets it
+function C.runAs(src, name, data)
+    if not WC.onlineSource(src) then return { ok = false, error = 'player_offline' } end
+    if type(name) ~= 'string' or not contract[name] or not (WEB[name] or C.handlers[name]) or type(data) ~= 'table'
+        or not bounded(data, 0, { n = 0, keys = 0 }) then return { ok = false, error = 'invalid_args' } end
+    if limited(src) then return { ok = false, error = 'rate_limited' } end
+    local s = C.sessions[src]
+    -- a character change (or a reused server id) ends the old lease; never renew it in place
+    if s and s.identity ~= identity(src) then retire(s, 'no_session'); s = nil end
+    if C.valid(s) and now() - s.refreshAt < 2000 then
+        TriggerClientEvent('w_connector:console:permissions', src, package(s))
+    else
+        local err
+        s, err = refresh(src, s)
+        if not s then return { ok = false, error = err or 'no_session' } end
+    end
+    if not C.valid(s) then return { ok = false, error = 'no_session' } end
+    if not s.allowed[name] then return { ok = false, error = 'no_permission' } end
+    if not WEB[name] then
+        local capable, reason = C.available(name, src)
+        if not capable then return { ok = false, error = 'capability_missing', data = { reason = reason } } end
+    end
+    local out
+    C.dispatch(src, s, name, data, function(result) out = result end)
+    return type(out) == 'table' and out or { ok = false, error = 'failed' }
+end
 WC.Ops.define('console.run', nil, function(args)
     local issue = C.issued[args.request]
     if not issue then return false, 'no_request' end

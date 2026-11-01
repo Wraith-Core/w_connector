@@ -102,8 +102,11 @@ local function setSession(s)
     C.session = s
     if WConsoleTools then
         for name, on in pairs(WConsoleTools.modes) do if on and not actions['self.' .. name] then WConsoleTools.modes[name] = false end end
+        -- 2.2.2: only what is on: a chat command's lease (any staff member) must not reset another
+        -- script's invincibility through the god-mode switch
+        local on = WMenu.selfState and WMenu.selfState() or {}
         for action, key in pairs({ noclip = 'noclip', godmode = 'godmode', names = 'viewids' }) do
-            if not actions['self.' .. action] then WMenu.applySelf('self.' .. key, { on = false }) end
+            if not actions['self.' .. action] and on[key == 'viewids' and 'ids' or key] then WMenu.applySelf('self.' .. key, { on = false }) end
         end
         if not actions['player.spectate'] then WMenu.stopSpectate() end
     end
@@ -121,8 +124,10 @@ RegisterNetEvent('w_connector:console:session', function(s)
     setSession(s); C.wantOpen = true; open()
 end)
 RegisterNetEvent('w_connector:console:permissions', function(s)
-    if foreign() or type(s) ~= 'table' or not C.session then return end
-    if s.nonce ~= C.session.nonce then return end
+    if foreign() or type(s) ~= 'table' or s.ok ~= true then return end
+    -- 2.2.2: a chat command (ops/native_commands.lua) opens a lease without the page: take it, so its
+    -- client tools (noclip ...) run as they do from the page
+    if C.session and s.nonce ~= C.session.nonce then return end
     setSession(s)
     if WMenu.open then send('permissions', { perms = s.perms, actions = s.actionAreas }); send('connectorCapabilities', { actions = s.list, unavailable = s.unavailable, game = s.game }); pushSelf() end
 end)
@@ -170,6 +175,18 @@ local function toggle(mode)
 end
 exports('OpenAdminConsole', toggle)
 exports('UsesUnifiedConsole', function() return true end)
+-- 2.2.2: the server's /admin, /am, /quickadmin and /noclip (ops/native_commands.lua, only while w_admin is off)
+RegisterNetEvent('w_connector:console:command', function(what)
+    if foreign() then return end
+    if what == 'full' or what == 'quick' then
+        if not (WMenu.open and C.mode == what) then toggle(what) end
+    elseif what == 'noclip' and WMenu.selfState then
+        if WMenu.selfState().noclip then
+            -- turning it off needs no authority, as the page's own off switch
+            WConsoleTools.execute('self.noclip', { state = false }); TriggerServerEvent('w_connector:console:modeOff', 'self.noclip'); pushSelf()
+        else TriggerServerEvent('w_connector:console:noclip') end
+    end
+end)
 RegisterCommand('wadmin', function() toggle('full') end, false)
 RegisterCommand('wquickadmin', function() toggle('quick') end, false)
 -- RegisterKeyMapping is available on both games. When w_admin owns F10 its existing binding
