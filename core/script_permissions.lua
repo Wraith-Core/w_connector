@@ -35,9 +35,10 @@ local function aclReady()
     end
     return true
 end
+-- 2.2.3: ExecuteCommand is void. A real FXServer returns false for every line, applied or silently denied,
+-- so its result proves nothing; only a native fault counts here and every caller verifies the ACE itself.
 local function execute(line)
-    local ok, result = pcall(ExecuteCommand, line)
-    return ok and result ~= false
+    return (pcall(ExecuteCommand, line))
 end
 local function warning(message)
     local t = now()
@@ -49,8 +50,11 @@ end
 local function aceAllowed(principal, node)
     if type(IsPrincipalAceAllowed) ~= 'function' then return nil end
     local ok, value = pcall(IsPrincipalAceAllowed, principal, node)
-    if not ok or type(value) ~= 'boolean' then return nil end
-    return value
+    -- 2.2.3: the native BOOL arrives as 1 when allowed and false when not; anything else stays unknown.
+    if not ok then return nil end
+    if value == true or value == 1 then return true end
+    if value == false or value == 0 then return false end
+    return nil
 end
 local function probe(s) return s.principal .. '.bound' end
 local function persist()

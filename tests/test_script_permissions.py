@@ -79,11 +79,24 @@ function WC.request(method,path,payload,timeout)
 end
 '''
 
+# 2.2.3: the return shapes a REAL FXServer gives (measured on FXServer, _fwtest/aclcheck, 2026-11-02):
+# ExecuteCommand is void and returns false for every line, applied or silently denied; the BOOL
+# IsPrincipalAceAllowed returns the number 1 when allowed and false when not.
+REAL_NATIVE_SHAPES = r'''
+local ace, exec = IsPrincipalAceAllowed, ExecuteCommand
+function IsPrincipalAceAllowed(principal, node) return ace(principal, node) and 1 or false end
+function ExecuteCommand(line) exec(line); return false end
+'''
+
 
 class ScriptPermissionsTests(unittest.TestCase):
+    REAL_NATIVES = False
+
     def setUp(self):
         self.lua = lua54.LuaRuntime()
         self.lua.execute(HARNESS)
+        if self.REAL_NATIVES:
+            self.lua.execute(REAL_NATIVE_SHAPES)
         def plain(value):
             if hasattr(value, 'items'):
                 pairs = dict(value.items())
@@ -432,6 +445,77 @@ class ScriptPermissionsTests(unittest.TestCase):
         self.run_lua("STARTED.w_core=true; WC.ScriptPermissionRegistry.groups[1].permissions[1].label=nil; WC.ScriptPermissionRegistry.groups[1].permissions[1].description=nil; exports={w_core={RanksState=function() return {catalog={{nodes={{node='w_farming.admin.view',label={ar='المزرعة',en='Farming'},desc={ar='عرض',en='View'}}}}},members=setmetatable({},{__pairs=function() error('member disclosure') end})} end}}")
         self.assertIn('w_farming:w_farming.admin.view', self.catalogue_ids())
         self.assertIsNone(self.val('(WC.ScriptCatalog.build()).members'))
+
+
+class RealFxServerNativeShapesTests(ScriptPermissionsTests):
+    """Every lease test again with FXServer's real return values, plus the live 2.2.2 stuck-cleanup cases."""
+    REAL_NATIVES = True
+    STUCK = 'wcsite.sp2_8b30d542c7dc388756563869673829cf.7.3'
+
+    def capture_warnings(self):
+        self.run_lua("LOGS={}; WC.log=function(fmt, ...) LOGS[#LOGS+1]=fmt:format(...) end")
+
+    def warnings(self):
+        return list(self.lua.globals().LOGS.values())
+
+    def test_real_shapes_grant_then_drop_retires_without_pending_warning(self):
+        self.capture_warnings()
+        self.assertTrue(self.refresh())
+        self.assertTrue(self.bound())
+        self.assertEqual(self.val("IsPrincipalAceAllowed('player.1','w_farming.admin.view')"), 1)
+        self.run_lua('source=1; HANDLERS.playerDropped()')
+        self.assertFalse(self.val("IsPrincipalAceAllowed('player.1','w_farming.admin.view')"))
+        self.assertFalse(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
+        self.assertFalse(self.val('next(WC.ScriptPermissions.owned) ~= nil'))
+        self.assertFalse(json.loads(self.val('KVP.wcsite_cleanup_v1'))['entries'])  # empty (the harness encodes {} for [])
+        self.assertEqual(self.warnings(), [])
+
+    def test_real_shapes_lease_expiry_retires_without_pending_warning(self):
+        self.capture_warnings()
+        self.assertTrue(self.refresh())
+        self.run_lua('NOW=46000; WC.ScriptPermissions.tick()')
+        self.assertFalse(self.bound())
+        self.assertFalse(self.val("IsPrincipalAceAllowed('player.1','w_farming.admin.view')"))
+        self.assertFalse(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
+        self.assertEqual(self.warnings(), [])
+
+    def stuck_journal(self, live_aces):
+        # The entry 2.2.2 left on Studio/Red River: a grant aborted after its probe add, for a player who is gone.
+        entry = {'source': 7, 'principal': self.STUCK, 'nodes': ['w_farming.admin.view'], 'bound': True, 'probe': True}
+        self.lua.globals().STUCK_JOURNAL = json.dumps({'version': 1, 'entries': [entry]})
+        self.run_lua("KVP.wcsite_cleanup_v1=STUCK_JOURNAL; PEOPLE={}")
+        if live_aces:  # resource restart inside the same FXServer process: the ACEs are still in memory
+            self.run_lua("P='%s'; ExecuteCommand('add_ace '..P..' '..P..'.bound allow'); ExecuteCommand('add_ace '..P..' w_farming.admin.view allow'); ExecuteCommand('add_principal player.7 '..P)" % self.STUCK)
+        self.capture_warnings()
+        self.lua.execute((ROOT / 'core/script_permissions.lua').read_text(encoding='utf-8'))
+        self.assertTrue(self.val("WC.ScriptPermissions.pending['%s'] ~= nil" % self.STUCK))
+        self.run_lua('WC.ScriptPermissions.tick()')
+
+    def test_stuck_journal_of_a_gone_player_is_retired_after_server_restart(self):
+        self.stuck_journal(live_aces=False)
+        self.assertFalse(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
+        self.assertFalse(json.loads(self.val('KVP.wcsite_cleanup_v1'))['entries'])  # empty (the harness encodes {} for [])
+        self.assertEqual(self.warnings(), [])
+
+    def test_stuck_journal_with_aces_still_in_memory_is_removed_and_retired(self):
+        self.stuck_journal(live_aces=True)
+        self.assertFalse(self.val("IsPrincipalAceAllowed('player.7','w_farming.admin.view')"))
+        self.assertFalse(self.val("IsPrincipalAceAllowed('%s','%s.bound')" % (self.STUCK, self.STUCK)))
+        self.assertFalse(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
+        self.assertFalse(json.loads(self.val('KVP.wcsite_cleanup_v1'))['entries'])  # empty (the harness encodes {} for [])
+        self.assertEqual(self.warnings(), [])
+
+    def test_silently_denied_removal_stays_pending_until_the_acl_returns(self):
+        # Without the ACL lines FXServer drops remove_ace/remove_principal silently (same false result).
+        self.assertTrue(self.refresh())
+        self.capture_warnings()
+        self.run_lua("ORIG_EXEC=ExecuteCommand; DENY=true; function ExecuteCommand(line) if DENY and line:match('^remove_') then return false end return ORIG_EXEC(line) end; source=1; HANDLERS.playerDropped()")
+        self.assertEqual(self.val("IsPrincipalAceAllowed('player.1','w_farming.admin.view')"), 1)
+        self.assertTrue(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
+        self.assertEqual(len(self.warnings()), 1)
+        self.run_lua('DENY=false; NOW=NOW+500; WC.ScriptPermissions.tick()')
+        self.assertFalse(self.val("IsPrincipalAceAllowed('player.1','w_farming.admin.view')"))
+        self.assertFalse(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
 
 
 class TransportLeaseTimeoutTests(unittest.TestCase):
