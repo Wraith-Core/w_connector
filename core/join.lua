@@ -5,6 +5,9 @@
 --- panel's Entry tab), and the player's queue priority. When the server is full, players wait here in order
 --- of priority, then arrival, until a slot opens.
 ---
+--- 2.2.4: in the 'waitApproval' mode a newcomer is not refused: they wait here (request id on the card) while
+--- staff approve or deny the request on the panel, at most `wraith_join_wait_minutes` (15).
+---
 --- When the website can't be reached the player is let in, unless `set wraith_join_fail_closed "true"`:
 --- a ban list that locks everyone out whenever the internet blips would be worse than the bans.
 
@@ -26,6 +29,10 @@ local joinText = {
         discord_member = 'يجب أن تكون عضوًا في سيرفر الديسكورد لتدخل. انضم إليه ثم حاول مجددًا.',
         discord_roles = 'ليست لديك رتبة الديسكورد المطلوبة لدخول هذا السيرفر.',
         discord_unavailable = 'تعذر التحقق من حساب الديسكورد الآن. حاول مجددًا بعد قليل.',
+        -- 2.2.4: waiting for approval on the connecting screen
+        waiting = 'بانتظار موافقة الإدارة. رقم طلبك: %s\nابقَ في هذه الشاشة، وستدخل السيرفر تلقائيًا عند الموافقة. (مضى %s)',
+        wait_denied = 'رفضت الإدارة طلب دخولك.',
+        wait_timeout = 'لم ترد الإدارة على طلبك (رقم %s) بعد. حاول الدخول لاحقًا.',
     },
     en = {
         unavailable = 'Access could not be checked. Please try again shortly.',
@@ -44,6 +51,10 @@ local joinText = {
         discord_member = 'You must be a member of our Discord server to join. Join it, then try again.',
         discord_roles = 'You do not have the Discord role this server requires.',
         discord_unavailable = 'Your Discord account could not be checked right now. Please try again shortly.',
+        -- 2.2.4: waiting for approval on the connecting screen
+        waiting = 'Waiting for staff approval. Your request ID: %s\nStay on this screen; you will join automatically once approved. (%s so far)',
+        wait_denied = 'Staff denied your join request.',
+        wait_timeout = 'Staff have not answered your request (%s) yet. Please try again later.',
     },
 }
 local function joinMessage(key, ...)
@@ -74,17 +85,20 @@ end
 local MODE_REFUSALS = { allowlist = true, admins = true, discord_missing = true, discord_member = true, discord_roles = true, discord_unavailable = true }
 local REQUEST_ID = '^R[1-9A-HJ-NP-Z][1-9A-HJ-NP-Z][1-9A-HJ-NP-Z][1-9A-HJ-NP-Z]$'
 
+local function instructionsOf(body)
+    local text = type(body.instructions) == 'string' and body.instructions:gsub('^%s+', ''):gsub('%s+$', '') or ''
+    local ok, cut = pcall(utf8.offset, text, 501) -- by characters, so an Arabic letter is never cut in half
+    if ok and cut then text = text:sub(1, cut - 1) end
+    return text
+end
+
 local function modeRefusal(body)
     local lines = { joinMessage(body.reason) }
     if body.reason == 'allowlist' and type(body.requestId) == 'string' and body.requestId:match(REQUEST_ID) then
         lines[#lines + 1] = joinMessage('request_id', body.requestId)
     end
-    local text = type(body.instructions) == 'string' and body.instructions:gsub('^%s+', ''):gsub('%s+$', '') or ''
-    if text ~= '' then
-        local ok, cut = pcall(utf8.offset, text, 501) -- by characters, so an Arabic letter is never cut in half
-        if ok and cut then text = text:sub(1, cut - 1) end
-        lines[#lines + 1] = text
-    end
+    local text = instructionsOf(body)
+    if text ~= '' then lines[#lines + 1] = text end
     return table.concat(lines, '\n')
 end
 
@@ -102,6 +116,32 @@ local function refusal(body)
     if body.reason == 'whitelist' then return joinMessage('whitelist') end
     if MODE_REFUSALS[body.reason] then return modeRefusal(body) end
     return type(body.message) == 'string' and body.message:sub(1, 500) or joinMessage('denied')
+end
+
+-- 2.2.4: the 'waitApproval' join mode. The player stays on the connecting screen while staff decide on the panel;
+-- the website is asked every few seconds. Returns the queue priority once approved, or nil when the player was sent
+-- away (denied, timed out, server closing) or left. A website that cannot be reached keeps the player waiting.
+local WAIT_POLL_MS = 5000
+
+local function waitForApproval(src, deferrals, reqId, instructions)
+    local limit = math.max(1, GetConvarInt('wraith_join_wait_minutes', 15)) * 60000
+    local started = GetGameTimer()
+    while true do
+        if GetPlayerName(src) == nil then return nil end
+        if WC.Host and WC.Host.shuttingDown then deferrals.done(WC.Host.say('closing')) return nil end
+        local elapsed = GetGameTimer() - started
+        if elapsed >= limit then deferrals.done(joinMessage('wait_timeout', reqId)) return nil end
+        local sec = elapsed // 1000
+        local card = joinMessage('waiting', reqId, ('%d:%02d'):format(sec // 60, sec % 60))
+        deferrals.update(instructions ~= '' and (card .. '\n' .. instructions) or card)
+        Wait(WAIT_POLL_MS)
+        if GetPlayerName(src) == nil then return nil end
+        local status, body = WC.request('POST', '/join/wait', { requestId = reqId, identifiers = WC.identifiers(src) })
+        if status == 200 and type(body) == 'table' then
+            if body.status == 'approved' then return math.tointeger(tonumber(body.priority)) or 0 end
+            if body.status == 'denied' then deferrals.done(joinMessage('wait_denied')) return nil end
+        end
+    end
 end
 
 local function slotsFree()
@@ -144,14 +184,20 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
         if failClosed() then return deferrals.done(joinMessage('unavailable')) end
         return deferrals.done()
     end
+    local priority = math.tointeger(tonumber(body.priority)) or 0
     if body.allow == false then
-        return deferrals.done(refusal(body))
+        if body.reason ~= 'allowlist_wait' or type(body.requestId) ~= 'string' or not body.requestId:match(REQUEST_ID) then
+            return deferrals.done(refusal(body))
+        end
+        local approved = waitForApproval(src, deferrals, body.requestId, instructionsOf(body))
+        if not approved then return end
+        priority = approved
     end
 
     if slotsFree() and #queue == 0 then return deferrals.done() end
 
     -- Full: wait in line. A player who closes the game leaves the line (GetPlayerName answers nil).
-    queue[#queue + 1] = { src = src, prio = math.tointeger(tonumber(body.priority)) or 0, at = GetGameTimer() }
+    queue[#queue + 1] = { src = src, prio = priority, at = GetGameTimer() }
     while true do
         if GetPlayerName(src) == nil then leave(src) return end
         local pos = position(src)
