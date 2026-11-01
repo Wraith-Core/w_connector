@@ -13,12 +13,20 @@ local joinText = {
         checking = 'جارٍ التحقق من صلاحية دخولك…',
         denied = 'لا يمكنك دخول السيرفر. راجع الإدارة لمعرفة السبب.',
         queued = 'السيرفر ممتلئ. ترتيبك %d من %d في قائمة الانتظار. انتظر؛ سيدخلك السيرفر تلقائيًا عند توفر مكان.',
+        closed = 'السيرفر مغلق الآن. حاول الدخول لاحقًا.',
+        banned = 'أنت محظور من هذا السيرفر. السبب: %s (رقم الحظر %s).',
+        banned_until = 'أنت محظور من هذا السيرفر حتى %s بتوقيت UTC. السبب: %s (رقم الحظر %s).',
+        whitelist = 'هذا السيرفر للقائمة المسموحة فقط، واسمك ليس فيها. راجع الإدارة.',
     },
     en = {
         unavailable = 'Access could not be checked. Please try again shortly.',
         checking = 'Checking your access…',
         denied = 'You cannot join this server. Contact staff for the reason.',
         queued = 'The server is full. You are %d of %d in the queue. Please wait; you will join automatically when a slot opens.',
+        closed = 'The server is closed right now. Please try again later.',
+        banned = 'You are banned from this server. Reason: %s (ban #%s).',
+        banned_until = 'You are banned from this server until %s UTC. Reason: %s (ban #%s).',
+        whitelist = 'This server is whitelisted, and you are not on the list. Contact staff.',
     },
 }
 local function joinMessage(key, ...)
@@ -28,6 +36,27 @@ end
 local queue = {} -- { src, prio, at }
 
 local function failClosed() return GetConvar('wraith_join_fail_closed', 'false') == 'true' end
+
+-- 2.2.0: a server closed from the website or /closeserver stays closed while the website cannot be reached
+-- (core/closed.lua keeps the last value); staff with the 'wraithadmin.join' ACE still come in.
+local function closedLocally(src)
+    return WC.Closed and WC.Closed.value == true and not IsPlayerAceAllowed(src, 'wraithadmin.join')
+end
+
+--- The website's refusal in the player's language (2.2.0: it sends a reason code; older sites only English text).
+local function refusal(body)
+    if body.reason == 'banned' then
+        local reason = type(body.banReason) == 'string' and body.banReason:sub(1, 200) or '-'
+        local id = tostring(math.tointeger(tonumber(body.banId)) or '-')
+        if type(body['until']) == 'string' then return joinMessage('banned_until', body['until']:sub(1, 20), reason, id) end
+        return joinMessage('banned', reason, id)
+    end
+    if body.reason == 'closed' then
+        return type(body.closedMessage) == 'string' and body.closedMessage ~= '' and body.closedMessage:sub(1, 300) or joinMessage('closed')
+    end
+    if body.reason == 'whitelist' then return joinMessage('whitelist') end
+    return type(body.message) == 'string' and body.message:sub(1, 500) or joinMessage('denied')
+end
 
 local function slotsFree()
     return GetNumPlayerIndices() < GetConvarInt('sv_maxclients', 32)
@@ -49,8 +78,11 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
     local src = source
     deferrals.defer()
     Wait(0)
+    -- 2.2.0: the host agent announced a shutdown (core/host.lua): nobody new comes in
+    if WC.Host and WC.Host.shuttingDown then return deferrals.done(WC.Host.say('closing')) end
     -- (Not `a and done(x) or done()`: done returns nothing, so that form calls done twice.)
     if not WC.linked() then
+        if closedLocally(src) then return deferrals.done(joinMessage('closed')) end
         if failClosed() then return deferrals.done(joinMessage('unavailable')) end
         return deferrals.done()
     end
@@ -58,11 +90,12 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
     deferrals.update(joinMessage('checking'))
     local status, body = WC.request('POST', '/join', { name = tostring(name or ''):sub(1, 64), identifiers = WC.identifiers(src) })
     if status ~= 200 or type(body) ~= 'table' then
+        if closedLocally(src) then return deferrals.done(joinMessage('closed')) end
         if failClosed() then return deferrals.done(joinMessage('unavailable')) end
         return deferrals.done()
     end
     if body.allow == false then
-        return deferrals.done(type(body.message) == 'string' and body.message:sub(1, 500) or joinMessage('denied'))
+        return deferrals.done(refusal(body))
     end
 
     if slotsFree() and #queue == 0 then return deferrals.done() end

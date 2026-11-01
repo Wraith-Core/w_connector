@@ -213,6 +213,11 @@ local function forward(kind, data, cb)
                 pushSelf()
                 if (action == 'noclip' or action == 'laser') and data.args and data.args.state or action:sub(1, 2) == 'tp' then WMenu.close() end
             end
+            -- 2.2.0: a hub quick command (ops/native_scripts.lua built the line from its registry): run
+            -- here, as this admin, while the console stays open; the script's own message shows the result
+            if kind == 'scripts' and type(r.data) == 'table' and type(r.data.exec) == 'string' then
+                local line = r.data.exec; r.data.exec = nil; ExecuteCommand(line)
+            end
             if type(r.data) == 'table' and type(r.data.route) == 'table' then
                 local route = r.data.route; r.data.route = nil; WMenu.close()
                 SetTimeout(150, function()

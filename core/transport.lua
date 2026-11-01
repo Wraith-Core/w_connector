@@ -227,8 +227,10 @@ function WC.start()
     CreateThread(function()
         while true do
             if link.up then
-                local status = WC.request('POST', '/heartbeat', { players = WC.onlinePlayers(), uptime = GetGameTimer() // 1000, queue = WC.queueSize and WC.queueSize() or 0 })
+                local status, body = WC.request('POST', '/heartbeat', { players = WC.onlinePlayers(), uptime = GetGameTimer() // 1000, queue = WC.queueSize and WC.queueSize() or 0 })
                 lost(status)
+                -- 2.2.0: the website's "server closed" switch rides on the answer (core/closed.lua)
+                if status == 200 and type(body) == 'table' and WC.Closed then WC.Closed.learn(body.closed, body.closedMessage) end
             end
             Wait(link.heartbeat * 1000)
         end

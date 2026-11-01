@@ -119,6 +119,19 @@ function WCore.canRevive() return WC.started('w_medic') end
 function WCore.revive(src) TriggerClientEvent('hospital:client:Revive', src) return true end
 function WCore.heal(src) TriggerClientEvent('hospital:client:adminHeal', src) return true end
 
+-- 2.2.0: hunger / thirst while w_hud is NOT running (ops/native_settings.lua asks w_hud first). w_core then
+-- owns them in the metadata and decays them itself (server/loops.lua), and tells the HUD the same way.
+function WCore.setNeeds(src, needs)
+    local p = player(src)
+    if not p then return false, 'no_character' end
+    if needs.hunger then p.Functions.SetMetaData('hunger', needs.hunger) end
+    if needs.thirst then p.Functions.SetMetaData('thirst', needs.thirst) end
+    local meta = p.PlayerData.metadata or {}
+    -- the copy above was taken before SetMetaData: send the new values, the copy only for the one not changed
+    TriggerClientEvent('hud:client:UpdateNeeds', src, needs.hunger or meta.hunger, needs.thirst or meta.thirst)
+    return true
+end
+
 
 -- Offline: the framework's own players table (citizenid, license, charinfo JSON, job JSON, money JSON —
 -- the columns read on the staging databases fwtest_rsg / fwtest_wcore and in qbcore.sql).
@@ -146,11 +159,37 @@ function WCore.offline(charId)
 end
 
 -- Offline money straight on the central bank's ledger (w_centralbank ledger.lua:183 AdjustPlayer).
-function WCore.moneyOffline(charId, account, delta)
+-- 2.2.0: `reason` (optional) is the journal's reason, e.g. the staff member's own words.
+function WCore.moneyOffline(charId, account, delta, reason)
     if not KNOWN[account] then return false, 'unknown_account' end
     if not bankReady() then return false, 'bank_not_ready' end
-    local ok, why = exports.w_centralbank:AdjustPlayer(charId, account, delta, 'wraith-panel (offline)')
+    local ok, why = exports.w_centralbank:AdjustPlayer(charId, account, delta, type(reason) == 'string' and reason ~= '' and reason or 'wraith-panel (offline)')
     if not ok then return false, type(why) == 'string' and why or 'refused' end
+    return true
+end
+
+-- 2.2.0: the characters page (ops/native_characters.lua). Is `grade` a grade of w_core's job / gang
+-- `name`? SetJob alone would take an unknown grade as "No Grades" (player.lua:231), so it is checked first.
+function WCore.roleGrade(kind, name, grade)
+    local shared = core().Shared
+    local def
+    if kind == 'gang' then def = shared.GetGang(name) else def = shared.GetJob(name) end
+    if type(def) ~= 'table' then return false, kind == 'gang' and 'unknown_gang' or 'unknown_job' end
+    local grades = type(def.grades) == 'table' and def.grades or {}
+    if grades[grade] == nil and grades[tostring(grade)] == nil then return false, 'unknown_grade' end
+    return true
+end
+
+-- 2.2.0: an offline character's job or gang, through w_core's own offline player (functions.lua:56): the
+-- same SetJob / SetGang as in play, then saved to its row.
+function WCore.setRoleOffline(charId, kind, name, grade)
+    local fits, why = WCore.roleGrade(kind, name, grade)
+    if not fits then return false, why end
+    local p = core().Functions.GetOfflinePlayerByCitizenId(charId)
+    if not p or not p.Functions then return false, 'not_found' end
+    local set = kind == 'gang' and p.Functions.SetGang or p.Functions.SetJob
+    if set(name, grade) == false then return false, 'refused' end
+    p.Functions.Save()
     return true
 end
 

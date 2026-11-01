@@ -211,6 +211,31 @@ EFFECTS.trollInvisible = function()
     SetEntityVisible(ped, not IsEntityVisible(ped), false)
 end
 
+--- 2.2.0: the needs page's stamina (0-100), as w_admin set it (cl_admin.lua applyStamina): the stamina core,
+--- the ped's and the player's stamina, the mount's too, and the `stamina` state bag the player list reads.
+--- Sent by ops/native_settings.lua to the TARGET; the RedM natives are pcalled (FiveM has only the player one).
+EFFECTS.setStamina = function(pct)
+    local ped, id = myPed(), PlayerId()
+    pct = math.max(0, math.min(100, tonumber(pct) or 100))
+    pcall(RestorePlayerStamina, id, pct / 100.0)
+    LocalPlayer.state:set('stamina', math.floor(pct), true)
+    -- RDR2 hashes only: on FiveM the same hash could name another native
+    if GetGameName() ~= 'redm' then return end
+    pcall(Citizen.InvokeNative, 0xC6258F41D86676E0, ped, 1, math.floor(pct))
+    pcall(RestorePedStamina, ped, pct + 0.0)
+    pcall(Citizen.InvokeNative, 0x675680D089BFA21F, ped, pct + 0.0)
+    pcall(Citizen.InvokeNative, 0xC41F4B6E23FE6A4A, id, pct / 100.0)
+    local onMount, mounted = pcall(IsPedOnMount, ped)
+    if onMount and mounted then
+        local okMount, mount = pcall(GetMount, ped)
+        if okMount and mount and mount ~= 0 then
+            pcall(Citizen.InvokeNative, 0xC6258F41D86676E0, mount, 1, math.floor(pct))
+            pcall(RestorePedStamina, mount, pct + 0.0)
+            pcall(Citizen.InvokeNative, 0x675680D089BFA21F, mount, pct + 0.0)
+        end
+    end
+end
+
 --- The dispatcher, which now SAYS when something goes wrong.
 ---
 --- It used to be `pcall(fn, arg)` with the result discarded. That makes the two failures an operator

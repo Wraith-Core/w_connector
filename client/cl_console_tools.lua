@@ -121,7 +121,30 @@ RegisterNetEvent('w_map:editorSaved', function(kind, saved, err, id)
     local pending = mapThemePending; mapThemePending = nil
     pending.promise:resolve({ ok = saved == true, error = err })
 end)
+-- 2.2.0: player.sitOnMount runs on the TARGET's own client (ops/native_player.lua; was w_admin
+-- cl_admin.lua): the closest live horse within 8 m that no player rides, then the saddle.
+local function sitOnMount()
+    if not redm then return fail('capability_missing') end
+    local me = ped()
+    if IsPedOnMount(me) or IsPedInAnyVehicle(me, false) then return fail('err_target_mounted') end
+    local at, closest, distance = GetEntityCoords(me), nil, 8.0
+    for _, horse in ipairs(GetGamePool('CPed')) do
+        local isHorse = Citizen.InvokeNative(0x772A1969F649E902, GetEntityModel(horse)) -- IsThisModelAHorse
+        if horse ~= me and (isHorse == 1 or isHorse == true) and not IsPedDeadOrDying(horse, true) then
+            local d = #(GetEntityCoords(horse) - at)
+            if d < distance then
+                local ridden = false
+                for _, idx in ipairs(GetActivePlayers()) do if GetMount(GetPlayerPed(idx)) == horse then ridden = true break end end
+                if not ridden then closest, distance = horse, d end
+            end
+        end
+    end
+    if not closest then return fail('no_mount_nearby') end
+    SetPedOntoMount(me, closest, -1, true)
+    return ok()
+end
 function T.execute(name, a, target)
+    if name == 'player.sitOnMount' then return sitOnMount() end
     local action = name:match('^[a-z]+%.(.+)$')
     if name == 'query.map' then
         local cfg = exports.w_map:GetMapConfig()

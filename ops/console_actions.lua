@@ -217,42 +217,8 @@ C.define('player.spectate', nil, function(data, ctx)
     allowMove(ctx.source)
     return C.client('player.spectate', { state = data.args.state ~= false, coords = position(ctx.target) }, ctx)
 end)
-local function wadmin()
-    if not WC.started('w_admin') then return false end
-    local ok, v = pcall(function() return exports.w_admin:ConnectorConsoleVersion() end)
-    return ok and v == 1
-end
-local function native(name, payload, ctx)
-    C.bridgeActive = C.bridgeActive or {}
-    local key = ('%08x%08x'):format(math.random(0, 0xffffffff), math.random(0, 0xffffffff))
-    C.bridgeActive[key] = { name = name, ctx = ctx }
-    local called, result = pcall(function() return exports.w_admin:ConnectorConsole(ctx.source, name, payload, key) end)
-    C.bridgeActive[key] = nil
-    if not called or type(result) ~= 'table' then return false, 'capability_missing' end
-    return result.ok == true, result.ok and result.data or result.error, not result.ok and result.data or nil
-end
-local function nativeAvailable(name)
-    return function(src)
-        if not wadmin() then return false, 'capability_missing' end
-        local ok, permitted = pcall(function() return exports.w_admin:CanConnectorConsole(src, name) end)
-        return ok and permitted == true, 'native_permission'
-    end
-end
-exports('AuthorizeConsoleBridge', function(src, name, key)
-    if GetInvokingResource() ~= 'w_admin' then return false end
-    local active = C.bridgeActive and C.bridgeActive[key]
-    if not active or active.ctx.source ~= src or active.name ~= name or not active.ctx.valid() then return false end
-    C.bridgeActive[key] = nil
-    return true
-end)
--- This optional bridge invokes the original resource's runners and its native permissions.
--- A website role never manufactures a framework master rank or bypasses an owning resource's gate.
-for _, name in ipairs({ 'player.wardrobe', 'player.sitOnMount',
-    'settings.list', 'settings.schema', 'settings.values', 'settings.apply', 'settings.reset', 'settings.history',
-    'settings.openPanel', 'settings.export', 'settings.import', 'settings.presets', 'characters.blocks',
-    'characters.money', 'characters.giveItem', 'characters.setJob', 'characters.setGang', 'hud.save', 'hud.setNeed' }) do
-    C.define(name, nativeAvailable(name), function(data, ctx) return native(name, data, ctx) end)
-end
+-- 2.2.0: the native w_admin bridge (wardrobe, sit on mount, live settings, HUD, offline character edits)
+-- is gone; each part now runs here without w_admin: ops/native_*.lua.
 C.define('player.openInventory', function() return inv() and type(inv().openPlayer) == 'function' end, function(_, ctx)
     if not ctx.valid() then return false, 'target_changed' end
     return inv().openPlayer(ctx.source, ctx.target)
@@ -282,7 +248,12 @@ for action, name in pairs({ weather = 'world.setWeather', time = 'world.setTime'
         local a = data.args
         if action == 'weather' then return op(name, { weather = a.type }) end
         if action == 'announce' then
-            if WC.started('w_hud') then return exports.w_hud:Announce(a.text, a.seconds, { by = GetPlayerName(ctx.source) }) ~= false end
+            if WC.started('w_hud') then
+                local shown = exports.w_hud:Announce(a.text, a.seconds, { by = GetPlayerName(ctx.source) }) ~= false
+                -- 2.2.0: the pause menu's announcements card records it, as after w_admin's (w_pausemenu 2.0.3 trusts this resource)
+                if shown then TriggerEvent('w_admin:server:announced', a.text, GetPlayerName(ctx.source)) end
+                return shown
+            end
             return op(name, { message = a.text })
         end
         return op(name, a)
@@ -322,19 +293,7 @@ for _, action in ipairs({ 'waypoint', 'clearWaypoint', 'copyCoords', 'setTheme' 
     C.define('map.' .. action, action == 'setTheme' and function() return WC.started('w_map') end or nil,
         function(data, ctx) return C.client('map.' .. action, data, ctx) end)
 end
-C.define('scripts.list', nil, function(data, ctx)
-    if nativeAvailable('scripts.list')(ctx.source) then return native('scripts.list', data, ctx) end
-    local ok, list = op('resources.list')
-    if not ok then return false, list end
-    local out = {}
-    for _, r in ipairs(list) do
-        out[#out + 1] = { resource = r.name, label = { ar = r.name, en = r.name },
-            description = { ar = r.description or '', en = r.description or '' }, help = { ar = r.description or '', en = r.description or '' },
-            group = 'system', state = r.state, version = r.version, settings = nil, commands = {} }
-    end
-    return true, out
-end)
-for _, action in ipairs({ 'open', 'run' }) do C.define('scripts.' .. action, nativeAvailable('scripts.' .. action), function(data, ctx) return native('scripts.' .. action, data, ctx) end) end
+-- scripts.list / open / run: ops/native_scripts.lua (2.2.0)
 C.define('scripts.start', nil, function(data) return op('resources.control', { name = data.resource, action = 'start' }) end)
 for action, verb in pairs({ startResource = 'start', stopResource = 'stop', restartResource = 'restart' }) do
     C.define('server.' .. action, nil, function(data, ctx)
@@ -342,39 +301,5 @@ for action, verb in pairs({ startResource = 'start', stopResource = 'stop', rest
         return op('resources.control', { name = data.args.name, action = verb })
     end)
 end
-for _, action in ipairs({ 'newsList', 'newsSave', 'newsReset' }) do
-    C.define('news.' .. action, function() return WC.started('w_admin') and WC.started('w_pausemenu') end, function(data, ctx)
-        data.action = action
-        local result = exports.w_admin:SiteRun('news', data, GetPlayerName(ctx.source))
-        if type(result) ~= 'table' then return false, 'failed' end
-        return result.ok == true, result.ok and result.data or result.error, not result.ok and result.data or nil
-    end)
-end
-for _, action in ipairs({ 'search', 'get' }) do
-    local opname = action == 'search' and 'players.search' or 'player.offline'
-    C.define('characters.' .. action, available(opname), function(data)
-        if action == 'get' and WC.started('w_admin') then
-            local ok, result = op('character.action', { action = 'get', charId = data.citizenid })
-            if ok then return true, result.data end
-        end
-        local ok, rows = op(opname, action == 'search' and { q = data.q } or { charId = data.citizenid })
-        if not ok then return false, rows end
-        local function row(p)
-            local accounts = {}; for id, balance in pairs(p.money or {}) do accounts[#accounts + 1] = { id = id, balance = balance, currency = id } end
-            return { citizenid = tostring(p.charId), name = p.charName or p.name or '', account = p.name or '', license = p.license or '', slot = 0,
-                lastSeen = p.lastSeen, job = p.job and (p.job.label or p.job.name) or '', online = nil,
-                money = accounts, gang = '', block = nil, dependencies = {}, siblings = {} }
-        end
-        if action == 'get' then return true, row(rows) end
-        local out = {}; for _, p in ipairs(rows) do out[#out + 1] = row(p) end
-        return true, out
-    end)
-end
-for _, action in ipairs({ 'block', 'unblock', 'reassign', 'transfer', 'transferStatus', 'delete', 'deleteStatus' }) do
-    C.define('characters.' .. action, function() return WC.started('w_admin') and WC.started('w_core') end, function(data, ctx)
-        local result = exports.w_admin:SiteCharacterAction(action, data, GetPlayerName(ctx.source))
-        if type(result) ~= 'table' then return false, 'failed' end
-        return result.ok == true, result.ok and result.data or result.error, not result.ok and result.data or nil
-    end)
-end
+-- news.* and characters.*: ops/native_news.lua and ops/native_characters.lua (2.2.0)
 AddEventHandler('playerDropped', function() returned[source], frozen[source] = nil, nil end)

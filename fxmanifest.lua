@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '2.1.1'
+version '2.2.0'
 description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith control panel.'
 
 -- The website bridge, join queue and /wadmin menu share this resource.
@@ -67,10 +67,19 @@ server_scripts {
     'ops/console.lua',
     'ops/console_actions.lua',
     'ops/console_entities.lua',
+    -- 2.2.0: what used to be reached through w_admin, now done here (no w_admin needed)
+    'ops/native_characters.lua',
+    'ops/native_settings.lua',
+    'ops/native_news.lua',
+    'core/scripts_registry.lua',
+    'ops/native_scripts.lua',
+    'ops/native_player.lua',
     'core/script_permission_registry.lua',
     'core/script_catalog.lua',
     'core/script_permissions.lua',
     'core/transport.lua',
+    'core/host.lua',
+    'core/closed.lua',
     'core/join.lua',
     'core/events.lua',
     'core/main.lua',
