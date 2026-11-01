@@ -14,9 +14,18 @@ local ACCOUNTS = {
 }
 local KNOWN = { cash = true, bank = true, gold = true }
 
+-- 2.1.1: the core object is fetched once and kept. An export's return is copied on every call (the whole
+-- WCore table, ~30 ms on Red River), and the heartbeat asks for every player every 15 s; the same
+-- per-call pattern caused Red River's 1-2 s hitches (w_lib 4.1.3). Dropped when w_core stops or starts.
+local coreObj
+
 local function core()
-    return exports.w_core:GetCoreObject()
+    if not coreObj then coreObj = exports.w_core:GetCoreObject() end
+    return coreObj
 end
+
+AddEventHandler('onResourceStop', function(name) if name == 'w_core' then coreObj = nil end end)
+AddEventHandler('onResourceStart', function(name) if name == 'w_core' then coreObj = nil end end)
 
 local function player(src)
     local p = core().Functions.GetPlayer(src)
