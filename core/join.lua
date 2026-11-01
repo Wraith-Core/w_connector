@@ -43,6 +43,16 @@ local function closedLocally(src)
     return WC.Closed and WC.Closed.value == true and not IsPlayerAceAllowed(src, 'wraithadmin.join')
 end
 
+-- 2.2.0: the website's own bans, kept on disk from the last ban sync (core/bans.lua): an outage lets nobody banned in
+local function bannedLocally(src)
+    if not WC.Bans then return nil end
+    local b = WC.Bans.cached(WC.identifiers(src))
+    if not b then return nil end
+    local id = tostring(b.id or '-')
+    if b['until'] then return joinMessage('banned_until', os.date('!%Y-%m-%d %H:%M', b['until']), b.reason ~= '' and b.reason or '-', id) end
+    return joinMessage('banned', b.reason ~= '' and b.reason or '-', id)
+end
+
 --- The website's refusal in the player's language (2.2.0: it sends a reason code; older sites only English text).
 local function refusal(body)
     if body.reason == 'banned' then
@@ -82,6 +92,8 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
     if WC.Host and WC.Host.shuttingDown then return deferrals.done(WC.Host.say('closing')) end
     -- (Not `a and done(x) or done()`: done returns nothing, so that form calls done twice.)
     if not WC.linked() then
+        local banned = bannedLocally(src)
+        if banned then return deferrals.done(banned) end
         if closedLocally(src) then return deferrals.done(joinMessage('closed')) end
         if failClosed() then return deferrals.done(joinMessage('unavailable')) end
         return deferrals.done()
@@ -90,6 +102,8 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
     deferrals.update(joinMessage('checking'))
     local status, body = WC.request('POST', '/join', { name = tostring(name or ''):sub(1, 64), identifiers = WC.identifiers(src) })
     if status ~= 200 or type(body) ~= 'table' then
+        local banned = bannedLocally(src)
+        if banned then return deferrals.done(banned) end
         if closedLocally(src) then return deferrals.done(joinMessage('closed')) end
         if failClosed() then return deferrals.done(joinMessage('unavailable')) end
         return deferrals.done()
