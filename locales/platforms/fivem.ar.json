@@ -1,0 +1,13 @@
+{
+  "label.quick.group.vehicle": "المركبة",
+  "label.tools.section.vehicle": "المركبة",
+  "label.tools.kind.wagons": "المركبات",
+  "label.tools.tool.repairVehicle": "إصلاح المركبة",
+  "label.tools.tool.flipVehicle": "تعديل المركبة المقلوبة",
+  "label.tools.tool.vehicleBoost": "دفعة سرعة للمركبة",
+  "label.tools.tool.deleteVehicle": "حذف المركبة القريبة",
+  "label.tools.hint.repairVehicle": "مركبتك الحالية أو أقرب مركبة فارغة",
+  "label.tools.hint.deleteVehicle": "مركبة فارغة خلال 6 أمتار",
+  "label.tools.confirm.deleteVehicle": "سنحذف المركبة الفارغة القريبة منك. انزل منها أولًا.",
+  "label.tools.confirm.deleteYes": "احذف المركبة"
+}

@@ -27,6 +27,7 @@ function WC.playerView(src)
         local ok, char = pcall(fw.player, src)
         if ok and char then
             out.charId, out.charName, out.job, out.gang, out.money = char.charId, char.charName, char.job, char.gang, char.money
+            out.status = char.status
         end
     end
     return out

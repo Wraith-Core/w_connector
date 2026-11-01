@@ -52,6 +52,8 @@ function Qb.player(src)
         job = { name = job.name, label = job.label, grade = tonumber(job.grade and job.grade.level) or 0 },
         gang = (gang.name and gang.name ~= 'none') and { name = gang.name, label = gang.label } or nil,
         money = d.money or {},
+        status = { dead = (d.metadata or {}).isdead == true or (d.metadata or {}).inlaststand == true,
+            needs = { hunger = (d.metadata or {}).hunger, thirst = (d.metadata or {}).thirst } },
     }
 end
 
@@ -129,6 +131,11 @@ end
 function Qb.offline(charId)
     local r = MySQL.single.await('SELECT citizenid, license, name, charinfo, job, money FROM players WHERE citizenid = ?', { charId })
     return r and rowOf(r) or nil
+end
+
+-- Raw, framework-owned definitions for the shared admin UI.
+function Qb.consoleCatalog()
+    return { jobs = qb().Shared.Jobs, gangs = qb().Shared.Gangs, wagons = qb().Shared.Vehicles }
 end
 
 WC.Adapters.register('framework', 'qbcore', Qb)

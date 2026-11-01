@@ -1,0 +1,40 @@
+/* w_admin · pages/bans: tabs over a split view; each side scrolls on its own. Tokens only. */
+
+.bn-page { display: flex; flex-direction: column; min-height: 0; }
+.bn-tabs { flex: none; padding: .375rem 1.5rem 0; }
+.bn-body {
+  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr);
+}
+.bn-body > .k-split { height: auto; min-height: 0; }
+
+.bn-toolbar { flex: none; }
+.bn-search { flex: 0 1 22rem; }
+.bn-search > .k-input { flex: 1; }
+.bn-count { font-size: var(--fs-135); color: var(--paper-faint); white-space: nowrap; }
+
+/* the reason wraps to two lines instead of pushing the table wide */
+.k-table td.bn-wrap { white-space: normal; line-height: 1.4; padding-top: .375rem; padding-bottom: .375rem; min-width: 12rem; }
+.bn-clamp {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  max-width: 30rem; color: var(--paper-dim);
+}
+.k-table td.bn-actions { width: 1%; }
+.bn-rowbtns { display: inline-flex; align-items: center; gap: .375rem; }
+.bn-lic { font-family: var(--f-mono); direction: ltr; unicode-bidi: isolate; letter-spacing: 0; }
+.bn-cid { display: inline-flex; align-items: baseline; gap: .5rem; }
+.bn-cid b { font-size: var(--fs-16); }
+.k-cell-main.bn-ended { color: var(--paper-faint); }
+
+/* an ended ban stays readable but steps back */
+.k-table tbody tr.bn-row-dim td { color: var(--paper-faint); }
+.k-table tbody tr.bn-row-dim .k-cell-main { color: var(--paper-dim); }
+
+.bn-reason-full {
+  white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; font-size: var(--fs-15); color: var(--paper);
+  background: var(--ink); border: 1px solid var(--rule); padding: .75rem .875rem;
+}
+
+/* free text from staff may be in either language: dir=auto orders it, the column keeps the page's alignment */
+html[dir='rtl'] .bn-clamp, html[dir='rtl'] .bn-reason-full { text-align: right; }
+html[dir='ltr'] .bn-clamp, html[dir='ltr'] .bn-reason-full { text-align: left; }

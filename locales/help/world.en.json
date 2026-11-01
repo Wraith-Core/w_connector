@@ -1,0 +1,174 @@
+{
+  "world": {
+    "now": "The world right now for every player: the weather and the in-game clock. It updates by itself; press Refresh for the latest values from the server.",
+    "nowWeather": "The weather every player sees now. If the automatic weather cycle is on, it changes by itself about every 10 minutes.",
+    "nowClock": {
+      "text": "The in-game clock, which runs faster than real life: an in-game hour passes in 2 real minutes and a full day in 48 minutes.",
+      "example": "If it is 14:00 now, 10 real minutes later it is 19:00"
+    },
+    "nowCycle": "Whether the weather changes by itself and whether the clock is stopped. Change them in the Time and weather cycle section below.",
+    "weather": {
+      "text": "Changes the weather for every player at once, within seconds. Pick a kind of weather, then press Set weather.",
+      "example": "Pick Rain for a night event",
+      "undo": "Yes, pick another weather and set it"
+    },
+    "group": {
+      "clear": "Clear, sunny skies with the best view. Good for normal play and photos.",
+      "clouds": "Cloudy skies or fog that cuts the view. Thick fog makes hunting and chases harder.",
+      "rain": "Rain, thunder or hail: darker skies and a storm you can hear. Good for night or mystery events.",
+      "snow": "Snow and blizzards. Strong ones like Whiteout drop the view to almost nothing, so use them briefly.",
+      "other": "Special skies like Sandstorm and Hurricane. Very strong; best for a short event."
+    },
+    "applyWeather": {
+      "text": "Sets the chosen weather for every player now. If the automatic cycle is on, it may change again in about 10 minutes.",
+      "undo": "Yes, pick another weather and set it"
+    },
+    "time": {
+      "text": "Sets the in-game clock for every player; the sun and moon move with it. Time keeps running afterwards.",
+      "example": "22:00 makes it night for everyone",
+      "undo": "Yes, set another time"
+    },
+    "hour": {
+      "text": "The hour from 0 to 23, on a 24-hour clock.",
+      "example": "18 means 6 in the evening"
+    },
+    "minute": {
+      "text": "The minute from 0 to 59.",
+      "example": "30 means half past"
+    },
+    "presets": "Fills in a ready time of day. Nothing changes in the game until you press Set time.",
+    "applyTime": {
+      "text": "Sets the chosen time for every player now. The sky changes at once and the clock runs on from there.",
+      "undo": "Yes, set another time"
+    },
+    "announce": "Sends a message every online player sees at the top centre of the screen, under the compass, for the time you choose, and a line in the chat. You can take it off screens early with Hide announcement.",
+    "announceText": {
+      "text": "The announcement text, up to 300 characters. Keep it short and clear; players see it exactly as you write it.",
+      "example": "Restart in 5 minutes, save your things"
+    },
+    "template": "Puts this ready text in the announcement box. You can edit it first; nothing is sent until you press Send to everyone.",
+    "preview": "This is how players get the announcement: white text at the top centre under the compass for the time you chose, and a line in the chat. The preview sends nothing.",
+    "send": {
+      "text": "Sends the announcement to every online player now and saves it in the admin log under your name. You confirm before it goes.",
+      "undo": "Partly: Hide announcement takes it off every screen, but the chat line stays"
+    },
+    "cycle": "Controls the weather script itself: freeze the clock, the automatic weather cycle and a blackout. Changes reach every player at once.",
+    "freezeTime": {
+      "text": "Stops the in-game clock where it is, so day and night stop changing. Useful for events and photos.",
+      "undo": "Yes, turn it off to let the clock run again"
+    },
+    "dynamicWeather": {
+      "text": "On: the weather changes by itself about every 10 minutes. Off: the weather you pick stays until you change it.",
+      "undo": "Yes, turn it on or off any time"
+    },
+    "blackout": {
+      "text": "Turns off artificial lights in the world, like town lights and lamps, so nights get truly dark. For dark events.",
+      "undo": "Yes, turn it off to bring the lights back"
+    },
+    "history": "The latest weather, time and announcement changes from this panel: who changed what and when. Handy when you want to know who changed the sky.",
+    "missing": "We could not read the weather from the server; the weather script w_weathersync is probably stopped. Start it from Resources and come back.",
+    "duration": {
+      "text": "How long the announcement stays on screen. Pick seconds or minutes, from 3 seconds up to 30 minutes. Players who join while it runs see it for the time left.",
+      "example": "2 minutes for an event that starts soon"
+    },
+    "clear": {
+      "text": "Takes the announcement that is on screen now off every player's screen at once. The chat line stays.",
+      "undo": "No, but you can send it again"
+    }
+  },
+  "label": {
+    "world": {
+      "now": "The world now",
+      "nowWeather": "Weather now",
+      "nowClock": "In-game clock",
+      "nowCycle": "Weather cycle",
+      "cycleAuto": "Changes by itself",
+      "cycleFixed": "Fixed",
+      "clockStopped": "Clock stopped",
+      "unknown": "Unknown",
+      "part": {
+        "dawn": "dawn",
+        "day": "day",
+        "evening": "evening",
+        "night": "night"
+      },
+      "weather": "Weather",
+      "weatherPick": "Pick the weather",
+      "current": "Now",
+      "applyWeather": "Set weather",
+      "applyWeatherTo": "Set: %s",
+      "group": {
+        "clear": "Clear",
+        "clouds": "Clouds and fog",
+        "rain": "Rain and storms",
+        "snow": "Snow",
+        "other": "Special"
+      },
+      "time": "Time",
+      "hour": "Hour",
+      "minute": "Minute",
+      "presets": "Ready times",
+      "preset": {
+        "dawn": "Dawn",
+        "morning": "Morning",
+        "noon": "Noon",
+        "afternoon": "Afternoon",
+        "sunset": "Sunset",
+        "night": "Night"
+      },
+      "applyTime": "Set time",
+      "timeResult": "After this it will be %s (%s) for every player",
+      "announce": "Announcement to everyone",
+      "announceText": "Announcement text",
+      "announcePh": "Write the announcement…",
+      "templates": "Ready texts",
+      "tpl": {
+        "restart5": "Restart in 5 minutes, save your things",
+        "restart15": "Restart in 15 minutes",
+        "maintenance": "Short server maintenance, back in a few minutes",
+        "event": "Event now in Valentine, everyone is welcome"
+      },
+      "tplShort": {
+        "restart5": "Restart 5 min",
+        "restart15": "Restart 15 min",
+        "maintenance": "Maintenance",
+        "event": "Event"
+      },
+      "preview": "How players see it",
+      "previewScreen": "Top centre under the compass · %s",
+      "previewChat": "In the chat",
+      "previewEmpty": "Write a text to see the preview here.",
+      "send": "Send to everyone",
+      "sendCount": "Reaches everyone online now (%s)",
+      "confirmTitle": "Send the announcement to everyone?",
+      "confirmText": "This announcement will show now for everyone online (%s) for %s.",
+      "cycle": "Time and weather cycle",
+      "freezeTime": "Freeze the clock",
+      "dynamicWeather": "Automatic weather",
+      "blackout": "Blackout",
+      "cycleDesc": {
+        "freezeTime": "The clock stops where it is.",
+        "dynamicWeather": "The weather changes by itself about every 10 minutes.",
+        "blackout": "Town lights and lamps go dark."
+      },
+      "history": "Latest world changes",
+      "historyEmpty": "No changes logged yet.",
+      "missing": "The weather cannot be read right now",
+      "openWorld": "All world tools",
+      "refresh": "Refresh",
+      "duration": "Time on screen",
+      "unit": {
+        "seconds": "Seconds",
+        "minutes": "Minutes"
+      },
+      "durationSeconds": "%s seconds",
+      "durationMinutes": "%s minutes",
+      "durationRange": "From 3 seconds to 30 minutes",
+      "clear": "Hide announcement",
+      "durationSecondsFew": "%s seconds",
+      "durationMinutesOne": "1 minute",
+      "durationMinutesTwo": "2 minutes",
+      "durationMinutesFew": "%s minutes"
+    }
+  }
+}

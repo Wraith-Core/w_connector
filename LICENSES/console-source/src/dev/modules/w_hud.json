@@ -1,0 +1,164 @@
+{
+  "resource": "w_hud",
+  "version": 1,
+  "level": "admin",
+  "title": { "ar": "الواجهة والأكل", "en": "HUD and food" },
+  "description": { "ar": "سرعة الجوع والعطش وضررهما، وما يسويه كل أكل وشرب، والمنشّطات والسم. الواجهة الأصلية للسكربت تبقى تشتغل كما هي.", "en": "Hunger and thirst speed and damage, what every food and drink does, buffs and poison. The script's own interface keeps working as before." },
+  "links": [
+    { "id": "hudmenu", "command": "hudmenu", "label": { "ar": "فتح لوحة w_hud الأصلية", "en": "Open the w_hud panel" }, "help": { "ar": "يقفل لوحة الإدارة ويفتح لوحة w_hud نفسها (F7). فيها نفس الإعدادات وإعدادات شكل الهود لكل لاعب.", "en": "Closes the admin panel and opens w_hud's own panel (F7). It has the same settings plus each player's HUD look." } }
+  ],
+  "groups": [
+    {
+      "id": "needs", "store": "own", "clientVisible": true,
+      "label": { "ar": "سرعة الجوع والعطش", "en": "Hunger and thirst speed" },
+      "help": { "ar": "كم بسرعة يجوع ويعطش كل اللاعبين. التعديل يوصل للكل فورًا بدون إعادة تشغيل.", "en": "How fast every player gets hungry and thirsty. Changes reach everyone at once, no restart." },
+      "fields": [
+        { "key": "needs.hungerRate", "type": "number", "min": 0, "max": 25, "step": 0.1, "unit": { "ar": "نقطة", "en": "points" },
+          "label": { "ar": "سرعة نقص الجوع", "en": "Hunger drop per cycle" },
+          "help": { "ar": "كم ينقص شريط الجوع في كل دورة (الشريط من 100). رقم أكبر يعني يجوع أسرع، وصفر يعني ما يجوع أبدًا.", "en": "How much the hunger bar (out of 100) drops each cycle. Higher means hungrier faster; zero means never hungry." },
+          "example": { "ar": "1 كل 90 ثانية = من شبعان لجائع تمامًا في حوالي ساعتين ونص", "en": "1 every 90 s = from full to starving in about 2.5 hours" },
+          "derived": { "kind": "drainTime", "args": { "rate": "needs.hungerRate", "interval": "needs.interval" } } },
+        { "key": "needs.thirstRate", "type": "number", "min": 0, "max": 25, "step": 0.1, "unit": { "ar": "نقطة", "en": "points" },
+          "label": { "ar": "سرعة نقص العطش", "en": "Thirst drop per cycle" },
+          "help": { "ar": "نفس فكرة الجوع لكن للعطش. رقم أكبر يعني يعطش أسرع.", "en": "Same idea as hunger, for thirst. Higher means thirstier faster." },
+          "example": { "ar": "1.4 كل 90 ثانية = يعطش تمامًا في حوالي ساعة و47 دقيقة", "en": "1.4 every 90 s = parched in about 1 hour 47 minutes" },
+          "derived": { "kind": "drainTime", "args": { "rate": "needs.thirstRate", "interval": "needs.interval" } } },
+        { "key": "needs.interval", "type": "number", "min": 5, "max": 1800, "step": 1, "integer": true, "unit": { "ar": "ثانية", "en": "s" },
+          "label": { "ar": "طول الدورة", "en": "Cycle length" },
+          "help": { "ar": "كل كم ثانية ينقص الجوع والعطش. أقل شيء 5 ثواني عشان ما يثقل السيرفر.", "en": "Every how many seconds hunger and thirst drop. At least 5 seconds so the server stays light." } }
+      ]
+    },
+    {
+      "id": "damage", "store": "own", "clientVisible": true,
+      "label": { "ar": "ضرر الجوع والعطش", "en": "Hunger and thirst damage" },
+      "help": { "ar": "ماذا يصير للاعب لما يجوع أو يعطش كثير: تنقص صحته شوي شوي، ويمكن يموت إذا سمحت بذلك.", "en": "What happens when a player gets very hungry or thirsty: health drops little by little, and they may die if you allow it." },
+      "fields": [
+        { "key": "damage.enabled", "type": "bool",
+          "label": { "ar": "الجوع والعطش يضرّون الصحة", "en": "Hunger and thirst hurt health" },
+          "help": { "ar": "إذا شغّلته: اللي جوعه أو عطشه تحت الحد تنقص صحته شوي شوي. إذا طفّيته: شكل فقط وما يضرّون.", "en": "On: a player under the limit slowly loses health. Off: the bars are for show only." } },
+        { "key": "damage.hungerAt", "type": "number", "min": 0, "max": 99, "step": 1, "integer": true,
+          "label": { "ar": "يبدأ الضرر لما الجوع أقل من", "en": "Damage starts when hunger is under" },
+          "help": { "ar": "إذا نزل شريط الجوع تحت هذا الرقم تبدأ الصحة تنقص.", "en": "When the hunger bar falls under this number, health starts dropping." } },
+        { "key": "damage.thirstAt", "type": "number", "min": 0, "max": 99, "step": 1, "integer": true,
+          "label": { "ar": "يبدأ الضرر لما العطش أقل من", "en": "Damage starts when thirst is under" },
+          "help": { "ar": "إذا نزل شريط العطش تحت هذا الرقم تبدأ الصحة تنقص.", "en": "When the thirst bar falls under this number, health starts dropping." } },
+        { "key": "damage.amount", "type": "number", "min": 0.5, "max": 25, "step": 0.5, "unit": { "ar": "%", "en": "%" },
+          "label": { "ar": "كم تنقص الصحة كل ضربة", "en": "Health lost per hit" },
+          "help": { "ar": "نسبة من شريط الصحة تنقص في كل ضربة. 2 تعني اثنين بالمية.", "en": "A share of the health bar lost each hit. 2 means two percent." } },
+        { "key": "damage.interval", "type": "number", "min": 3, "max": 600, "step": 1, "integer": true, "unit": { "ar": "ثانية", "en": "s" },
+          "label": { "ar": "كل كم ثانية ضربة", "en": "Seconds between hits" },
+          "help": { "ar": "المدة بين كل ضربة وضربة. رقم أصغر يعني الجوع يقتل أسرع.", "en": "The time between two hits. A smaller number means hunger kills faster." },
+          "derived": { "kind": "deathTime", "args": { "amount": "damage.amount", "interval": "damage.interval" } } },
+        { "key": "damage.canKill", "type": "bool",
+          "label": { "ar": "يقدر الجوع والعطش يقتلون", "en": "Hunger and thirst can kill" },
+          "help": { "ar": "إذا طفّيته تنزل الصحة لين قبل الموت بشوي وتوقف هناك.", "en": "Off: health drops to just above death and stops there." } }
+      ]
+    },
+    {
+      "id": "features", "store": "own", "clientVisible": true,
+      "label": { "ar": "إظهار عناصر الهود", "en": "HUD elements shown" },
+      "help": { "ar": "إطفاء أي عنصر يخفيه من شاشة كل اللاعبين فورًا. اللاعب ما يقدر يرجّعه من إعداداته.", "en": "Turning an element off hides it from every player's screen at once. Players cannot bring it back from their settings." },
+      "fields": [
+        { "key": "features.health", "type": "bool", "label": { "ar": "دائرة الصحة", "en": "Health ring" }, "help": { "ar": "يظهر أو يخفي دائرة الصحة عند كل اللاعبين.", "en": "Shows or hides the health ring for every player." } },
+        { "key": "features.stamina", "type": "bool", "label": { "ar": "دائرة التحمّل", "en": "Stamina ring" }, "help": { "ar": "يظهر أو يخفي دائرة التحمّل عند كل اللاعبين.", "en": "Shows or hides the stamina ring for every player." } },
+        { "key": "features.hunger", "type": "bool", "label": { "ar": "الجوع", "en": "Hunger" }, "help": { "ar": "يظهر أو يخفي شريط الجوع. إخفاؤه ما يوقف الجوع نفسه.", "en": "Shows or hides the hunger bar. Hiding it does not stop hunger itself." } },
+        { "key": "features.thirst", "type": "bool", "label": { "ar": "العطش", "en": "Thirst" }, "help": { "ar": "يظهر أو يخفي شريط العطش. إخفاؤه ما يوقف العطش نفسه.", "en": "Shows or hides the thirst bar. Hiding it does not stop thirst itself." } },
+        { "key": "features.voice", "type": "bool", "label": { "ar": "مؤشر الصوت", "en": "Voice indicator" }, "help": { "ar": "يظهر مدى صوت اللاعب ومتى يتكلم.", "en": "Shows the player's voice range and when they talk." } },
+        { "key": "features.compass", "type": "bool", "label": { "ar": "البوصلة", "en": "Compass" }, "help": { "ar": "يظهر البوصلة أعلى الشاشة.", "en": "Shows the compass at the top of the screen." } }
+      ]
+    },
+    {
+      "id": "identity", "store": "own", "clientVisible": true,
+      "label": { "ar": "اسم وشعار السيرفر في الهود", "en": "Server name and logo on the HUD" },
+      "help": { "ar": "الاسم والشعار اللي يظهرون في زاوية الشاشة عند كل اللاعبين.", "en": "The name and logo shown in the corner of every player's screen." },
+      "fields": [
+        { "key": "name", "type": "text", "maxLength": 40, "label": { "ar": "اسم السيرفر", "en": "Server name" }, "help": { "ar": "يظهر تحت الشعار. أقصى شيء 40 حرف.", "en": "Shown under the logo. At most 40 characters." } },
+        { "key": "logo.url", "type": "text", "maxLength": 300, "pattern": "^https://", "label": { "ar": "رابط الشعار", "en": "Logo link" }, "help": { "ar": "رابط صورة الشعار. لازم يبدأ بـ https وإلا ما ينحفظ.", "en": "The logo image link. It must start with https or it will not be saved." } }
+      ]
+    },
+    {
+      "id": "food", "store": "central", "clientVisible": true, "type": "table",
+      "label": { "ar": "الأكل والشرب", "en": "Food and drink" },
+      "help": { "ar": "كل غرض يُؤكل أو يُشرب وش يسوي باللاعب. التعديل يتطبّق من الأكلة الجاية على الكل بدون إعادة تشغيل.", "en": "What every food and drink does to the player. Changes apply from the next bite, for everyone, with no restart." },
+      "fields": [
+        { "key": "food", "type": "table",
+          "label": { "ar": "الأصناف", "en": "Items" },
+          "help": { "ar": "صف لكل صنف. الأرقام الرمادية هي الافتراضية، والمعدّلة يظهر تحتها خط.", "en": "One row per item. Grey numbers are defaults; changed ones are underlined." },
+          "families": [
+            { "id": "fruit", "label": { "ar": "فواكه وخضار", "en": "Fruit and vegetables" } },
+            { "id": "herbs", "label": { "ar": "أعشاب", "en": "Herbs" } },
+            { "id": "meat", "label": { "ar": "لحم مطبوخ", "en": "Cooked meat" } },
+            { "id": "canned", "label": { "ar": "معلّبات", "en": "Canned" } },
+            { "id": "bread", "label": { "ar": "خبز ووجبات خفيفة", "en": "Bread and snacks" } },
+            { "id": "drinks", "label": { "ar": "مشروبات", "en": "Drinks" } },
+            { "id": "alcohol", "label": { "ar": "كحول", "en": "Alcohol" } },
+            { "id": "tonic", "label": { "ar": "دخان ومنبّهات", "en": "Tobacco and stimulants" } },
+            { "id": "medicine", "label": { "ar": "أدوية", "en": "Medicine" } }
+          ],
+          "readOnly": [ { "key": "kind", "label": { "ar": "النوع", "en": "Kind" } } ],
+          "columns": [
+            { "key": "hunger", "type": "number", "min": -50, "max": 100, "step": 1, "integer": true, "label": { "ar": "الجوع", "en": "Hunger" }, "help": { "ar": "كم يشبّع من الجوع (من 100). بالسالب يجوّع بدل ما يشبّع.", "en": "How much hunger it fills (out of 100). A negative number makes the player hungrier." }, "example": { "ar": "30 تعني لاعب جوعه 20 يصير 50", "en": "30 takes a player from 20 to 50" } },
+            { "key": "thirst", "type": "number", "min": -50, "max": 100, "step": 1, "integer": true, "label": { "ar": "العطش", "en": "Thirst" }, "help": { "ar": "كم يروي من العطش. بالسالب يعطّش مثل الأكل المالح أو الناشف.", "en": "How much thirst it quenches. Negative makes the player thirstier, like salty or dry food." }, "example": { "ar": "اللحم المجفف −10", "en": "Jerky is -10" } },
+            { "key": "stamina", "type": "number", "min": -100, "max": 100, "step": 1, "integer": true, "label": { "ar": "نواة التحمّل", "en": "Stamina core" }, "help": { "ar": "كم يعبّي الدائرة الصغيرة داخل أيقونة التحمّل. هذي تخلّي التحمّل يرجع بسرعة بعد الجري.", "en": "How much it fills the small circle inside the stamina icon, which refills stamina quickly after running." } },
+            { "key": "innerHealth", "type": "number", "min": -100, "max": 100, "step": 1, "integer": true, "label": { "ar": "نواة الصحة", "en": "Health core" }, "help": { "ar": "الدائرة الصغيرة داخل أيقونة الصحة، تخلّي الصحة ترجع لحالها. بالسالب يضرّها مثل الدخان.", "en": "The small circle inside the health icon that lets health refill by itself. Negative harms it, like tobacco." } },
+            { "key": "outerHealth", "type": "number", "min": -300, "max": 600, "step": 5, "integer": true, "label": { "ar": "الصحة فورًا", "en": "Instant health" }, "help": { "ar": "كم يرجّع من الصحة على طول. الصحة الكاملة حوالي 600، يعني 120 تساوي خُمسها.", "en": "How much health it restores right away. Full health is about 600, so 120 is a fifth." } },
+            { "key": "buffType", "type": "enum", "label": { "ar": "المنشّط", "en": "Buff" }, "help": { "ar": "أثر يبقى فترة ويعطي فائدة كل ثانيتين: تعافٍ صحة، غذاء صحي جوع وعطش، نشاط تحمّل، عافية نواة الصحة.", "en": "An effect that lasts a while and helps every 2 seconds: recovery gives health, healthy food hunger and thirst, energy stamina, vigor the health core." },
+              "options": [
+                { "value": "none", "label": { "ar": "بدون", "en": "None" } },
+                { "value": "health", "label": { "ar": "تعافٍ", "en": "Recovery" } },
+                { "value": "vegan", "label": { "ar": "غذاء صحي", "en": "Healthy food" } },
+                { "value": "energy", "label": { "ar": "نشاط", "en": "Energy" } },
+                { "value": "vigor", "label": { "ar": "عافية", "en": "Vigor" } }
+              ] },
+            { "key": "buffAmount", "type": "number", "min": 0, "max": 100, "step": 5, "integer": true, "label": { "ar": "قوة المنشّط", "en": "Buff strength" }, "help": { "ar": "كل ما كبر الرقم بقي المنشّط أطول. ما يتعدّل إذا المنشّط «بدون».", "en": "The bigger the number, the longer the buff lasts. It cannot be set while the buff is None." } },
+            { "key": "outerStamina", "advanced": true, "type": "number", "min": 0, "max": 100, "step": 5, "integer": true, "unit": { "ar": "%", "en": "%" }, "label": { "ar": "شريط الجري", "en": "Running bar" }, "help": { "ar": "كم بالمية يعبّي من شريط الجري نفسه. 100 تعني كامل. الأكل العادي صفر، والقهوة والتونيك فيها.", "en": "What share of the running bar it refills. 100 is full. Normal food is zero; coffee and tonics have some." } },
+            { "key": "poison", "advanced": true, "type": "number", "min": 0, "max": 600, "step": 5, "integer": true, "unit": { "ar": "ثانية", "en": "s" }, "label": { "ar": "يسمّم", "en": "Poisons" }, "help": { "ar": "كم ثانية يبقى اللاعب مسمومًا: القلب يخضرّ والصحة تنقص. صفر يعني ما يسمّم.", "en": "How many seconds the player stays poisoned: the heart turns green and health drops. Zero means no poison." } },
+            { "key": "curesPoison", "advanced": true, "type": "bool", "label": { "ar": "يعالج السم", "en": "Cures poison" }, "help": { "ar": "يشيل السم من اللاعب فورًا.", "en": "Removes poison from the player at once." } },
+            { "key": "heal", "advanced": true, "type": "bool", "label": { "ar": "يعالج الجروح", "en": "Heals wounds" }, "help": { "ar": "يوقف النزيف ويعالج الجروح.", "en": "Stops bleeding and heals wounds." } }
+          ] }
+      ]
+    },
+    {
+      "id": "buffs", "store": "central", "clientVisible": true,
+      "label": { "ar": "المنشّطات", "en": "Buffs" },
+      "help": { "ar": "المنشّط أثر يبقى فترة بعد الأكل أو الدواء، يعطي فائدة كل نبضة (ثانيتين) وبعدين يخلص.", "en": "A buff is an effect that lasts after food or medicine, helping every pulse (2 seconds) until it runs out." },
+      "fields": [
+        { "key": "buffs.health.amount", "type": "number", "min": 0, "max": 60, "step": 1, "integer": true, "label": { "ar": "التعافي: كم صحة كل نبضة", "en": "Recovery: health per pulse" }, "help": { "ar": "كم صحة يرجع للاعب في كل نبضة من منشّط التعافي. يجي من الأدوية.", "en": "Health given each pulse by the recovery buff. It comes from medicine." } },
+        { "key": "buffs.vegan.amount", "type": "number", "min": 0, "max": 10, "step": 1, "integer": true, "label": { "ar": "الغذاء الصحي: كم جوع وعطش كل نبضة", "en": "Healthy food: hunger and thirst per pulse" }, "help": { "ar": "كم يعبّي من الجوع والعطش في كل نبضة. يجي من الخضار والفواكه والأعشاب والماء.", "en": "Hunger and thirst filled each pulse. It comes from vegetables, fruit, herbs and water." } },
+        { "key": "buffs.energy.amount", "type": "number", "min": 0, "max": 25, "step": 1, "integer": true, "label": { "ar": "النشاط", "en": "Energy" }, "help": { "ar": "كم تحمّل يرجع كل نبضة. يجي من القهوة والتونيك وزيت الأفعى.", "en": "Stamina given each pulse. It comes from coffee, tonics and snake oil." } },
+        { "key": "buffs.vigor.amount", "type": "number", "min": 0, "max": 25, "step": 1, "integer": true, "label": { "ar": "العافية", "en": "Vigor" }, "help": { "ar": "كم يعبّي من نواة الصحة كل نبضة. يجي من اللحم المطبوخ.", "en": "Health core filled each pulse. It comes from cooked meat." } },
+        { "key": "buffs.tick", "type": "number", "min": 500, "max": 10000, "step": 100, "integer": true, "advanced": true, "unit": { "ar": "جزء من الثانية", "en": "ms" }, "label": { "ar": "سرعة نبضة المنشّطات", "en": "Buff pulse speed" }, "help": { "ar": "كل كم جزء من الثانية تجي نبضة المنشّط. لا تغيّره إلا إذا تعرف وش تسوي.", "en": "How many milliseconds between buff pulses. Leave it unless you know what you are doing." } }
+      ]
+    },
+    {
+      "id": "poison", "store": "central", "clientVisible": true,
+      "label": { "ar": "التسمّم", "en": "Poison" },
+      "help": { "ar": "وش يسوي السم باللاعب المسموم: كم ينقص من صحته وإلى أي حد.", "en": "What poison does to a poisoned player: how much health it takes and down to what." },
+      "fields": [
+        { "key": "poison.enabled", "type": "bool", "label": { "ar": "السم شغّال", "en": "Poison is on" }, "help": { "ar": "إذا طفّيته ما يتسمم أحد حتى لو أكل شيئًا مسممًا.", "en": "Off: nobody gets poisoned, even from poisonous food." } },
+        { "key": "poison.damage", "type": "number", "min": 0, "max": 60, "step": 1, "integer": true, "label": { "ar": "كم ينقص كل ضربة", "en": "Health lost per hit" }, "help": { "ar": "كم صحة تنقص في كل ضربة سم. 12 تساوي 2% تقريبًا.", "en": "Health lost each poison hit. 12 is about 2%." } },
+        { "key": "poison.minHealth", "type": "number", "min": 0, "max": 600, "step": 5, "integer": true, "label": { "ar": "أقل صحة يوصلها المسموم", "en": "Lowest health from poison" }, "help": { "ar": "السم ما ينزّل الصحة تحت هذا الرقم. صفر يعني السم يقتل.", "en": "Poison never takes health below this. Zero means poison can kill." } }
+      ]
+    },
+    {
+      "id": "gold", "store": "central", "clientVisible": true,
+      "label": { "ar": "التذهيب", "en": "Gilding" },
+      "help": { "ar": "بعض الأدوية والأكلات تخلّي الصحة أو التحمّل ذهبية ما تنقص فترة من الوقت.", "en": "Some medicine and food make health or stamina golden, so it does not drop for a while." },
+      "fields": [
+        { "key": "gold.duration", "type": "number", "min": 5, "max": 300, "step": 5, "integer": true, "unit": { "ar": "ثانية", "en": "s" }, "label": { "ar": "مدة التذهيب", "en": "Gilding length" }, "help": { "ar": "كم ثانية تبقى الصحة أو التحمّل ذهبية بعد الأكل أو الدواء.", "en": "How many seconds health or stamina stays golden after the food or medicine." } }
+      ]
+    },
+    {
+      "id": "satchels", "store": "central", "type": "table",
+      "label": { "ar": "الحقائب", "en": "Satchels" },
+      "help": { "ar": "كم كيلو تزيد كل حقيبة على الحمل الأساسي 30 كيلو.", "en": "How many kilos each satchel adds to the base 30 kg carry weight." },
+      "confirm": { "ar": "يتغير عند كل اللي عندهم هذي الحقيبة الحين، مو بس اللي يشترونها بعدين.", "en": "It changes for everyone who has this satchel now, not only new buyers." },
+      "fields": [
+        { "key": "satchels", "type": "table", "label": { "ar": "الحقائب", "en": "Satchels" }, "help": { "ar": "صف لكل حقيبة.", "en": "One row per satchel." },
+          "columns": [
+            { "key": "bonus", "type": "number", "min": 0, "max": 200, "step": 1, "integer": true, "unit": { "ar": "كيلو", "en": "kg" }, "label": { "ar": "كم تزيد الحمل", "en": "Extra carry weight" }, "help": { "ar": "كم كيلو تزيد هذي الحقيبة على الحمل الأساسي 30 كيلو.", "en": "How many kilos this satchel adds to the base 30 kg." }, "derived": { "kind": "kg" } }
+          ] }
+      ]
+    }
+  ]
+}

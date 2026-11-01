@@ -59,4 +59,9 @@ function RsgInv.clear(src)
     return true
 end
 
+function RsgInv.openPlayer(actor, target)
+    local result = inv():OpenInventoryById(actor, target)
+    return result ~= false and (result ~= nil or Player(target).state.inv_busy == true)
+end
+
 WC.Adapters.register('inventory', 'rsg_inventory', RsgInv)

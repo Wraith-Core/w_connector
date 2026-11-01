@@ -58,4 +58,10 @@ function QbInv.clear(src)
     return true
 end
 
+function QbInv.openPlayer(actor, target)
+    local result = inv():OpenInventoryById(actor, target)
+    -- Stock qb-inventory returns nil on both success and hook refusal.
+    return result ~= false and (result ~= nil or Player(target).state.inv_busy == true)
+end
+
 WC.Adapters.register('inventory', 'qb_inventory', QbInv)

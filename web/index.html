@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ar" style="background: transparent !important; background-color: transparent !important;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wraith · Admin Console</title>
+  <!-- The server-wide Wraith theme (w_lib/nui/theme): the --w-* tokens and the faces (Amiri, EB Garamond...).
+       Linked at runtime, outside the bundle: Vite would rewrite these absolute URLs if src/ imported them.
+       src/styles/tokens.css maps the console's own names onto --w-* with the same values as fallbacks,
+       so the console still draws (bands become plain paper) in a browser where cfx-nui-w_lib does not exist. -->
+  <link rel="stylesheet" href="./theme/tokens.css" />
+  <link rel="stylesheet" href="./theme/fonts.css" />
+</head>
+<body style="background: transparent !important; background-color: transparent !important;">
+  <div id="root"></div>
+  <script src="../../nui/spectate.js"></script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

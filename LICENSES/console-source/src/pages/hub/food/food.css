@@ -1,0 +1,86 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · pages/hub/food/food.css  (the table editor of live settings)
+ * Tokens only (styles/tokens.css). Red: a pending edit's underline, a refused cell, the selected row.
+ * Chrome 87: no :has(), no container queries, no aspect-ratio.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.fd-editor { display: flex; flex-direction: column; min-width: 0; }
+.fd-editor > .k-alert { margin-bottom: .625rem; }
+
+.fd-toolbar { margin-bottom: .5rem; }
+.fd-search { flex: 1 1 16rem; max-width: 26rem; }
+.fd-search .k-input { width: 100%; }
+.fd-toolbar-end { margin-inline-start: auto; display: inline-flex; align-items: center; gap: .75rem; }
+.fd-count { font-size: var(--fs-13); color: var(--paper-faint); white-space: nowrap; }
+.fd-chips { margin-bottom: .625rem; }
+
+/* the table scrolls on its own (its header stays in view), inside the settings page */
+.fd-table { display: flex; flex-direction: column; min-height: 0; }
+.fd-table .k-table-wrap { flex: none; max-height: max(15rem, calc(100vh - 34rem)); border: 1px solid var(--rule); }
+.fd-table .k-table td { padding: .25rem .5rem; }
+.fd-table .k-table th { padding: .625rem .5rem; }
+.fd-table .k-table tbody tr.is-locked td { color: var(--paper-faint); }
+
+/* the item cell */
+.fd-item { display: flex; align-items: center; gap: .625rem; min-width: 0; max-width: 17rem; }
+.fd-img {
+  flex: none; width: 2.25rem; height: 2.25rem; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--ink-2); border: 1px solid var(--rule);
+}
+.fd-img img { width: 100%; height: 100%; object-fit: contain; }
+.fd-name { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.fd-name b { font-weight: 700; font-size: var(--fs-145); color: var(--paper); }
+.fd-name small { font-size: var(--fs-12); color: var(--paper-faint); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fd-name .fd-edited { color: var(--paper-dim); }
+.fd-id { font-family: var(--f-mono); font-size: var(--fs-11); }
+.fd-item.is-locked .fd-name b { color: var(--paper-dim); }
+.fd-item.is-locked .fd-img { opacity: .5; }
+
+/* an editable cell: the control, and one short line under it when it says something */
+.fd-cell { display: inline-flex; flex-direction: column; align-items: stretch; gap: 2px; min-width: 4.75rem; vertical-align: middle; }
+.fd-cell .k-numwrap > .k-input { min-width: 4.5rem; width: 4.75rem; flex: none; }
+.fd-cell .k-switch-opt { padding: 0 .5rem; font-size: var(--fs-13); }
+.fd-cell .k-ctlwrap--num { display: inline-flex; }
+.fd-cell .fd-sel .k-select { min-width: 7.5rem; }
+.fd-note { font-size: var(--fs-12); line-height: 1; color: var(--paper-dim); white-space: nowrap; text-align: start; }
+.fd-note--faint { color: var(--paper-faint); }
+.fd-note--bad { color: var(--paper); text-decoration: underline; text-decoration-color: var(--red); text-underline-offset: 2px; }
+/* a pending edit: a paper line under the box (the kit's "changed, not saved yet", as on the settings
+   rows); a saved change: a thin rule at the start of the box. Red is kept for an edit that fails its
+   field's check (the kit's invalid underline), so a valid edit never reads as an error. */
+.fd-cell.is-draft .k-input, .fd-cell.is-draft .k-select, .fd-cell.is-draft .k-switch { box-shadow: inset 0 -2px 0 var(--paper); }
+.fd-cell.is-reset .k-input, .fd-cell.is-reset .k-select, .fd-cell.is-reset .k-switch { box-shadow: inset 0 -2px 0 var(--paper-dim); }
+.fd-cell.is-rejected .k-input, .fd-cell.is-rejected .k-select, .fd-cell.is-rejected .k-switch { box-shadow: inset 0 -2px 0 var(--red); }
+.fd-cell.is-over .k-input, .fd-cell.is-over .k-select, .fd-cell.is-over .k-switch { box-shadow: inset 2px 0 0 var(--paper-dim); }
+[dir='rtl'] .fd-cell.is-over .k-input, [dir='rtl'] .fd-cell.is-over .k-select, [dir='rtl'] .fd-cell.is-over .k-switch { box-shadow: inset -2px 0 0 var(--paper-dim); }
+.fd-cell.is-dependent { opacity: .45; }
+.fd-dash { color: var(--paper-faint); }
+
+/* "what this means" */
+.fd-preview {
+  flex: none; display: flex; align-items: baseline; gap: .75rem; margin: .625rem 0 0; padding: .625rem .875rem;
+  border: 1px dashed var(--rule-2); font-size: var(--fs-15); color: var(--paper); min-height: 2.75rem;
+  /* always in view at the bottom of the settings page, above its save bar */
+  position: sticky; bottom: 0; z-index: 2; background: var(--ink);
+}
+.fd-preview-label { flex: none; display: inline-flex; align-items: center; gap: .375rem; font-weight: 700; color: var(--paper-dim); font-size: var(--fs-14); }
+.fd-preview-text { min-width: 0; line-height: 1.5; }
+
+/* alerts */
+.fd-drift { list-style: none; margin: .25rem 0 0; padding: 0; display: flex; flex-direction: column; gap: .375rem; }
+.fd-drift li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; }
+.fd-drift li > span { color: var(--paper); }
+.fd-more { margin-top: .25rem; font-size: var(--fs-13); color: var(--paper-faint); }
+.fd-orphans { font-family: var(--f-mono); font-size: var(--fs-12); }
+
+/* the review and bulk dialogs sit on the paper note (neutral, never cream) */
+.fd-review p { margin: 0 0 .5rem; }
+.fd-review-list { margin: 0; padding-inline-start: 1.1rem; max-height: 16rem; overflow: auto; font-size: var(--fs-14); line-height: 1.6; }
+.fd-review-list em { font-style: normal; color: var(--note-dim); }
+.fd-review-more { margin-top: .375rem; color: var(--note-dim); font-size: var(--fs-13); }
+.fd-review .fd-review-confirm { margin-top: .625rem; padding: .375rem .625rem; border-inline-start: 3px solid var(--red); font-weight: 700; }
+.fd-bulk { display: flex; flex-direction: column; gap: .75rem; min-width: 24rem; }
+.fd-bulk-scope { margin: 0; font-size: var(--fs-14); color: var(--note-dim); }
+.fd-bulk-plan { border-top: 1px solid var(--note-rule); padding-top: .5rem; font-size: var(--fs-14); }
+.fd-bulk-plan p { margin: 0 0 .25rem; }
+.fd-bulk-plan ul { margin: 0; padding-inline-start: 1.1rem; line-height: 1.6; }

@@ -1,0 +1,39 @@
+{
+  "resource": "w_store",
+  "version": 1,
+  "level": "god",
+  "title": { "ar": "المتاجر", "en": "Stores" },
+  "description": { "ar": "هوامش المتاجر الحكومية وطلبات التوريد والغرامات. إعدادات اقتصادية، فهي لمستوى المالك فقط.", "en": "Government store margins, supply orders and fines. Economy settings, so they are for the owner level only." },
+  "links": [
+    { "id": "wstore", "command": "wstore", "level": "admin", "label": { "ar": "فتح لوحة المتاجر الأصلية", "en": "Open the stores panel" }, "help": { "ar": "يقفل لوحة الإدارة ويفتح لوحة w_store نفسها: كل متجر وأصحابه وأسعاره ومخزونه.", "en": "Closes the admin panel and opens w_store's own panel: every store, its owners, prices and stock." } }
+  ],
+  "groups": [
+    {
+      "id": "margins", "store": "central", "level": "god",
+      "label": { "ar": "هوامش المتاجر الحكومية", "en": "Government store margins" },
+      "help": { "ar": "بكم تبيع المتاجر الحكومية وبكم تشتري من اللاعبين. أي تغيير يعيد تسعير كل رفوف الحكومة.", "en": "How much government stores sell for and how much they pay players. Any change re-prices every government shelf." },
+      "confirm": { "ar": "يعيد تسعير كل رفوف المتاجر الحكومية الآن. اللاعبون يشوفون الأسعار الجديدة فورًا.", "en": "Re-prices every government shelf now. Players see the new prices at once." },
+      "fields": [
+        { "key": "Money.govSellMarkup", "type": "number", "min": 0, "max": 200, "step": 1, "integer": true, "unit": { "ar": "%", "en": "%" },
+          "label": { "ar": "زيادة سعر البيع", "en": "Sale markup" },
+          "help": { "ar": "كم بالمية تزيد المتاجر الحكومية على السعر الأساسي لما تبيع. 20 تعني غرض بـ 10$ يُباع بـ 12$.", "en": "How many percent government stores add to the base price when selling. 20 makes a $10 item cost $12." } },
+        { "key": "Money.govBuyDiscount", "type": "number", "min": 0, "max": 100, "step": 1, "integer": true, "unit": { "ar": "%", "en": "%" },
+          "label": { "ar": "خصم سعر الشراء", "en": "Buy-back discount" },
+          "help": { "ar": "كم بالمية تنقص المتاجر الحكومية من السعر لما تشتري من اللاعب. 40 تعني تدفع 6$ عن غرض بـ 10$.", "en": "How many percent government stores take off when buying from a player. 40 pays $6 for a $10 item." } }
+      ]
+    },
+    {
+      "id": "law", "store": "central", "level": "admin",
+      "label": { "ar": "الغرامات", "en": "Fines" },
+      "help": { "ar": "غرامة من يُمسك وهو يسرق متجرًا، وكم يأخذ الشرطي منها.", "en": "The fine for a player caught robbing a store, and the officer's share of it." },
+      "fields": [
+        { "key": "Law.fine", "type": "number", "min": 0, "max": 5000, "step": 5, "integer": true, "unit": { "ar": "$", "en": "$" },
+          "label": { "ar": "قيمة الغرامة", "en": "Fine amount" },
+          "help": { "ar": "كم دولار يدفع اللي انمسك وهو يسرق متجر.", "en": "How many dollars a player caught robbing a store pays." } },
+        { "key": "Law.officerShare", "type": "number", "min": 0, "max": 100, "step": 5, "integer": true, "unit": { "ar": "%", "en": "%" },
+          "label": { "ar": "نصيب الشرطي", "en": "Officer's share" },
+          "help": { "ar": "كم بالمية من الغرامة تروح للشرطي اللي مسكه. الباقي يروح للخزينة.", "en": "What percent of the fine goes to the arresting officer. The rest goes to the treasury." } }
+      ]
+    }
+  ]
+}

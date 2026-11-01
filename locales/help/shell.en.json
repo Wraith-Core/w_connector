@@ -1,0 +1,134 @@
+{
+  "shell": {
+    "page": {
+      "dashboard": "Shows the server right now: how many are online, who needs help and what staff did last. You can also change weather and time or send an announcement here.",
+      "players": "Everyone in the server right now. Pick a player to see their file, move, heal or kick them. Offline players are under Characters.",
+      "characters": "Every saved character by citizen ID, online or not. Change money and jobs, suspend a character or delete it from here.",
+      "bans": "Who is banned from the server and which characters are suspended. Lift a ban or a suspension here and they can play again.",
+      "map": "The world map with players live on it. Click a player to go to them or bring them, or click a spot to teleport there.",
+      "world": "Changes weather and time for every player at once, and sends an announcement everyone sees on screen.",
+      "tools": "Your own staff tools: fly, go invisible, heal, spawn a horse and more. They affect only you unless stated.",
+      "hub": "Every script of the server in one place. Open a script's own interface or change its settings; its own interface keeps working as before.",
+      "hud": "Player HUD settings from the w_hud script: how fast hunger and thirst drop, their damage and what shows on screen. Saved changes reach everyone at once.",
+      "resources": "The scripts running on the server. Start, stop or restart one; players may notice its feature pause for a few seconds.",
+      "perms": "Your current website permissions. This page is read only; delegated role changes belong on the Ranks page.",
+      "log": "Everything staff did from this panel: who did what, to whom and when. Useful when you need to check or undo something.",
+      "settings": "Settings of this panel for you only: language, table size, help mode and motion. Nobody else is affected.",
+      "kit": "A sample of every component of the panel for developers to review. It exists only in the browser copy, never on the server.",
+      "news": "The news card of the pause menu (Esc in the game). Add, edit, order or delete the news here; players see a change at once, and it stays after a restart.",
+      "ranks": "Staff ranks and what each one allows. Create a rank, choose its permissions, and give it to a player or take it away, online or not. Changes apply at once.",
+      "reports": "The players’ reports, the same list as the website Reports page. Take, answer and close them here."
+    },
+    "nav": {
+      "text": "The side menu: each name opens a page of the panel. You only see the pages your level allows.",
+      "title": "Side menu"
+    },
+    "navCollapse": {
+      "text": "Shrinks the side menu to a thin strip so the page gets more room. Your choice is remembered next time.",
+      "title": "Collapse menu",
+      "undo": "Yes, press it again"
+    },
+    "palette": {
+      "text": "Quickly find a player by name, citizen ID or session number like #5, or jump to a page or tool. Shortcut Ctrl+K.",
+      "title": "Quick search",
+      "example": "Type 12 to open the owner of citizen ID 12"
+    },
+    "online": {
+      "text": "How many players are online right now, out of the most the server accepts.",
+      "title": "Online"
+    },
+    "helpMode": {
+      "text": "Turns on help mode: every ? stands out, and pressing one tells you what that thing does. Shortcut F1.",
+      "title": "Help mode",
+      "undo": "Yes, press it again or F1"
+    },
+    "quick": {
+      "text": "Opens the small quick menu at the side of the screen, so you can use your tools while watching the game. Shortcut F10.",
+      "title": "Quick menu"
+    },
+    "close": {
+      "text": "Closes the admin panel and takes you back to the game. Nothing you did is cancelled. Shortcut Esc.",
+      "title": "Close the panel"
+    },
+    "whoami": {
+      "text": "Your staff account and website role. Its permissions decide which pages and actions you can use.",
+      "title": "Your account"
+    }
+  },
+  "label": {
+    "shell": {
+      "brand": "Admin Panel",
+      "crumbRoot": "Admin Panel",
+      "section": {
+        "overview": "Overview",
+        "people": "People",
+        "world": "World",
+        "scripts": "Scripts",
+        "system": "System"
+      },
+      "page": {
+        "dashboard": "Dashboard",
+        "players": "Players",
+        "characters": "Characters",
+        "bans": "Bans and suspensions",
+        "map": "Map",
+        "world": "Weather, time and notices",
+        "tools": "My tools",
+        "hub": "Scripts hub",
+        "hud": "HUD and food",
+        "resources": "Resources",
+        "perms": "Permissions",
+        "log": "Admin log",
+        "settings": "Panel settings",
+        "kit": "Component sample",
+        "news": "News",
+        "ranks": "Ranks",
+        "reports": "Reports"
+      },
+      "desc": {
+        "dashboard": "The server right now, who needs help and what staff did last.",
+        "players": "Everyone in the server right now. Pick a player to see their file and act.",
+        "characters": "Every character by citizen ID, online or offline.",
+        "bans": "Banned players and suspended characters.",
+        "map": "Players, towns and services on one map.",
+        "world": "Weather, time and announcements for the whole server.",
+        "tools": "Your personal staff tools in one place.",
+        "hub": "Every script: open its own interface or change its settings.",
+        "hud": "How fast hunger and thirst drop, their damage and what the player HUD shows.",
+        "resources": "Start, stop or restart scripts.",
+        "perms": "Your account and website role permissions.",
+        "log": "Everything staff did from this panel.",
+        "settings": "Your language, table size and help mode.",
+        "kit": "Every component of the panel on one page, for developers only.",
+        "news": "The news card of the pause menu: add, edit, order and delete.",
+        "ranks": "Ranks, their permissions and who holds them.",
+        "reports": "The players’ reports: take, answer and close them."
+      },
+      "palette": {
+        "open": "Find a player, citizen ID or tool…",
+        "placeholder": "Name, citizen ID like 12, session like #5, or a page",
+        "players": "Online players",
+        "character": "Character",
+        "pages": "Pages",
+        "tools": "Tools",
+        "empty": "Nothing found. Try the citizen ID, or # and the session number.",
+        "hint": "↑ ↓ move · Enter open · Esc close",
+        "offline": "Offline now, opens in Characters",
+        "online": "Online · #%s",
+        "checking": "Looking up the citizen ID…"
+      },
+      "online": "Online",
+      "helpMode": "Help mode",
+      "helpBanner": "Help mode is on: press any ? to see what it does.",
+      "helpBannerOff": "Turn off help mode",
+      "quick": "Quick menu",
+      "close": "Close",
+      "navCollapse": "Collapse menu",
+      "navExpand": "Expand menu",
+      "whoLevel": "Role",
+      "whoCid": "Citizen ID",
+      "noPages": "No pages are allowed for your level.",
+      "legacy": "This page keeps its old look until its new design lands."
+    }
+  }
+}

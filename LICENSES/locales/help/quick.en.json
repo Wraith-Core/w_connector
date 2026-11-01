@@ -1,0 +1,70 @@
+{
+  "quick": {
+    "panel": "A small menu at the side of the screen with your tools, so you can use them while watching the game. F10 opens and closes it; PgUp opens the full panel.",
+    "close": "Closes the menu and takes you back to the game. Modes that are on stay on. Shortcut Esc or F10.",
+    "search": "Searches every tool by name, like 'fly' or 'copy'; results come from all sections. In the Players section it searches their names.",
+    "group": {
+      "self": "Your own tools: flying, invisibility, protection and healing.",
+      "travel": "Quick travel: to the map waypoint, to coordinates, or back to your last spot.",
+      "players": "Quick actions on one player: move them, go to them, heal them or freeze them.",
+      "spawn": "Spawns a temporary horse, wagon, animal or person next to you.",
+      "vehicle": "Repairs or fixes the wagon or horse you are using.",
+      "dev": "Developer tools: coordinates, object IDs and clearing the area.",
+      "world": "Weather, time and announcements; they change for every player."
+    },
+    "target": {
+      "text": "Type the citizen ID of the player you want, like 12. For a session number put # first, like #5. Or press their name in the list below.",
+      "example": "12 or #5"
+    },
+    "online": "Players online now. Press any name and their citizen ID fills the box above and their actions appear.",
+    "full": "Opens the full admin panel with every page. Shortcut PgUp.",
+    "active": "How many modes are on for you now, like Invisible or Noclip. Each stays until you turn it off."
+  },
+  "label": {
+    "quick": {
+      "brand": "WRAITH",
+      "title": "Quick menu",
+      "groups": "Tool sections",
+      "group": {
+        "self": "Self",
+        "travel": "Travel",
+        "players": "Players",
+        "spawn": "Spawn",
+        "vehicle": "Wagon",
+        "dev": "Developer",
+        "world": "World"
+      },
+      "search": "Search tools…",
+      "searchPlayers": "Search a player name or ID…",
+      "noResults": "Nothing by that name",
+      "target": "Player",
+      "online": "Online now",
+      "noOnline": "No player matches the search",
+      "pickPlayer": "Type a citizen ID or pick a player to see the actions.",
+      "offline": "This player is not in the game right now, so these actions do not apply.",
+      "frozen": "This player is frozen right now.",
+      "selfNote": "This is you, so some actions do not apply.",
+      "act": {
+        "teleportTo": "Go to",
+        "bring": "Bring",
+        "bringBack": "Send back",
+        "spectate": "Watch",
+        "freeze": "Freeze",
+        "unfreeze": "Unfreeze",
+        "revive": "Revive",
+        "heal": "Heal",
+        "openInventory": "Bag",
+        "wardrobe": "Wardrobe"
+      },
+      "full": "Full panel",
+      "active": "%s modes on",
+      "activeOne": "One mode on",
+      "activeNone": "Nothing on",
+      "keys": {
+        "move": "Move",
+        "pick": "Pick",
+        "close": "Close"
+      }
+    }
+  }
+}

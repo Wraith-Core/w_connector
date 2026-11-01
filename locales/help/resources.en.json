@@ -1,0 +1,103 @@
+{
+  "resources": {
+    "stat": {
+      "running": "How many scripts run right now, out of every script the server has.",
+      "stopped": "Scripts that exist but are stopped: their features do not work for players until you start them.",
+      "protected": "Core scripts that cannot be stopped from here, because the panel or the whole server depends on them."
+    },
+    "search": "Filters the list by script name, state or description. Example: type hud to find w_hud.",
+    "filter": {
+      "all": "Every script, running and stopped.",
+      "running": "Only the scripts running now.",
+      "stopped": "Only stopped or missing scripts: their features are gone for players.",
+      "protected": "The protected scripts that cannot be stopped from the panel."
+    },
+    "group": {
+      "ours": "Red River scripts (their names start with w_): the server's main features. Stopping or restarting one asks you to type its name to confirm.",
+      "others": "Scripts from outside Red River, such as tools and databases. Same buttons, with a normal confirmation.",
+      "protected": "Scripts whose stop would take the panel or the whole server down, so they cannot be stopped here. Restart the server from txAdmin instead."
+    },
+    "col": {
+      "name": "The script's name as it is in the server files, with its description under it when its author wrote one.",
+      "version": "The script's version number. Useful to check that a new update really arrived.",
+      "state": "Whether the script runs now: Running, Stopped or Starting, and Missing when its files were not found on the server.",
+      "actions": "Start, stop or restart the script. Point at a button to see exactly what it does."
+    },
+    "start": {
+      "text": "Starts the script, so its features come back for players within seconds. Nobody online is affected.",
+      "undo": "Yes, stop it again with Stop"
+    },
+    "restart": {
+      "text": "Stops the script and starts it again. Players may notice its feature pause for a few seconds. Useful after editing its files.",
+      "undo": "Nothing to undo: the script comes back by itself"
+    },
+    "stop": {
+      "text": "Stops the script now, so its feature disappears for every player until you start it. Example: stopping w_hud hides the hunger and thirst bars.",
+      "undo": "Yes, with Start on the same line"
+    },
+    "protected": "This script is protected: nobody can stop or restart it from the panel, because the panel or the server depends on it.",
+    "confirmCore": {
+      "text": "This is a core Red River script: stopping it affects every player at once, and other scripts may depend on it. Type its exact name so we know you mean it.",
+      "example": "To stop w_hud, type w_hud"
+    }
+  },
+  "label": {
+    "resources": {
+      "stat": {
+        "running": "Running",
+        "stopped": "Stopped",
+        "protected": "Protected",
+        "ofTotal": "out of %s"
+      },
+      "search": "Search by script name or state…",
+      "refresh": "Refresh",
+      "filters": "Script filter",
+      "filter": {
+        "all": "All",
+        "running": "Running",
+        "stopped": "Stopped",
+        "protected": "Protected"
+      },
+      "group": {
+        "ours": "Red River scripts",
+        "others": "Other scripts",
+        "protected": "Protected scripts"
+      },
+      "lead": {
+        "ours": "The server's main features. Stop and restart ask you to type the script name.",
+        "others": "Tools and scripts from outside Red River.",
+        "protected": "The panel or the server depends on them, so they are not stopped or restarted here."
+      },
+      "col": {
+        "name": "Script",
+        "version": "Version",
+        "state": "State",
+        "actions": "Actions"
+      },
+      "state": {
+        "started": "Running",
+        "stopped": "Stopped",
+        "starting": "Starting",
+        "stopping": "Stopping",
+        "missing": "Missing",
+        "uninitialized": "Not ready",
+        "unknown": "Unknown"
+      },
+      "start": "Start",
+      "restart": "Restart",
+      "stop": "Stop",
+      "protected": "Protected",
+      "protectedNote": "Not stopped from the panel",
+      "stopTitle": "Stop %s",
+      "stopText": "The feature of \"%s\" stops for every player until you start it again.",
+      "restartTitle": "Restart %s",
+      "restartText": "\"%s\" stops and starts again, so its feature pauses for a few seconds for every player.",
+      "coreNote": "This is a core Red River script; other scripts that depend on it may be affected.",
+      "none": "No scripts match this search or filter.",
+      "clear": "Clear search",
+      "waiting": "Waiting for the script list from the server…",
+      "showing": "Showing %s of %s",
+      "listLabel": "Script list"
+    }
+  }
+}

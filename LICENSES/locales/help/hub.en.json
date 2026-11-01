@@ -1,0 +1,261 @@
+{
+  "hub": {
+    "search": "Filters the scripts by their name, their technical name like w_stables, or a word from their description. Changes nothing.",
+    "filter": {
+      "all": "Shows every server script the admin panel can manage.",
+      "panel": "Shows scripts that have their own interface. Open it here with Open its own interface.",
+      "commands": "Shows scripts with quick commands you run from here instead of typing them in chat.",
+      "settings": "Shows scripts whose settings you change here; a change reaches every player without a restart.",
+      "stopped": "Shows scripts that are stopped now. Their features work for no player until someone starts them."
+    },
+    "group": {
+      "economy": "Stores, money, crafting and smuggling: everything that brings money into the server or takes it out.",
+      "animals": "Horses, wagons, pets and their shops.",
+      "world": "The map, the weather and the places everyone sees in the world.",
+      "tribes": "Tribes, kingdoms, jobs and their rules.",
+      "player": "What concerns the player: their HUD, food, drink and XP.",
+      "fun": "Games and entertainment inside the server.",
+      "system": "The logs and the tools the server depends on to run.",
+      "other": "Scripts without a set section."
+    },
+    "state": "Whether the script runs now. Stopped means its feature works for nobody until someone starts it here or on the Resources page.",
+    "version": "The script version as its author wrote it. Useful when you report a problem and need to know which copy runs.",
+    "overridden": "How many settings of this script differ from their original value because staff changed them. Restore them on its settings page.",
+    "open": {
+      "text": "Closes the admin panel and opens the script's own interface. The server checks your permission first; press PgUp to come back.",
+      "undo": "Opening it changes nothing; close it to come back"
+    },
+    "openLocked": "Locked because the script itself does not let you open its interface. The reason is written under the button; ask the owner if you need it.",
+    "commandsBtn": "Opens this script's quick commands in the side panel. Fill in the boxes and run them without typing anything in chat.",
+    "settingsBtn": "Opens the script settings you can change here. Changes apply to every player once saved, with no restart.",
+    "details": "Shows everything about the script in the side panel: what it does, how its interface opens and its quick commands.",
+    "start": {
+      "text": "Starts the stopped script. Its feature returns for players within seconds.",
+      "undo": "Yes, stop it from the Resources page"
+    },
+    "how": "How a player or staff member opens this interface in the game without the admin panel, like a command typed in chat.",
+    "drawer": {
+      "about": "What this script does in the server and when you need it.",
+      "own": "The script's own interface as it is. The admin panel only opens it; the script checks every permission inside it itself.",
+      "commands": "The script's ready commands. Each runs in your name and is kept in the admin log, so type the values with care.",
+      "settings": "The settings you can change from the admin panel, and how many of them differ from the original now.",
+      "resource": "The script's state on the server, its technical name and its version.",
+      "name": "The script's technical name on the server. You need it on the Resources page or when talking to the developer."
+    },
+    "cmd": {
+      "run": "Runs the command now in your name with the values you typed. The script checks your permission itself, and the command is kept in the admin log.",
+      "runDanger": {
+        "text": "Runs a command that changes something for the player that does not change back by itself. We ask once more first so it never happens by mistake.",
+        "undo": "No, only with another command that sets it back"
+      },
+      "output": "The script's answer to the last command you ran here. If it shows an error, read it, fix the values and try again.",
+      "online": "The command needs the player in the game now. If they are away, wait for them to join or use the Characters page."
+    },
+    "module": {
+      "back": "Takes you back to the list of all scripts. Your unsaved edits stay in the draft until you come back to this script.",
+      "history": "Every change made to this script's settings: who made it, what the value was, what it became and when.",
+      "advanced": "Settings you rarely need, with a big effect. Change them only if you know what they do.",
+      "readOnly": "You can see the values but not change them, because this section needs a higher level than yours.",
+      "orphans": "Saved values for settings the script no longer has. They are not applied and not deleted by themselves; the developer decides.",
+      "drift": "The developer changed this setting's original value after you edited it. Your value is the one applied now.",
+      "keepMine": "Keeps your value and hides this notice. Changes nothing on the server.",
+      "takeNew": {
+        "text": "Sets the setting back to the new original value the developer chose. It applies after you save.",
+        "undo": "Yes, before saving with Discard"
+      },
+      "review": "Every change written as a plain sentence before it applies. Read them carefully, then save.",
+      "understand": "An extra check for big changes. Turn it on once you understand the change reaches every player now.",
+      "save": {
+        "text": "Saves the changes and applies them to every player at once, with no restart; they are kept in the admin log in your name.",
+        "undo": "Yes, change the value again or press Restore"
+      },
+      "rejected": "Some changes were not saved. The reason is next to each one, and your edits are still in the draft.",
+      "invalid": "A box holds a value outside the allowed range or is empty. Fix it before saving; the box is outlined.",
+      "reload": "Fetches the saved values from the server now. Your unsaved edits stay in the draft."
+    },
+    "table": {
+      "search": "Filters the rows by their name or the item's script name. Changes nothing.",
+      "family": "Shows one family of items, like fruit or meat, so you can edit them together.",
+      "all": "Shows every row.",
+      "changed": "Shows only rows with an unsaved edit or a value that differs from the original.",
+      "readOnly": "Information about the item, for viewing only. It cannot be changed here because it is part of how the script is built.",
+      "item": "The item name, with its script name under it. A locked row cannot be edited; the reason is written under it.",
+      "rowReset": {
+        "text": "Sets every cell of this row back to its original value. It applies after you save.",
+        "undo": "Yes, before saving with Discard"
+      }
+    },
+    "history": {
+      "when": "When the change was made.",
+      "who": "Which staff member made the change.",
+      "key": "Which setting changed.",
+      "change": "The value before and after the change. Original means it went back to the original value."
+    },
+    "builtin": {
+      "whud": "Draws the player HUD and runs hunger and thirst. Change their speed, their damage and what shows on screen here; its own F7 panel stays as it is."
+    }
+  },
+  "label": {
+    "hub": {
+      "search": "Find a script by name or description…",
+      "filterLabel": "Filter the scripts",
+      "filter": {
+        "all": "All",
+        "panel": "Own interface",
+        "commands": "Quick commands",
+        "settings": "Settings",
+        "stopped": "Stopped"
+      },
+      "group": {
+        "economy": "Economy and trade",
+        "animals": "Horses and animals",
+        "world": "World and map",
+        "tribes": "Tribes and jobs",
+        "player": "Player",
+        "fun": "Entertainment",
+        "system": "System",
+        "other": "Other"
+      },
+      "state": {
+        "started": "Running",
+        "stopped": "Stopped",
+        "missing": "Missing",
+        "starting": "Starting…",
+        "stopping": "Stopping…",
+        "unknown": "Unknown"
+      },
+      "version": "Version %s",
+      "noVersion": "No version number",
+      "open": "Open its own interface",
+      "opening": "Opening…",
+      "commands": "Quick commands (%s)",
+      "settings": "Settings",
+      "details": "Details",
+      "start": "Start it",
+      "overridden": "Changed: %s",
+      "howPrefix": "How to open:",
+      "how": "How to open",
+      "lockedLevel": "Needs level %s",
+      "editNeeds": "Changing needs level %s; you can view the values",
+      "appliesAll": "Every player, as soon as you save",
+      "appliesRestart": "Every player, after the script restarts",
+      "lockedAce": "Needs the script's own permission %s",
+      "empty": "No script matches your search.",
+      "emptyNone": "The script list did not arrive from the server.",
+      "clear": "Clear the search",
+      "retry": "Try again",
+      "refresh": "Refresh",
+      "loadError": "Could not load the script list",
+      "saved": "Settings saved and applied to everyone",
+      "palette": "Scripts",
+      "paletteSettings": "Settings · %s",
+      "drawer": {
+        "about": "What it does",
+        "own": "Its own interface",
+        "noPanel": "This script has no interface of its own, so you manage it with the quick commands or the settings here.",
+        "commands": "Quick commands",
+        "noCommands": "It has no quick commands.",
+        "settings": "Settings",
+        "settingsInfo": "%s sections · %s values changed from the original",
+        "noSettings": "It has no settings you can change from the admin panel yet.",
+        "resource": "The script itself",
+        "state": "State",
+        "version": "Version",
+        "name": "Technical name"
+      },
+      "cmd": {
+        "run": "Run the command",
+        "running": "Running…",
+        "output": "The script's answer",
+        "online": "Must be in the game",
+        "confirmTitle": "Run \"%s\"?",
+        "confirmText": "Check the values: %s",
+        "fillRequired": "Fill in the required boxes first",
+        "offline": "The player is not in the game now"
+      },
+      "module": {
+        "back": "All scripts",
+        "nav": "Sections",
+        "history": "Change history",
+        "advanced": "Advanced settings (%s)",
+        "hideAdvanced": "Hide the advanced settings",
+        "readOnly": "View only",
+        "changedBy": "Last change: %s · %s",
+        "orphans": "Saved values for settings that no longer exist",
+        "drift": "The developer changed the original from %s to %s after your edit",
+        "keepMine": "Keep my value",
+        "takeNew": "Take the new one",
+        "notFound": "This script was not found or has no settings.",
+        "invalid": "Fix %s boxes before saving",
+        "reload": "Reload the values",
+        "builtinNote": "These settings are saved through w_hud itself, like its F7 panel, and reach everyone at once.",
+        "noHudCfg": "w_hud's settings have not arrived from the server yet. Press Reload the values; if they still do not come, check that w_hud is running.",
+        "loading": "Loading the settings…"
+      },
+      "review": {
+        "title": "Check the changes before saving",
+        "lead": "These changes will apply to every player now:",
+        "reset": "back to the original (%s)",
+        "understand": "I understand, apply them to everyone now",
+        "save": "Save and apply to everyone"
+      },
+      "reject": {
+        "stale": "Someone else changed the value before you saved. We reloaded the values; check them and save again",
+        "out_of_range": "Outside the allowed range",
+        "bad_type": "Wrong kind of value",
+        "unknown_key": "The setting no longer exists",
+        "locked_row": "The row is locked",
+        "no_access": "Your level does not allow this setting",
+        "other": "The script refused it"
+      },
+      "invalid": {
+        "empty": "The box is empty; type a number",
+        "range": "Outside the allowed range",
+        "integer": "Must be a whole number",
+        "length": "Longer than allowed",
+        "pattern": "Wrong format; see the example in ?",
+        "option": "Pick from the list",
+        "type": "Wrong kind of value"
+      },
+      "derived": {
+        "drain": "With these numbers the bar empties from 100 to 0 in about %s",
+        "never": "With this value it never drops",
+        "death": "From the first damage to death: about %s",
+        "noKill": "and killing is off, so health stops just above death",
+        "off": "Damage is off, so hunger and thirst hurt nobody",
+        "kg": "Carry weight becomes %s kg"
+      },
+      "table": {
+        "item": "Item",
+        "search": "Find an item…",
+        "all": "All",
+        "changed": "Changed",
+        "families": "Item families",
+        "empty": "No row matches your search.",
+        "orig": "was %s",
+        "rowReset": "Restore the row",
+        "rows": "%s rows"
+      },
+      "history": {
+        "when": "When",
+        "who": "Who",
+        "key": "Setting",
+        "change": "Change",
+        "empty": "No change has been made to this script's settings yet.",
+        "original": "Original"
+      },
+      "value": {
+        "on": "On",
+        "off": "Off",
+        "empty": "Empty"
+      },
+      "builtin": {
+        "whud": {
+          "label": "HUD and food",
+          "description": "Health, stamina, hunger and thirst rings, and how fast hunger and thirst drop and hurt.",
+          "how": "The /hudmenu command or F7"
+        }
+      }
+    }
+  }
+}

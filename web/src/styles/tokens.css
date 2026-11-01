@@ -1,0 +1,137 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · styles/tokens.css
+ * The console's names for the server-wide Wraith theme (w_lib/nui/theme/tokens.css, linked at runtime
+ * by index.html). Every colour and face below reads its --w-* token, with the theme's own value as the
+ * fallback, so a change to the theme reaches the console without a rebuild and the console still draws
+ * the same where the theme is not served (the Vite dev server).
+ * Ink shell, paper text, the paper note, ONE red. Pages use these variables only: no other colours.
+ *
+ * Red is a MARK, never text and never a filled slab:
+ *   the danger underline under a destructive button's label · the square beside a critical state
+ *   (dead, stopped, a meter under 20 %) · an invalid field's underline · a card's ribbon (hub).
+ * "The cursor is here" (hover, keyboard focus, the active page, the active tab, the selected row) is
+ * the game's brushed paper band with ink text (kit.css "the paper band").
+ *
+ * Scale: 1rem = 16px at 1080p (root = clamp(13px, 1.48vh, 24px)). Sizes below are named by their
+ * pixel value at 1080p.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* palette (w_lib tokens.css): the Wraith launcher's neutral black and white - every grey has
+     r = g = b; no warm, cream or "aged paper" tint anywhere, red stays a mark */
+  --ink: var(--w-ink, #0A0A0A);                  /* page */
+  --ink-2: var(--w-ink-2, #111111);              /* sidebar, drawer, inputs */
+  --ink-3: var(--w-ink-3, #191919);              /* raised, selected */
+  --ink-4: var(--w-ink-4, #222222);              /* pressed, meter track */
+  --paper: var(--w-paper, #F2F2F2);              /* text */
+  --paper-lit: var(--w-paper-lit, #FFFFFF);      /* the primary band under the cursor */
+  --paper-dim: var(--w-paper-dim, #B4B4B4);      /* secondary text */
+  --paper-faint: var(--w-paper-faint, #7A7A7A);  /* captions, placeholders */
+  --rule: var(--w-rule, rgba(242, 242, 242, .16));   /* hairlines between rows: the pause menu's */
+  /* the console keeps boxed controls, so its stronger rules stay a step below the theme's brushed ones */
+  --rule-2: rgba(242, 242, 242, .22);
+  --rule-3: rgba(242, 242, 242, .38);
+  --red: var(--w-red, #CB0101);                  /* the only accent, a mark */
+  --red-hover: var(--w-red, #CB0101);            /* one red: there is no darker second red */
+  --red-soft: var(--w-red-soft, rgba(242, 242, 242, .06));   /* the theme's: a paper lift, red is never a fill */
+  --note: var(--w-note, #E9E9E9);                /* help notes and confirm dialogs: the paper note */
+  --note-ink: var(--w-note-ink, #111111);
+  --note-dim: var(--w-note-dim, #555555);
+  --note-rule: var(--w-note-rule, rgba(17, 17, 17, .18));
+  --note-glow: var(--w-note-glow, rgba(0, 0, 0, .28));   /* the note's inner burn */
+  /* the note colour at 60 %, laid over the grain so it shows at the theme's strength (.w-note::before
+     draws it at .45 opacity; a scrolling dialog cannot carry that pseudo-element) */
+  --note-veil: rgba(233, 233, 233, .6);
+  --scrim: var(--w-scrim, rgba(5, 5, 5, .72));
+
+  /* The band. These never turn over inside a band (kit.css swaps --paper / --ink there), so a band
+     is always drawn in paper whatever it sits in. Without the theme the mask is none: a plain paper bar. */
+  --band: var(--w-paper, #F2F2F2);
+  --band-ink: var(--w-ink, #0A0A0A);             /* the words on the band */
+  --tex-band: var(--w-tex-band, none);           /* selection_box_bg_1a: rows, nav items */
+  --tex-band-sm: var(--w-tex-band-sm, none);     /* selection_box_bg_1c: tabs, buttons, chips */
+  --tex-grain: var(--w-tex-grain, none);         /* the pause menu's paper grain (notes, dialogs) */
+  --tex-tear: var(--w-tex-tear, none);           /* the pause menu's torn edge (9-slice mask) */
+  --edge: var(--w-edge, 1.7rem);                 /* how deep the torn edge bites */
+
+  /* faces (w_lib fonts.css: Lalezar / Amiri / Tajawal / Aref Ruqaa, EB Garamond, the RDR faces).
+     The w_admin copies injected by fonts.ts stay as the fallback for the faces both ship. */
+  --f-title-ar: var(--w-f-ar-display, 'Lalezar', 'EB Garamond', 'Tajawal', 'W Noto Arabic', 'Noto Sans Arabic', sans-serif); /* Arabic titles */
+  /* Latin titles: EB Garamond 600 (the pause menu's). The stack keeps Lalezar, so an Arabic name in an
+     English title is still drawn by a role face. Read under html[lang=en] only. */
+  --f-title: 'EB Garamond', 'Lalezar', 'Tajawal', 'W Noto Arabic', Georgia, serif;
+  --f-mark: 'RDR Lino', Georgia, serif;          /* the WRAITH wordmark only */
+  --f-ui: 'Tajawal', 'W Noto Arabic', 'Noto Sans Arabic', sans-serif;   /* labels, controls, cells: all UI text, Latin digits */
+  /* reading text (help notes, descriptions, a confirm's question): Amiri in Arabic, EB Garamond in
+     English. --w-f-text follows the page's dir, which i18n sets on <html>. */
+  --f-text: var(--w-f-text, 'Amiri', 'EB Garamond', 'W Noto Arabic', 'Noto Sans Arabic', serif);
+  --f-kpi: 'RDR Catalogue', 'Tajawal', sans-serif;                     /* ONLY numbers >= 28px (KPIs) */
+  --f-hand: var(--w-f-ar-hand, 'Aref Ruqaa', 'Amiri', 'W Noto Arabic', serif);  /* "ما هذا؟" on help notes only */
+  --f-latin-caption: 'Hapna Slab', Georgia, serif;
+  --f-mono: Consolas, 'Courier New', monospace;
+  /* reading text is 16 px or more at 1080p; Amiri runs small, so Arabic takes the theme's 1.06 */
+  --fs-text: 1rem;
+  --k-text: 1;
+
+  /* type scale (px at 1080p) */
+  --fs-11: .6875rem;
+  --fs-12: .75rem;           /* caption (the smallest) */
+  --fs-13: .8125rem;
+  --fs-135: .84375rem;       /* meta */
+  --fs-14: .875rem;
+  --fs-145: .90625rem;       /* table */
+  --fs-15: .9375rem;         /* body */
+  --fs-16: 1rem;             /* strong */
+  --fs-18: 1.125rem;         /* section */
+  --fs-22: 1.375rem;
+  --fs-26: 1.625rem;         /* drawer title */
+  --fs-34: 2.125rem;         /* page title */
+  --fs-40: 2.5rem;           /* KPI */
+
+  /* spacing (4 px grid) */
+  --s1: .25rem;              /* 4 */
+  --s2: .5rem;               /* 8 */
+  --s3: .75rem;              /* 12 */
+  --s4: 1rem;                /* 16 */
+  --s5: 1.5rem;              /* 24 */
+  --s6: 2rem;                /* 32 */
+
+  /* geometry */
+  --row: 2.875rem;           /* 46 */
+  --row-compact: 2.25rem;    /* 36 */
+  --control: 2.375rem;       /* 38 */
+  --control-sm: 2rem;        /* 32 */
+  --help-dot: 1.125rem;      /* 18: the circled ؟ */
+  --help-hit: 1.75rem;       /* 28: its hit area */
+  --shell-inset: 1.25rem;    /* 20 */
+  --side: 15.5rem;           /* 248 */
+  --rail: 4rem;              /* 64 */
+  --topbar: 3.5rem;          /* 56 */
+  --drawer: 35rem;           /* 560 */
+  --note-w: 22.5rem;         /* 360: the torn edge and the reading face need a little more than 340 */
+  --radius: 0;
+
+  /* motion */
+  --t-fast: 120ms;
+  --t-med: 160ms;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+
+  /* layers */
+  --z-sticky: 5;
+  --z-popover: 700;
+  --z-drawer-over: 750;
+  --z-palette: 800;
+  --z-dialog: 900;
+  --z-note: 1000;
+  --z-toast: 1100;
+
+  --lh-text: 1.5;
+}
+/* Arabic reading text is Amiri: a little larger than the Garamond it stands for, with room for its
+   tails (the theme's factor and line height for the reading role) */
+html[dir='rtl'] { --k-text: 1.06; --lh-text: 1.6; }
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-fast: 0ms; --t-med: 0ms; }
+}
+html.k-reduced-motion { --t-fast: 0ms; --t-med: 0ms; }

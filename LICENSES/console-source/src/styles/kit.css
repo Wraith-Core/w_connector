@@ -1,0 +1,647 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · styles/kit.css
+ * Every kit component. Square corners, one thin rule, paper text on ink, red only as a mark.
+ * The states are the server theme's (w_lib/nui/theme/THEME.md): the cursor, the active page, the active
+ * tab and the selected row are the game's brushed paper band with ink text.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── the paper band ─────────────────────────────────────────────────────────
+ * Inside a band the palette turns over: --paper becomes ink and --ink becomes paper, so every child
+ * that draws with the console's names (a cell's sub line, a badge, a meter, the "؟", a row's buttons)
+ * reads as ink on paper without a rule per component. The band itself is painted with --band, which
+ * never turns over. One list of scopes, kept in step with the rules that paint the band below. */
+.sh-nav-btn:hover, .sh-nav-btn:focus-visible, .sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn,
+.k-settings-btn:hover, .k-settings-btn:focus-visible, .k-settings-item.is-active .k-settings-btn,
+.k-tab.is-active, .k-tab-wrap:hover > .k-tab:not(:disabled), .k-tab:focus-visible,
+/* a strip whose "؟" sits inside the tab's end padding: that "؟" is on the band too */
+.k-tabs--compact .k-tab.is-active + .k-tab-help, .k-tabs--compact .k-tab-wrap:hover > .k-tab:not(:disabled) + .k-tab-help,
+.pl-drawer .k-tab.is-active + .k-tab-help, .pl-drawer .k-tab-wrap:hover > .k-tab:not(:disabled) + .k-tab-help,
+.k-seg-btn.is-on, .k-switch.is-on .k-switch-opt.is-active, .k-chip.is-on,
+.k-table-wrap[tabindex] tbody tr:hover > td, .k-table tbody tr.is-selected > td,
+.k-pop-opt.is-active, .sh-pal-item.is-active, .sh-helpbtn.is-on, .sh-helpbtn:hover, .sh-helpbtn:focus-visible {
+  --paper: var(--w-ink, #0A0A0A);
+  --paper-lit: var(--w-ink-3, #191919);
+  --paper-dim: var(--w-note-dim, #555555);
+  --paper-faint: var(--w-note-dim, #555555);
+  --rule: var(--w-note-rule, rgba(17, 17, 17, .18));
+  --rule-2: rgba(17, 17, 17, .3);
+  --rule-3: rgba(17, 17, 17, .45);
+  --ink: var(--w-paper, #F2F2F2);
+  --ink-2: rgba(17, 17, 17, .06);
+  --ink-3: rgba(17, 17, 17, .1);
+  --ink-4: rgba(17, 17, 17, .16);
+  color: var(--paper);
+}
+/* the band is a ::before behind the content (the content is never masked). A table cell takes the
+   middle of the brush and the row's two end cells its torn ends, so a row reads as one stroke. */
+.sh-nav-btn, .k-settings-btn, .k-tab, .k-seg-btn, .k-switch-opt, .k-chip, .k-pop-opt, .sh-pal-item, .sh-helpbtn {
+  position: relative; isolation: isolate;
+}
+.sh-nav-btn::before, .k-settings-btn::before, .k-tab::before, .k-seg-btn::before, .k-switch-opt::before,
+.k-chip::before, .k-pop-opt::before, .sh-pal-item::before, .sh-helpbtn::before, .k-table tbody td::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--band); opacity: 0;
+  -webkit-mask: var(--tex-band) center / 100% 100% no-repeat; mask: var(--tex-band) center / 100% 100% no-repeat;
+  transition: opacity var(--t-fast) var(--ease);
+}
+.k-tab::before, .k-seg-btn::before, .k-switch-opt::before, .k-chip::before, .sh-helpbtn::before {
+  -webkit-mask-image: var(--tex-band-sm); mask-image: var(--tex-band-sm);
+}
+.sh-nav-btn:hover::before, .sh-nav-btn:focus-visible::before, .sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn::before,
+.k-settings-btn:hover::before, .k-settings-btn:focus-visible::before, .k-settings-item.is-active .k-settings-btn::before,
+.k-tab.is-active::before, .k-tab-wrap:hover > .k-tab:not(:disabled)::before, .k-tab:focus-visible::before,
+.k-seg-btn.is-on::before, .k-switch.is-on .k-switch-opt.is-active::before, .k-chip.is-on::before,
+.k-table-wrap[tabindex] tbody tr:hover > td::before, .k-table tbody tr.is-selected > td::before,
+.k-pop-opt.is-active::before, .sh-pal-item.is-active::before, .sh-helpbtn.is-on::before, .sh-helpbtn:hover::before,
+.sh-helpbtn:focus-visible::before { opacity: 1; }
+/* the band is the focus mark: no second ring around it */
+.sh-nav-btn:focus-visible, .k-settings-btn:focus-visible, .k-tab:focus-visible, .sh-helpbtn:focus-visible { outline: none; }
+
+/* ── buttons ────────────────────────────────────────────────────────────── */
+.k-btnwrap { display: inline-flex; align-items: center; gap: .375rem; min-width: 0; vertical-align: middle; }
+.k-btnwrap.is-block { display: flex; width: 100%; }
+.k-btn {
+  position: relative; isolation: isolate;
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  height: var(--control); padding: 0 1rem; min-width: 0;
+  border: 1px solid var(--rule-2); background: var(--ink-3); color: var(--paper);
+  font: 700 var(--fs-14)/1 var(--f-ui); white-space: nowrap;
+  transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+/* Under the cursor every button is the paper band with ink text (the theme's .w-btn). Drawn with
+   --paper, not --band: inside a banded row the palette has turned over, so a row's button becomes an
+   ink band on the paper one instead of vanishing into it. */
+.k-btn::before {
+  content: ''; position: absolute; inset: -1px; z-index: -1; pointer-events: none;
+  background: var(--paper); opacity: 0;
+  -webkit-mask: var(--tex-band-sm) center / 100% 100% no-repeat; mask: var(--tex-band-sm) center / 100% 100% no-repeat;
+  transition: opacity var(--t-fast) var(--ease);
+}
+.k-btn.is-block { flex: 1; }
+.k-btn .k-glyph { width: 1.05em; height: 1.05em; flex: none; }
+.k-btn-label { overflow: hidden; text-overflow: ellipsis; }
+/* a key cap follows the button's own colour, so it stays legible on the band */
+.k-app .k-btn kbd, .k-layer .k-btn kbd { margin-inline-start: .125rem; color: inherit; border-color: currentColor; opacity: .75; }
+.k-btn:hover:not(:disabled), .k-btn:focus-visible { background: transparent; border-color: transparent; color: var(--ink); outline: none; }
+.k-btn:hover:not(:disabled)::before, .k-btn:focus-visible::before { opacity: 1; }
+/* a button with its own inner layout (a dashboard shortcut, a quick-menu row) takes the band's ink
+   throughout, so a line coloured for the ink plate never sits paper-on-paper */
+.k-btn:hover:not(:disabled) .k-btn-label *, .k-btn:focus-visible .k-btn-label *, .k-btn--primary .k-btn-label * { color: inherit; }
+.k-btn:active:not(:disabled) { transform: translateY(1px); }
+.k-btn:active:not(:disabled)::before { background: var(--paper-dim); }
+.k-btn:disabled { opacity: .45; }
+.k-btn.is-locked { opacity: .55; }
+.k-btn-lock { width: .9em !important; height: .9em !important; opacity: .8; }
+.k-btn.is-busy { cursor: progress; }
+.k-btn.is-busy-dots .k-btn-label::after { content: '…'; }
+.k-btn--sm { height: var(--control-sm); padding: 0 .75rem; font-size: var(--fs-135); }
+.k-btn--lg { height: 2.625rem; padding: 0 1.25rem; font-size: var(--fs-15); }
+/* primary: the band at rest, the lit band under the cursor */
+.k-btn--primary { background: transparent; border-color: transparent; color: var(--ink); }
+.k-btn--primary::before { opacity: 1; }
+.k-btn--primary:hover:not(:disabled)::before, .k-btn--primary:focus-visible::before { background: var(--paper-lit); }
+/* a disabled or locked primary must not read as the one live action of the view: it drops to the plain look */
+.k-btn--primary:disabled:not(.is-busy) { background: var(--ink-3); border-color: var(--rule-2); color: var(--paper-dim); }
+.k-btn--primary:disabled:not(.is-busy)::before { opacity: 0; }
+.k-btn--ghost { background: transparent; border-color: var(--rule); color: var(--paper-dim); }
+/* danger: the plain button with a red underline under its label, kept on the band under the cursor
+   (the pause menu's confirm note); never a red slab */
+.k-btn--danger::after {
+  content: ''; position: absolute; inset-inline: 22%; bottom: .3125rem; height: 2px; background: var(--red); pointer-events: none;
+}
+.k-btn--sm.k-btn--danger::after { bottom: .25rem; }
+.k-btn--danger:disabled::after { opacity: .6; }
+/* filled: the destructive confirm inside a confirm dialog, on the paper note (see .k-onpaper below):
+   an outline with the red underline, the band only under the cursor. Never a red slab. */
+.k-btn--danger.is-filled { border-color: var(--paper-dim); }
+.k-btn--link {
+  height: auto; padding: 0; border: 0; background: none; color: var(--paper-dim);
+  font-weight: 700; text-decoration: underline; text-underline-offset: .2em;
+}
+.k-btn--link::before { display: none; }
+.k-btn--link:hover:not(:disabled), .k-btn--link:focus-visible { background: none; color: var(--paper); }
+.k-btn--link:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+.k-btnrow { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; }
+.k-btnrow.is-end { justify-content: flex-end; }
+.k-linkbtn { color: var(--paper-dim); text-decoration: underline; text-underline-offset: .2em; font-size: var(--fs-13); }
+.k-linkbtn:hover:not(:disabled) { color: var(--paper); }
+
+.k-iconbtn {
+  display: inline-grid; place-items: center; flex: none;
+  width: var(--control-sm); height: var(--control-sm);
+  border: 1px solid var(--rule); color: var(--paper-dim); background: transparent;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+}
+.k-iconbtn .k-glyph { width: 1.05rem; height: 1.05rem; }
+.k-iconbtn--sm { width: 1.625rem; height: 1.625rem; border-color: transparent; }
+.k-iconbtn--sm .k-glyph { width: .9rem; height: .9rem; }
+.k-iconbtn:hover:not(:disabled) { color: var(--paper); background: var(--ink-3); border-color: var(--rule-2); }
+.k-iconbtn--secondary { background: var(--ink-3); border-color: var(--rule-2); }
+/* danger: the red underline, like the danger button (never a red box) */
+.k-iconbtn--danger { color: var(--paper); box-shadow: inset 0 -2px 0 var(--red); }
+.k-iconbtn[aria-pressed='true'] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+.k-iconbtn:disabled { opacity: .45; }
+
+/* ── fields ─────────────────────────────────────────────────────────────── */
+.k-field { display: flex; flex-direction: column; gap: .375rem; min-width: 0; }
+.k-field-head { display: flex; align-items: center; gap: .375rem; min-width: 0; }
+.k-field-label { font: 700 var(--fs-14)/1.3 var(--f-ui); color: var(--paper); }
+.k-field-req { color: var(--paper-dim); }
+.k-field-aside { margin-inline-start: auto; font-size: var(--fs-12); color: var(--paper-faint); }
+.k-field-hint { font-size: var(--fs-12); color: var(--paper-faint); line-height: 1.45; }
+/* the message under an invalid field: paper text marked by a red square (the theme's .w-error), never red text */
+.k-field-error { font: 700 var(--fs-13)/1.45 var(--f-ui); color: var(--paper); }
+.k-field-error::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-end: .5em; vertical-align: .12em; background: var(--red); }
+.k-field--inline { display: grid; grid-template-columns: minmax(8rem, 34%) 1fr; align-items: center; column-gap: 1rem; }
+.k-field--inline .k-field-hint, .k-field--inline .k-field-error { grid-column: 2; }
+.k-field.is-locked .k-field-label { color: var(--paper-dim); }
+
+.k-ctlwrap { display: inline-flex; align-items: center; gap: .375rem; min-width: 0; max-width: 100%; }
+.k-field-control > .k-ctlwrap, .k-ctlwrap--block { display: flex; width: 100%; }
+.k-field-control > .k-ctlwrap > .k-input,
+.k-field-control > .k-ctlwrap > .k-select,
+.k-ctlwrap--block > .k-textarea,
+.k-ctlwrap--block > .k-slider { flex: 1; min-width: 0; }
+
+/* ── inputs ─────────────────────────────────────────────────────────────── */
+.k-input {
+  position: relative; display: flex; align-items: center; min-width: 0;
+  height: var(--control); background: var(--ink-2); border: 1px solid var(--rule-2);
+  transition: border-color var(--t-fast) var(--ease);
+}
+.k-input:focus-within { border-color: var(--paper-dim); }
+.k-input input {
+  flex: 1; min-width: 0; width: 100%; height: 100%;
+  background: transparent; border: 0; outline: none; padding: 0 .75rem;
+  color: var(--paper); font-size: var(--fs-145);
+}
+.k-input input::placeholder, .k-textarea textarea::placeholder { color: var(--paper-faint); opacity: 1; }
+/* the wrapper shows focus (its border); no second ring on the inner field */
+.k-input input:focus-visible, .k-textarea textarea:focus-visible, .k-pop-search input:focus-visible { outline: none; }
+.k-input--sm { height: var(--control-sm); }
+.k-input--sm input { font-size: var(--fs-14); padding: 0 .5rem; }
+.k-input.has-icon input { padding-inline-start: 2.1rem; }
+.k-input-icon { position: absolute; inset-inline-start: .7rem; width: 1rem; height: 1rem; color: var(--paper-faint); pointer-events: none; }
+.k-input-suffix, .k-input-unit { flex: none; padding-inline-end: .75rem; color: var(--paper-faint); font-size: var(--fs-13); white-space: nowrap; }
+.k-input-clear { flex: none; display: grid; place-items: center; width: 1.75rem; height: 100%; color: var(--paper-faint); }
+.k-input-clear:hover { color: var(--paper); }
+.k-input-clear .k-glyph { width: .85rem; height: .85rem; }
+/* invalid: a red underline, the box itself stays a hairline */
+.k-input.is-invalid, .k-textarea.is-invalid, .k-select.is-invalid { box-shadow: inset 0 -2px 0 var(--red); }
+.k-input.is-disabled, .k-textarea.is-disabled { opacity: .5; }
+.k-input--num input { text-align: end; font-variant-numeric: tabular-nums; }
+.k-numwrap { display: inline-flex; align-items: center; gap: .375rem; min-width: 0; }
+.k-field-control .k-numwrap, .k-setrow-r .k-numwrap { width: 100%; }
+.k-numwrap > .k-input { flex: 1; min-width: 5rem; }
+.k-ctlwrap--num { flex-direction: column; align-items: stretch; }
+.k-field-control > .k-ctlwrap--num, .k-setrow-r > .k-ctlwrap--num { display: flex; }
+.k-numrange { display: block; margin-top: .25rem; font-size: var(--fs-12); color: var(--paper-faint); }
+.k-numrange.is-invalid { color: var(--paper); }
+.k-numrange.is-invalid::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-end: .4em; background: var(--red); vertical-align: middle; }
+
+.k-textarea { position: relative; display: flex; background: var(--ink-2); border: 1px solid var(--rule-2); min-width: 0; }
+.k-textarea:focus-within { border-color: var(--paper-dim); }
+.k-textarea textarea {
+  flex: 1; min-width: 0; resize: vertical; min-height: 4rem;
+  background: transparent; border: 0; outline: none; padding: .5rem .75rem;
+  color: var(--paper); font-size: var(--fs-145); line-height: 1.5;
+}
+.k-textarea-count { position: absolute; inset-inline-end: .5rem; bottom: .25rem; font-size: var(--fs-11); color: var(--paper-faint); pointer-events: none; }
+
+/* switch: two words; "on" is the paper band (the band section above), "off" an ink plate */
+.k-switch { display: inline-flex; border: 1px solid var(--rule-2); background: var(--ink-2); height: var(--control); padding: 0; }
+.k-switch--sm { height: var(--control-sm); }
+.k-switch-opt { display: inline-flex; align-items: center; padding: 0 .875rem; font-size: var(--fs-14); color: var(--paper-faint); white-space: nowrap; }
+.k-switch-opt.is-active { background: var(--ink-4); color: var(--paper); font-weight: 700; }
+.k-switch.is-on .k-switch-opt.is-active { background: transparent; }
+.k-switch:disabled { opacity: .5; }
+
+/* segmented */
+.k-seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule-2); background: var(--ink-2); max-width: 100%; }
+.k-seg-item { display: inline-flex; align-items: center; }
+.k-seg-item + .k-seg-item { border-inline-start: 1px solid var(--rule); }
+.k-seg-btn { height: calc(var(--control) - 2px); padding: 0 .875rem; font-size: var(--fs-14); color: var(--paper-dim); white-space: nowrap; }
+.k-seg--sm .k-seg-btn { height: calc(var(--control-sm) - 2px); padding: 0 .75rem; font-size: var(--fs-135); }
+.k-seg-btn:hover:not(:disabled) { color: var(--paper); background: var(--ink-3); }
+/* the chosen option is the band (see the band section): no flat fill of its own */
+.k-seg-btn.is-on, .k-seg-btn.is-on:hover:not(:disabled) { background: transparent; font-weight: 700; }
+.k-seg-btn:disabled { opacity: .45; }
+.k-seg-help { margin-inline: .25rem .5rem; }
+
+/* slider */
+.k-slider { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+.k-slider .k-ctlwrap { width: 6.5rem; flex: none; }
+.k-slider-track { position: relative; flex: 1; height: 1.5rem; display: flex; align-items: center; }
+.k-slider-track::before { content: ''; position: absolute; inset-inline: 0; height: 4px; background: var(--ink-4); }
+.k-slider-track::after { content: ''; position: absolute; left: 0; width: var(--pct, 0%); height: 4px; background: var(--paper-dim); pointer-events: none; }
+.k-slider.is-low .k-slider-track::after { background: var(--red); }
+.k-slider-track input { position: relative; z-index: 1; width: 100%; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; height: 1.5rem; }
+.k-slider-track input::-webkit-slider-runnable-track { height: 4px; background: transparent; }
+.k-slider-track input::-webkit-slider-thumb { -webkit-appearance: none; width: .875rem; height: .875rem; margin-top: -5px; background: var(--paper); border: 0; }
+.k-slider.is-disabled { opacity: .5; }
+
+/* select / combobox */
+.k-select {
+  display: flex; align-items: center; gap: .5rem; min-width: 8rem; width: 100%;
+  height: var(--control); padding: 0 .75rem; background: var(--ink-2); border: 1px solid var(--rule-2);
+  color: var(--paper); font-size: var(--fs-145); text-align: start;
+}
+.k-select--sm { height: var(--control-sm); font-size: var(--fs-14); padding: 0 .5rem; min-width: 6rem; }
+.k-select:hover:not(:disabled), .k-select.is-open { border-color: var(--paper-dim); }
+.k-select.is-empty .k-select-value { color: var(--paper-faint); }
+.k-select-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-select-sub { color: var(--paper-faint); font-size: var(--fs-12); white-space: nowrap; }
+.k-select-caret { width: .9rem; height: .9rem; color: var(--paper-faint); flex: none; }
+.k-select:disabled { opacity: .5; }
+.k-pop {
+  z-index: var(--z-popover); background: var(--ink-2); border: 1px solid var(--rule-3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .6); display: flex; flex-direction: column;
+}
+.k-pop-search { display: flex; align-items: center; gap: .5rem; padding: 0 .75rem; border-bottom: 1px solid var(--rule-2); height: var(--control); }
+.k-pop-search .k-glyph { width: 1rem; height: 1rem; color: var(--paper-faint); flex: none; }
+.k-pop-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--paper); font-size: var(--fs-145); }
+.k-pop-list { overflow-y: auto; padding: .25rem 0; }
+.k-pop-opt { display: flex; align-items: center; gap: .5rem; min-height: 2.25rem; padding: .25rem .75rem; cursor: pointer; font-size: var(--fs-145); }
+/* the option under the cursor is the band (see the band section); the chosen one stays bold with its tick */
+.k-pop-opt.is-selected { font-weight: 700; }
+.k-pop-opt.is-disabled { opacity: .45; cursor: default; }
+.k-pop-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-pop-sub { color: var(--paper-faint); font-size: var(--fs-12); white-space: nowrap; }
+.k-pop-check { width: .9rem; height: .9rem; flex: none; }
+.k-pop-empty { padding: .75rem; color: var(--paper-faint); font-size: var(--fs-14); }
+
+/* chips */
+.k-chips { display: flex; flex-wrap: wrap; align-items: center; gap: .375rem; }
+.k-chip-wrap { display: inline-flex; align-items: center; gap: .25rem; }
+.k-chip {
+  display: inline-flex; align-items: center; gap: .375rem; height: 1.875rem; padding: 0 .75rem;
+  border: 1px solid var(--rule); color: var(--paper-dim); font-size: var(--fs-14); white-space: nowrap;
+}
+.k-chip i { font-style: normal; color: var(--paper-faint); font-size: var(--fs-12); }
+.k-chip:hover:not(:disabled) { color: var(--paper); border-color: var(--rule-2); }
+/* the chosen filter is the band (see the band section) */
+.k-chip.is-on { border-color: transparent; font-weight: 700; }
+html:not(.k-help-mode) .k-chip-wrap:not(:hover) > .k-chip:not(.is-on) + .k-chip-help { visibility: hidden; }
+.k-chip-help:focus-visible { visibility: visible; }
+
+/* citizen id */
+.k-citizen { display: flex; flex-direction: column; gap: .375rem; min-width: 0; width: 100%; }
+.k-citizen-row { display: flex; align-items: center; gap: .375rem; }
+.k-citizen-row > .k-ctlwrap { flex: 1; }
+.k-citizen-row > .k-ctlwrap > .k-input { flex: 1; }
+[dir='rtl'] .k-citizen-row input { text-align: right; }
+.k-cchip {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: .125rem .75rem;
+  padding: .375rem .625rem; border: 1px solid var(--rule); background: var(--ink-3); font-size: var(--fs-135);
+}
+.k-cchip-name { font-weight: 700; color: var(--paper); }
+.k-cchip-meta { display: inline-flex; flex-wrap: wrap; gap: .75rem; color: var(--paper-dim); }
+.k-cchip-state { display: inline-flex; align-items: center; gap: .375rem; }
+.k-cchip.is-checking { color: var(--paper-faint); }
+.k-cchip.is-bad { border-color: var(--rule-2); border-inline-start: 2px solid var(--red); color: var(--paper); }
+.k-shape-sq { display: inline-block; width: .45rem; height: .45rem; background: var(--paper); }
+.k-shape-hollow { display: inline-block; width: .45rem; height: .45rem; border: 1.5px solid var(--paper-dim); }
+
+/* coords / duration / reason */
+.k-coords { display: flex; flex-direction: column; gap: .25rem; width: 100%; }
+.k-coords-row { display: flex; align-items: center; gap: .5rem; }
+.k-coords-cell { display: flex; align-items: center; gap: .375rem; flex: 1; min-width: 0; }
+.k-coords-cell .k-ctlwrap { flex: 1; }
+.k-coords-axis { font: 700 var(--fs-12)/1 var(--f-ui); color: var(--paper-faint); }
+.k-coords-hint { font-size: var(--fs-12); color: var(--paper-faint); }
+.k-duration { display: flex; flex-direction: column; gap: .5rem; width: 100%; }
+.k-duration-row { display: flex; align-items: center; gap: .375rem; }
+.k-duration-custom { display: flex; align-items: center; gap: .5rem; }
+.k-duration-custom .k-ctlwrap { width: 9rem; }
+.k-reason { display: flex; flex-direction: column; gap: .5rem; width: 100%; }
+.k-reason-tpl { display: flex; flex-wrap: wrap; gap: .375rem; }
+.k-reason-row { display: flex; align-items: flex-start; gap: .375rem; }
+.k-reason-row > .k-ctlwrap { flex: 1; }
+
+/* ── page header, sections, tabs, toolbar ───────────────────────────────── */
+.k-pagehead { display: flex; align-items: flex-end; gap: 1rem; padding: 1.25rem 1.5rem .875rem; flex: none; }
+.k-pagehead-main { min-width: 0; flex: 1; }
+.k-pagehead-title { display: flex; align-items: center; gap: .625rem; font: 400 var(--fs-34)/1.25 var(--f-title-ar); color: var(--paper); }
+html[lang='en'] .k-pagehead-title { font: 600 1.9rem/1.12 var(--f-title); letter-spacing: .005em; }
+/* descriptions are reading text: Amiri in Arabic, EB Garamond in English */
+.k-pagehead-desc { margin-top: .125rem; font: 400 calc(var(--fs-text) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--paper-dim); }
+.k-pagehead-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.k-pagehead-actions:empty { display: none; }
+
+.k-section { border: 1px solid var(--rule); background: var(--ink); padding: .875rem 1rem; }
+.k-section + .k-section { margin-top: .75rem; }
+.k-section-head { display: flex; align-items: center; gap: .5rem; min-width: 0; }
+.k-section-title { display: flex; align-items: center; gap: .5rem; font: 700 var(--fs-16)/1.25 var(--f-ui); color: var(--paper); min-width: 0; }
+.k-section-actions { margin-inline-start: auto; display: flex; align-items: center; gap: .5rem; }
+.k-section-lead { margin-top: .25rem; font: 400 calc(var(--fs-15) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--paper-dim); }
+.k-section-body { margin-top: .75rem; }
+.k-section-body > * + *, .k-drawer-body > * + *, .k-dialog-body > * + * { margin-top: .75rem; }
+.k-section--danger { border-color: var(--rule-2); border-inline-start: 3px solid var(--red); }
+.k-section--plain { border: 0; background: transparent; padding: 0; }
+
+.k-tabs { display: flex; flex-wrap: wrap; align-items: stretch; gap: .125rem; }
+.k-tabs--line { border-bottom: 1px solid var(--rule-2); }
+.k-tab-wrap { display: inline-flex; align-items: center; gap: .125rem; position: relative; }
+.k-tab {
+  position: relative; display: inline-flex; align-items: center; gap: .375rem;
+  height: 2.25rem; padding: 0 .75rem; color: var(--paper-dim); font-size: var(--fs-145); white-space: nowrap;
+}
+.k-tab:hover:not(:disabled) { color: var(--paper); }
+/* the active tab and the tab under the cursor are the band (see the band section) */
+.k-tab.is-active { font-weight: 700; }
+.k-tabs--box .k-tab { border: 1px solid var(--rule); }
+.k-tabs--box .k-tab.is-active, .k-tabs--box .k-tab-wrap:hover > .k-tab:not(:disabled) { border-color: transparent; }
+.k-tab:disabled { opacity: .45; }
+.k-tab-badge { font-size: var(--fs-11); color: var(--paper-faint); border: 1px solid var(--rule-2); padding: 0 .3rem; line-height: 1.4; }
+.k-tab-help { margin-inline-end: .375rem; }
+html:not(.k-help-mode) .k-tab-wrap:not(.is-active):not(:hover) .k-tab-help { visibility: hidden; }
+.k-tab-help:focus-visible { visibility: visible; }
+.k-tab-lock { width: .8em; height: .8em; opacity: .75; }
+.k-tab-wrap.is-locked .k-tab:disabled { opacity: .6; }
+/* compact strip: the "؟" lives inside the tab's end padding, so a hidden one takes no room */
+.k-tabs--compact { gap: 0; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; }
+.k-tabs--compact .k-tab-wrap { gap: 0; flex: none; }
+.k-tabs--compact .k-tab { padding-inline: .5rem 1.5rem; }
+.k-tabs--compact .k-tab-help { position: absolute; top: 50%; inset-inline-end: .3125rem; margin: -.5rem 0 0; z-index: 1; }
+
+.k-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; margin-bottom: .75rem; }
+
+/* ── split view + drawer ────────────────────────────────────────────────── */
+.k-split { display: grid; grid-template-columns: minmax(0, 1fr); height: 100%; min-height: 0; }
+.k-split.has-drawer { grid-template-columns: minmax(0, 1fr) min(var(--drawer), 46%); }
+.k-split-list { min-width: 0; min-height: 0; overflow: auto; padding: .875rem 1.5rem 1rem; display: flex; flex-direction: column; }
+.k-split-drawer { min-width: 0; min-height: 0; display: flex; }
+
+.k-drawer {
+  position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  background: var(--ink-2); border-inline-start: 1px solid var(--rule-2);
+}
+.k-drawer-head { flex: none; padding: 1.125rem 1.375rem 0; }
+.k-drawer-row { display: flex; align-items: flex-start; gap: .75rem; }
+.k-drawer-titles { flex: 1; min-width: 0; }
+/* Lalezar needs 1.25 so its marks are not cut by the name's ellipsis box */
+.k-drawer-title { display: flex; align-items: center; gap: .5rem; font: 400 var(--fs-26)/1.25 var(--f-title-ar); color: var(--paper); }
+html[lang='en'] .k-drawer-title { font: 600 1.5rem/1.2 var(--f-title); }
+.k-drawer-title > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-drawer-sub { margin-top: .25rem; font-size: var(--fs-135); color: var(--paper-dim); display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; }
+.k-drawer-sub b { color: var(--paper); }
+.k-drawer-chips { margin-top: .625rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+.k-drawer-tabs { margin-top: .875rem; }
+.k-drawer-body { flex: 1; min-height: 0; overflow: auto; padding: 1rem 1.375rem 1.25rem; }
+.k-drawer-foot {
+  flex: none; display: flex; align-items: center; gap: .5rem; padding: .75rem 1.375rem;
+  border-top: 1px solid var(--rule-2); background: var(--ink-2);
+}
+.k-drawer-foot-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.k-drawer-foot-note { margin-inline-start: auto; font-size: var(--fs-12); color: var(--paper-faint); }
+
+/* ── settings layout ────────────────────────────────────────────────────── */
+.k-settings { display: grid; grid-template-columns: 15.5rem minmax(0, 1fr); height: 100%; min-height: 0; border-top: 1px solid var(--rule); }
+.k-settings-nav { border-inline-end: 1px solid var(--rule); padding: 1rem .75rem; overflow: auto; }
+.k-settings-navtitle { font: 700 var(--fs-12)/1 var(--f-ui); color: var(--paper-faint); padding: 0 .625rem .625rem; }
+.k-settings-item { position: relative; display: flex; align-items: center; gap: .25rem; }
+.k-settings-btn > .k-ellipsis { flex: 1 1 auto; text-align: start; }
+.k-settings-btn {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: .5rem;
+  height: 2.5rem; padding: 0 .625rem; color: var(--paper-dim); font-size: var(--fs-15);
+}
+/* the open group and the group under the cursor are the band (see the band section) */
+.k-settings-item.is-active .k-settings-btn { font-weight: 700; }
+.k-settings-dirty { width: .4rem; height: .4rem; background: var(--paper); flex: none; }
+.k-settings-help { margin-inline-end: .25rem; }
+html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-help { visibility: hidden; }
+.k-settings-main { position: relative; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.k-settings-toolbar { flex: none; padding: 1rem 1.75rem 0; }
+.k-settings-form { flex: 1; min-height: 0; overflow: auto; padding: .5rem 1.75rem 1.5rem; }
+
+.k-setrow { display: grid; grid-template-columns: minmax(0, 1fr) minmax(14rem, 19rem); gap: 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--rule); align-items: start; position: relative; }
+.k-setrow.is-dirty::before { content: ''; position: absolute; inset-inline-start: -.75rem; top: 1rem; bottom: 1rem; width: 2px; background: var(--paper); }
+.k-setrow-head { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.k-setrow-label { font: 700 var(--fs-15)/1.35 var(--f-ui); color: var(--paper); }
+.k-setrow-dirty, .k-setrow-restart { font: 700 var(--fs-11)/1.5 var(--f-ui); padding: 0 .375rem; }
+.k-setrow-dirty { background: var(--paper); color: var(--ink); }
+.k-setrow-restart { border: 1px solid var(--rule-2); color: var(--paper-dim); }
+.k-setrow-desc { margin-top: .1875rem; font: 400 calc(var(--fs-15) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--paper-dim); max-width: 42rem; }
+.k-setrow-changed { margin-top: .25rem; font-size: var(--fs-12); color: var(--paper-faint); }
+.k-setrow-r { min-width: 0; }
+.k-setrow-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem .75rem; margin-top: .375rem; font-size: var(--fs-12); color: var(--paper-faint); }
+.k-setrow-meta b { color: var(--paper-dim); font-weight: 700; }
+.k-setrow-reset { display: inline-flex; align-items: center; gap: .25rem; }
+.k-setrow-preview { margin-top: .5rem; font-size: var(--fs-135); color: var(--paper-dim); border: 1px dashed var(--rule-2); padding: .375rem .625rem; }
+.k-setrow.is-locked .k-setrow-label { color: var(--paper-dim); }
+
+.k-savebar {
+  flex: none; display: flex; align-items: center; gap: .75rem; min-height: 4rem; padding: .625rem 1.75rem;
+  background: var(--ink-2); border-top: 1px solid var(--rule-2);
+}
+.k-savebar-msg { display: inline-flex; align-items: center; gap: .5rem; font-size: var(--fs-145); color: var(--paper); font-weight: 700; }
+.k-savebar-note { font-size: var(--fs-13); color: var(--paper-faint); }
+.k-savebar-btns { margin-inline-start: auto; display: flex; gap: .5rem; align-items: center; }
+
+/* ── table ──────────────────────────────────────────────────────────────── */
+.k-table-wrap { position: relative; min-height: 0; overflow: auto; flex: 1; }
+.k-table-wrap:focus-visible { outline-offset: -2px; }
+.k-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.k-table th {
+  position: sticky; top: 0; z-index: var(--z-sticky); background: var(--ink);
+  text-align: start; font: 700 var(--fs-13)/1 var(--f-ui); color: var(--paper-faint);
+  padding: .625rem .75rem; border-bottom: 1px solid var(--rule-2); white-space: nowrap;
+}
+.k-th { display: inline-flex; align-items: center; gap: .3rem; }
+.k-th-sort { display: inline-flex; align-items: center; gap: .25rem; color: inherit; font: inherit; }
+.k-th-sort:hover, .k-th-sort.is-active { color: var(--paper); }
+.k-th-arrow { font-size: .6rem; min-width: .5rem; }
+.k-table td {
+  height: var(--row); padding: 0 .75rem; border-bottom: 1px solid var(--rule);
+  font-size: var(--fs-145); color: var(--paper); white-space: nowrap; vertical-align: middle;
+}
+/* a cell holds its piece of the row's band (a cell, unlike a row, can position it in CEF's Chromium) */
+.k-table tbody td { position: relative; isolation: isolate; }
+.k-table--compact td, html.k-compact .k-table td { height: var(--row-compact); }
+.k-table th.is-num, .k-table td.is-num { text-align: end; }
+.k-table td.is-num { font-variant-numeric: tabular-nums; }
+.k-table tbody tr { cursor: default; }
+.k-table-wrap[tabindex] tbody tr { cursor: pointer; }
+/* a read-only table only shades the row under the mouse; a table you pick from (tabindex) puts the
+   band on it, and the selected row keeps the band */
+.k-table tbody tr:hover td { background: var(--ink-2); }
+.k-table-wrap[tabindex] tbody tr:hover > td, .k-table tbody tr.is-selected > td { background: transparent; border-bottom-color: transparent; }
+/* each cell shows the middle of the brush; the row's two end cells show its torn ends */
+.k-table tbody td::before { -webkit-mask-size: 300% 100%; mask-size: 300% 100%; }
+.k-table tbody td:first-child::before { -webkit-mask-position: left center; mask-position: left center; }
+.k-table tbody td:last-child::before { -webkit-mask-position: right center; mask-position: right center; }
+[dir='rtl'] .k-table tbody td:first-child::before { -webkit-mask-position: right center; mask-position: right center; }
+[dir='rtl'] .k-table tbody td:last-child::before { -webkit-mask-position: left center; mask-position: left center; }
+.k-cell-main { display: block; font-weight: 700; color: var(--paper); line-height: 1.3; }
+.k-cell-sub { display: block; font-size: var(--fs-12); color: var(--paper-faint); line-height: 1.25; }
+/* a cell line that is a left-to-right island (a date, a license, a line in the server's language with
+   dir=auto) keeps the alignment of its cell: in Arabic it sits under the Arabic line, not at the far side */
+.k-cell-main, .k-cell-sub { text-align: -webkit-match-parent; }
+
+/* ── key / value ────────────────────────────────────────────────────────── */
+.k-kvlist { display: grid; gap: 0 1.5rem; }
+.k-kvlist--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.k-kvlist--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.k-kv { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-height: 2.5rem; border-bottom: 1px solid var(--rule); }
+.k-kv-k { display: inline-flex; align-items: center; gap: .375rem; color: var(--paper-dim); font-size: var(--fs-14); white-space: nowrap; }
+.k-kv-v { display: inline-flex; align-items: center; gap: .25rem; margin: 0; min-width: 0; color: var(--paper); font-size: var(--fs-145); font-weight: 700; text-align: end; }
+.k-kv-v > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── stat tiles, meters, status, tags ───────────────────────────────────── */
+.k-stat { position: relative; display: flex; border: 1px solid var(--rule); background: var(--ink-2); min-width: 0; }
+.k-stat-btn { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; padding: .875rem 1rem; min-width: 0; text-align: start; }
+.k-stat.is-link .k-stat-btn:hover { background: var(--ink-3); }
+.k-stat-label { font-size: var(--fs-135); color: var(--paper-dim); }
+.k-stat-value { font: 700 var(--fs-26)/1.1 var(--f-ui); color: var(--paper); }
+.k-stat-value.is-kpi { font: 400 var(--fs-40)/1 var(--f-kpi); letter-spacing: .02em; direction: ltr; unicode-bidi: isolate; }
+/* critical: the figure stays paper, a red square beside it is the mark */
+.k-stat-value.is-critical::after { content: ''; display: inline-block; width: .5rem; height: .5rem; margin-inline-start: .5rem; background: var(--red); vertical-align: middle; }
+.k-stat-sub { font-size: var(--fs-12); color: var(--paper-faint); }
+.k-stat-help { position: absolute; top: .75rem; inset-inline-end: .75rem; }
+
+.k-meter { display: inline-flex; align-items: center; gap: .375rem; direction: ltr; }
+.k-meter-bar { position: relative; width: 3.375rem; height: 5px; background: var(--ink-4); }
+.k-meter-fill { position: absolute; inset: 0 auto 0 0; background: var(--paper-dim); }
+.k-meter.is-low .k-meter-fill { background: var(--red); }
+.k-meter b { font-weight: 700; font-size: var(--fs-14); min-width: 1.6rem; text-align: end; }
+.k-meter.is-none { color: var(--paper-faint); }
+
+.k-status { display: inline-flex; align-items: center; gap: .4rem; font-size: var(--fs-135); color: var(--paper-dim); white-space: nowrap; }
+.k-status-shape { display: inline-block; width: .45rem; height: .45rem; background: var(--paper-dim); flex: none; }
+.k-status--low { color: var(--paper); }
+.k-status--low .k-status-shape { background: none; border: 1.5px solid var(--paper); }
+/* dead / stopped: the word in paper, the red diamond is the mark (never red text) */
+.k-status--dead, .k-status--stopped { color: var(--paper); font-weight: 700; }
+.k-status--dead .k-status-shape, .k-status--stopped .k-status-shape { background: var(--red); transform: rotate(45deg); }
+.k-status--frozen .k-status-shape { background: none; border: 1.5px solid var(--paper-dim); transform: rotate(45deg); }
+.k-status--blocked { color: var(--paper); }
+.k-status--blocked .k-status-shape { background: none; border: 1.5px solid var(--paper); border-radius: 50%; }
+.k-status--offline .k-status-shape { background: none; border: 1.5px solid var(--paper-faint); }
+.k-status--offline { color: var(--paper-faint); }
+.k-status--online .k-status-shape, .k-status--running .k-status-shape { background: var(--paper); }
+
+.k-tag { display: inline-flex; align-items: center; font-size: var(--fs-12); line-height: 1.45; border: 1px solid var(--rule-2); padding: 0 .375rem; color: var(--paper-dim); white-space: nowrap; }
+.k-tag--strong { background: var(--paper); color: var(--ink); border-color: var(--paper); font-weight: 700; }
+/* danger ("failed", "cannot be undone"): paper words on the hairline tag, a red square is the mark
+   (never a red box) */
+.k-tag--danger { color: var(--paper); }
+.k-tag--danger::before { content: ''; flex: none; width: 5px; height: 5px; margin-inline-end: .375em; background: var(--red); }
+.k-tag--faint { color: var(--paper-faint); border-color: var(--rule); }
+.k-nav-badge { margin-inline-start: auto; font-size: var(--fs-12); color: var(--paper-faint); border: 1px solid var(--rule-2); padding: 0 .375rem; line-height: 1.5; min-width: 1.5rem; text-align: center; }
+
+/* ── states ─────────────────────────────────────────────────────────────── */
+.k-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .75rem; padding: 2.5rem 1rem; text-align: center; color: var(--paper-dim); font-size: var(--fs-15); }
+.k-empty-next { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+.k-skeleton { display: flex; flex-direction: column; gap: .75rem; padding: 1rem .75rem; }
+.k-skeleton span { display: block; height: .75rem; background: linear-gradient(90deg, var(--ink-3), var(--ink-4), var(--ink-3)); background-size: 200% 100%; animation: k-shimmer 1.4s linear infinite; }
+@keyframes k-shimmer { from { background-position: 200% 0; } to { background-position: 0 0; } }
+.k-loading { display: flex; align-items: center; justify-content: center; gap: .625rem; padding: 2rem; color: var(--paper-dim); }
+.k-spinner { width: 1rem; height: 1rem; border: 2px solid var(--rule-2); border-top-color: var(--paper); border-radius: 50%; animation: k-spin .8s linear infinite; }
+@keyframes k-spin { to { transform: rotate(360deg); } }
+html.k-reduced-motion .k-skeleton span, html.k-reduced-motion .k-spinner { animation: none; }
+
+.k-alert { display: flex; align-items: flex-start; gap: .75rem; padding: .75rem 1rem; border: 1px solid var(--rule-2); background: var(--ink-2); }
+.k-alert + .k-alert { margin-top: .5rem; }
+.k-alert-body { flex: 1; min-width: 0; }
+.k-alert-title { display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--paper); }
+.k-alert-text { margin-top: .125rem; font: 400 calc(var(--fs-15) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--paper-dim); }
+.k-alert-actions { margin-top: .5rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+.k-alert--warn { border-inline-start: 3px solid var(--paper); }
+.k-alert--danger { border-inline-start: 3px solid var(--red); }
+
+.k-gate.is-locked > .k-gate-body { opacity: .55; }
+.k-lockline { display: inline-flex; align-items: center; gap: .375rem; margin-bottom: .5rem; font-size: var(--fs-13); color: var(--paper-dim); }
+.k-lockline .k-glyph { width: .9rem; height: .9rem; }
+
+/* ── dialog: the paper note on the scrim (the pause menu's confirm) ─────── */
+.k-dialog-veil {
+  position: fixed; inset: 0; z-index: var(--z-dialog); display: grid; place-items: center;
+  background: var(--scrim);
+}
+/* The note: flat paper, its grain, the inner burn and the torn edge (w_lib's .w-note). The mask clips
+   an outer shadow, and the scrim already sets the note off, so it has none. */
+.k-dialog {
+  position: relative;
+  width: min(34rem, calc(100vw - 2rem)); max-height: calc(100vh - 3rem); overflow: auto;
+  background-color: var(--note);
+  background-image: linear-gradient(var(--note-veil), var(--note-veil)), var(--tex-grain); background-size: auto, 256px 256px;
+  color: var(--note-ink); padding: 1.625rem 1.875rem 1.5rem;
+  box-shadow: inset 0 0 3rem var(--note-glow);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge) round;
+  animation: k-note-in var(--t-med) var(--ease);
+}
+/* danger: a red rule inside the torn edge (a border would be torn away with it) */
+.k-dialog.is-danger::after {
+  content: ''; position: absolute; inset-inline-start: .875rem; top: 1.75rem; width: 3px; height: 2.5rem;
+  background: var(--red); pointer-events: none;
+}
+.k-dialog-title { display: flex; align-items: center; gap: .5rem; font: 400 var(--fs-26)/1.25 var(--f-title-ar); color: var(--note-ink); }
+html[lang='en'] .k-dialog-title { font: 600 1.5rem/1.15 var(--f-title); }
+/* the question is reading text: Amiri / EB Garamond */
+.k-dialog-text { margin-top: .5rem; font: 400 calc(var(--fs-text) * var(--k-text))/var(--lh-text) var(--f-text); }
+.k-dialog-body { margin-top: .875rem; }
+.k-dialog-phrase { margin-top: .875rem; display: flex; flex-direction: column; gap: .375rem; }
+.k-dialog-phrase-label { font: 700 var(--fs-14)/1.4 var(--f-ui); }
+.k-dialog-phrase-label b { margin-inline-start: .25rem; font-family: var(--f-mono); }
+/* "cannot be undone": ink words on the note, the red square is the mark */
+.k-dialog-noundo { margin-top: .875rem; padding: .5rem .75rem; border: 1px solid var(--note-rule); color: var(--note-ink); font: 700 var(--fs-14)/1.4 var(--f-ui); }
+.k-dialog-noundo::before { content: ''; display: inline-block; width: 7px; height: 7px; margin-inline-end: .5em; vertical-align: .1em; background: var(--red); }
+.k-dialog-actions { display: flex; flex-wrap: wrap; gap: .625rem; margin-top: 1.125rem; }
+.k-dialog-cancel { display: inline-flex; }
+/* controls on paper */
+.k-onpaper .k-input, .k-onpaper .k-textarea, .k-onpaper .k-select, .k-onpaper .k-seg, .k-onpaper .k-switch {
+  background: rgba(17, 17, 17, .06); border-color: var(--note-rule);
+}
+.k-onpaper .k-input input, .k-onpaper .k-textarea textarea, .k-onpaper .k-select { color: var(--note-ink); }
+.k-onpaper .k-input input::placeholder, .k-onpaper .k-textarea textarea::placeholder { color: var(--note-dim); }
+.k-onpaper .k-input:focus-within, .k-onpaper .k-textarea:focus-within { border-color: var(--note-ink); }
+.k-onpaper .k-field-label, .k-onpaper .k-setrow-label { color: var(--note-ink); }
+.k-onpaper .k-field-hint, .k-onpaper .k-numrange, .k-onpaper .k-textarea-count { color: var(--note-dim); }
+.k-onpaper .k-seg-btn, .k-onpaper .k-chip, .k-onpaper .k-switch-opt { color: var(--note-dim); border-color: var(--note-rule); }
+/* a switch on the note (the review's "I understand"): "off" is a faint ink plate, "on" the ink band
+   below; the paper band of the ink page would vanish into the paper */
+.k-onpaper .k-switch-opt.is-active { background: rgba(17, 17, 17, .1); color: var(--note-ink); }
+.k-onpaper .k-switch.is-on .k-switch-opt.is-active { background: transparent; color: var(--note); }
+.k-onpaper .k-switch.is-on .k-switch-opt.is-active::before { background: var(--note-ink); }
+/* on the note the band turns over: the chosen option, the button under the cursor and the note's one
+   action are an ink band with paper words (the pause menu's confirm) */
+.k-onpaper .k-seg-btn.is-on, .k-onpaper .k-chip.is-on { color: var(--note); }
+.k-onpaper .k-seg-btn.is-on::before, .k-onpaper .k-chip.is-on::before, .k-onpaper .k-btn::before { background: var(--note-ink); }
+.k-onpaper .k-btn:hover:not(:disabled), .k-onpaper .k-btn:focus-visible { color: var(--note); }
+.k-onpaper .k-btn:active:not(:disabled)::before { background: var(--note-dim); }
+.k-onpaper .k-btn--ghost { color: var(--note-ink); border-color: var(--note-rule); }
+.k-onpaper .k-btn--primary { background: transparent; border-color: transparent; color: var(--note); }
+.k-onpaper .k-btn--primary::before { opacity: 1; }
+.k-onpaper .k-btn--primary:hover:not(:disabled)::before, .k-onpaper .k-btn--primary:focus-visible::before { background: var(--ink); }
+/* a note's primary that is not ready yet (the review before "I understand") is an outline on the paper,
+   not the ink page's dark plate */
+.k-onpaper .k-btn--primary:disabled:not(.is-busy) { background: transparent; border-color: var(--note-rule); color: var(--note-dim); }
+/* the destructive confirm is never the band at rest: like the pause menu's "Quit?" note, the cursor
+   starts on the safe choice, and the red underline alone marks the destructive one until the cursor
+   is on it (then the ink band, the underline kept) */
+.k-onpaper .k-btn--danger.is-filled { background: transparent; border-color: var(--note-ink); color: var(--note-ink); }
+.k-onpaper .k-btn--danger.is-filled:hover:not(:disabled), .k-onpaper .k-btn--danger.is-filled:focus-visible { border-color: transparent; }
+.k-onpaper .k-btn--danger:not(.is-filled) { color: var(--note-ink); }
+.k-onpaper .k-btn:disabled { opacity: .45; }
+/* until a destructive confirm is ready (the phrase typed) it is a plain outline with its red mark */
+.k-btn--danger.is-filled:disabled { background: transparent; color: var(--paper-dim); border-color: var(--rule-2); }
+.k-btn--danger.is-filled:disabled::before { opacity: 0; }
+.k-onpaper .k-btn--danger.is-filled:disabled { color: var(--note-dim); border-color: var(--note-rule); opacity: 1; }
+.k-onpaper .k-btn--danger.is-filled:disabled::before { opacity: 0; }
+.k-onpaper :focus-visible { outline-color: var(--note-ink); }
+
+/* ── toasts ─────────────────────────────────────────────────────────────── */
+.k-toasts {
+  position: fixed; z-index: var(--z-toast); bottom: 2.25rem; inset-inline-end: 2.25rem;
+  display: flex; flex-direction: column; align-items: flex-end; gap: .5rem; pointer-events: none;
+}
+.k-toast {
+  pointer-events: auto; display: flex; align-items: center; gap: .625rem; max-width: 26rem;
+  padding: .625rem .875rem; background: var(--ink-2); border: 1px solid var(--rule-2);
+  color: var(--paper); font-size: var(--fs-145); text-align: start; box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  animation: k-note-in var(--t-med) var(--ease);
+}
+.k-toast-shape { width: .5rem; height: .5rem; flex: none; background: var(--paper); }
+.k-toast--inform .k-toast-shape { background: none; border: 1.5px solid var(--paper-dim); }
+.k-toast--error { border-inline-start: 3px solid var(--red); }
+.k-toast--error .k-toast-shape { background: var(--red); transform: rotate(45deg); }

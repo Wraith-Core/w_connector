@@ -55,6 +55,8 @@ function WCore.player(src)
         job = { name = job.name, label = job.label, labelAr = job.label_ar, grade = tonumber(job.grade and job.grade.level) or 0 },
         gang = (gang.name and gang.name ~= 'none') and { name = gang.name, label = gang.label } or nil,
         money = money,
+        status = { dead = (d.metadata or {}).isdead == true or (d.metadata or {}).inlaststand == true,
+            needs = { hunger = (d.metadata or {}).hunger, thirst = (d.metadata or {}).thirst } },
     }
 end
 
@@ -141,6 +143,11 @@ function WCore.moneyOffline(charId, account, delta)
     local ok, why = exports.w_centralbank:AdjustPlayer(charId, account, delta, 'wraith-panel (offline)')
     if not ok then return false, type(why) == 'string' and why or 'refused' end
     return true
+end
+
+-- Raw, framework-owned definitions for the shared admin UI.
+function WCore.consoleCatalog()
+    return { jobs = core().Shared.GetJobs(), gangs = core().Shared.GetGangs(), horses = core().Shared.GetHorses(), wagons = core().Shared.GetVehicles() }
 end
 
 WC.Adapters.register('framework', 'wcore', WCore)

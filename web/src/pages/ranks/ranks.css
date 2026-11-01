@@ -1,0 +1,113 @@
+/* w_admin · pages/ranks: tabs over two panes (both stay mounted); the Ranks pane is a narrow list beside a
+   wide editor, the Staff pane one scrolling column. Tokens only; a rank's own colour is data (a dot). */
+
+.rk-page { display: flex; flex-direction: column; min-height: 0; }
+.rk-pad { padding: 1rem 1.5rem; }
+.rk-tabs { flex: none; padding: .375rem 1.5rem 0; }
+.rk-body {
+  flex: 1; min-height: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr);
+}
+.rk-pane { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); min-height: 0; }
+.rk-pane[hidden] { display: none; }
+.rk-pane > .k-split { height: auto; min-height: 0; }
+
+/* the list is short (a few ranks): the editor gets the room */
+.k-split.rk-split.has-drawer { grid-template-columns: minmax(17rem, 24rem) minmax(0, 1fr); }
+
+.rk-toolbar { flex: none; }
+.rk-count { display: inline-flex; align-items: center; gap: .375rem; font-size: var(--fs-135); color: var(--paper-faint); white-space: nowrap; }
+.rk-hint { font-size: var(--fs-13); color: var(--paper-faint); line-height: 1.5; }
+.rk-err { font: 700 var(--fs-13)/1.45 var(--f-ui); color: var(--paper); }
+.rk-err::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-end: .5em; vertical-align: .12em; background: var(--red); }
+.k-split-list > .rk-hint { margin-top: .75rem; }
+
+/* ── a rank's colour ─────────────────────────────────────────────────────── */
+.rk-dot {
+  flex: none; display: inline-block; width: .625rem; height: .625rem; border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--rule-2);
+}
+.rk-dot--lg { width: .875rem; height: .875rem; }
+.rk-swatch { display: inline-block; width: 1rem; height: 1rem; border-radius: 2px; box-shadow: 0 0 0 1px var(--rule-2); vertical-align: middle; }
+.rk-colorval { display: inline-flex; align-items: center; gap: .4rem; }
+
+.rk-rankcell { display: flex; align-items: center; gap: .625rem; min-width: 0; }
+.rk-rankcell-text { min-width: 0; }
+.rk-rankcell-text .k-cell-main { overflow: hidden; text-overflow: ellipsis; }
+.rk-locktag { gap: .25rem; margin-inline-start: auto; }
+.rk-locktag .k-glyph { width: .75rem; height: .75rem; }
+
+.rk-title { display: inline-flex; align-items: center; gap: .625rem; min-width: 0; }
+.rk-title > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── the editor ──────────────────────────────────────────────────────────── */
+.rk-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .875rem 1rem; align-items: start; }
+.rk-colorrow { display: flex; align-items: flex-end; gap: .5rem; min-width: 0; }
+.rk-colorfield { flex: 1; min-width: 0; }
+.rk-preset { flex: none; }
+.rk-preset .k-select { min-width: 8.5rem; }
+
+.rk-permhead .k-section-body { margin-top: .5rem; }
+.rk-permcount { font-size: var(--fs-13); color: var(--paper-faint); white-space: nowrap; }
+.rk-permsearch { display: flex; width: 100%; }
+.rk-permsearch > .k-input { flex: 1; }
+
+.rk-group .k-section-body { margin-top: .5rem; }
+.rk-nodes { display: flex; flex-direction: column; }
+.rk-node {
+  display: flex; align-items: center; gap: 1rem; padding: .5rem 0;
+  border-top: 1px solid var(--rule);
+}
+.rk-node:first-child { border-top: 0; padding-top: .125rem; }
+.rk-node-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .125rem; }
+.rk-node-top { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.rk-node-label { font: 700 var(--fs-14)/1.35 var(--f-ui); color: var(--paper-dim); }
+.rk-node.is-on .rk-node-label { color: var(--paper); }
+.rk-node-key { font-size: var(--fs-12); color: var(--paper-faint); }
+.rk-node-desc { font-size: var(--fs-13); line-height: 1.45; color: var(--paper-faint); }
+.rk-node.is-on.is-danger { border-inline-start: 3px solid var(--red); padding-inline-start: .625rem; }
+
+.rk-custom-add { display: flex; align-items: center; gap: .5rem; }
+.rk-custom-input { flex: 1; min-width: 0; }
+.rk-custom-input > .k-input { flex: 1; }
+.rk-ctags { display: flex; flex-wrap: wrap; gap: .375rem; }
+.rk-ctag {
+  display: inline-flex; align-items: center; gap: .375rem; min-width: 0;
+  border: 1px solid var(--rule-2); padding-inline-start: .5rem; font-size: var(--fs-13); color: var(--paper);
+}
+.rk-ctag-sub { font-size: var(--fs-12); color: var(--paper-faint); }
+
+/* ── staff ───────────────────────────────────────────────────────────────── */
+.rk-give { flex: none; margin-bottom: .875rem; }
+.rk-give-grid { display: flex; flex-wrap: wrap; align-items: flex-start; gap: .75rem 1rem; }
+.rk-give-grid > .k-field { flex: 1 1 13rem; min-width: 0; }
+.rk-give-grid > .k-field:first-child { flex: 0 0 auto; }
+.rk-give-go { flex: none; align-self: flex-start; padding-top: 1.6rem; }
+
+.rk-stafftools { flex: none; }
+.rk-search { flex: 0 1 22rem; }
+.rk-search > .k-input { flex: 1; }
+.rk-ident { font-family: var(--f-mono); direction: ltr; unicode-bidi: isolate; letter-spacing: 0; }
+
+.k-table td.rk-wrap { white-space: normal; padding-top: .375rem; padding-bottom: .375rem; min-width: 12rem; }
+.k-table td.rk-givecell { width: 1%; }
+.rk-chips { display: flex; flex-wrap: wrap; gap: .375rem; }
+.rk-chip {
+  display: inline-flex; align-items: center; gap: .375rem; min-height: 1.75rem;
+  border: 1px solid var(--rule-2); padding-inline-start: .5rem; font-size: var(--fs-13); color: var(--paper);
+}
+.rk-chip.is-locked { padding-inline-end: .375rem; border-style: dashed; }
+.rk-chip-lock { display: inline-flex; color: var(--paper-faint); }
+.rk-chip-lock .k-glyph { width: .8rem; height: .8rem; }
+.rk-chip:hover > .k-help--quiet, .rk-chip:focus-within > .k-help--quiet { visibility: visible; }
+.rk-rowgive { display: inline-flex; align-items: center; gap: .375rem; }
+.rk-rowselect .k-select { min-width: 8rem; }
+.k-table tbody tr.rk-row-off .k-cell-main { color: var(--paper-dim); }
+
+.rk-hasranks { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .25rem .625rem; }
+.rk-mini { display: inline-flex; align-items: center; gap: .3rem; color: var(--paper-dim); }
+
+@media (max-width: 1100px) {
+  .k-split.rk-split.has-drawer { grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr); }
+  .rk-form { grid-template-columns: minmax(0, 1fr); }
+}

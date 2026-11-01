@@ -1,0 +1,159 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   Wraith Core theme · tokens.css
+   Custom properties only: no selectors that style anything, so linking this file can
+   never change a page by itself. Served as nui://w_lib/nui/theme/tokens.css
+   (./tokens.css inside CEF).
+
+   One palette for every interface: black and white, one red. The values are the Wraith
+   launcher's (launcher/renderer/styles.css): NEUTRAL greys, r = g = b in every ink and
+   paper step. Never a cream, sepia or warm tint here or in a copy of these values (the old
+   warm set 0B0A08 / EDE6D6 / B9AF9C / E3D9C4 read as "milky" in game and was retired
+   2026-09-26). Text "white" is paper #F2F2F2; only --w-paper-lit is #FFFFFF.
+
+   Every name is prefixed --w- so it cannot collide with a resource's own --ink / --paper.
+   Names a resource already uses and that this file must never take: --w-ui-scale,
+   --w-ui-px, --w-lib-px, --w-aux-px, --w-nav (w_admin also has private --w-rule,
+   --w-rule-2, --w-text-2, --w-text-3, --w-hover, --w-ok, --w-gold on its own root).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+:root, [dir=ltr] {
+  /* ── palette ─────────────────────────────────────────────────────────────── */
+  --w-ink: #0A0A0A;            /* page, sheets, text on the paper band */
+  --w-ink-2: #111111;          /* cards, fields at rest */
+  --w-ink-3: #191919;          /* plates, a focused card */
+  --w-ink-4: #222222;          /* a pressed plate, a field with focus */
+  --w-ink-5: #333333;          /* a plate under the cursor where a band would be too loud */
+  --w-paper: #F2F2F2;          /* primary text, the selection band, fills */
+  --w-paper-lit: #FFFFFF;      /* the band under the cursor when it is already a band (primary) */
+  --w-paper-dim: #B4B4B4;      /* secondary text, labels, controls at rest */
+  --w-paper-faint: #7A7A7A;    /* placeholders, captions >= 14px, legal lines */
+  --w-rule: rgba(242, 242, 242, .16);    /* hairlines between rows */
+  --w-rule-2: rgba(242, 242, 242, .32);  /* stronger dividers, brushed rules */
+  --w-rule-3: rgba(242, 242, 242, .5);   /* the store's divider brush */
+  --w-red: #CB0101;            /* a MARK only: where the player is, destructive confirm, critical, progress tick */
+  --w-red-deep: #CB0101;       /* ONE red: the old deeper step is the mark itself now (kept as a name, many sheets read it) */
+  --w-red-soft: rgba(242, 242, 242, .06); /* was a red wash; red is never a fill, so the plate behind an error is a paper lift and the red stays on its rule */
+  --w-note: #E9E9E9;           /* the paper note (confirm dialogs, help notes): the only light surface */
+  --w-note-ink: #111111;
+  --w-note-dim: #555555;
+  --w-note-rule: rgba(17, 17, 17, .18);
+  --w-note-glow: rgba(0, 0, 0, .28);  /* the note's inner shade (inset box-shadow): a neutral shadow, no brown burn */
+  --w-strip: #CFCFCF;          /* the pinned paper strip beside a board (pause menu) */
+  --w-scrim: rgba(5, 5, 5, .72);
+  --w-shadow: 0 .55em .9em rgba(0, 0, 0, .55);
+  --w-text-shadow: 0 1px .4em rgba(0, 0, 0, .6);
+
+  /* ── faces (LTR): the Latin face first, Arabic glyphs fall through by unicode-range ── */
+  --w-f-display: 'RDR Lino', 'Lalezar', 'Tajawal', 'W Noto Arabic', Georgia, serif;      /* wordmark, masthead only */
+  --w-f-title: 'EB Garamond', 'Lalezar', 'Tajawal', 'W Noto Arabic', Georgia, serif;     /* titles: 600 Latin, 400 Arabic */
+  --w-f-text: 'EB Garamond', 'Amiri', 'W Noto Arabic', Georgia, serif;                   /* reading text */
+  --w-f-action: 'EB Garamond', 'Amiri', 'Tajawal', 'W Noto Arabic', Georgia, serif;      /* menu rows, big buttons */
+  --w-f-label: 'Hapna Slab', 'Tajawal', 'W Noto Arabic', Georgia, serif;                 /* labels, controls, cells, chips, < 16px */
+  --w-f-input: 'Hapna Slab', 'Tajawal', 'W Noto Arabic', Georgia, serif;                 /* what the player types or picks */
+  --w-f-num: 'RDR Catalogue', 'Hapna Slab', 'Tajawal', Georgia, sans-serif;                 /* big figures: money, KPIs, counters */
+  --w-f-figure: 'EB Garamond', 'Hapna Slab', Georgia, serif;                                /* figures inside text: lining, tabular */
+  --w-f-hand: 'Hapna Slab', 'Aref Ruqaa', 'Amiri', Georgia, serif;                          /* captions (Latin: tracked caps) */
+  --w-f-book: 'EB Garamond', 'Amiri', Georgia, 'Times New Roman', serif;                    /* the pause menu's serif, unchanged */
+  --w-f-mono: Consolas, 'Courier New', 'Tajawal', 'W Noto Arabic', monospace;
+
+  /* Arabic-first stacks whatever the direction (for adapters that pick by language, not dir) */
+  --w-f-ar-display: 'Lalezar', 'EB Garamond', 'Tajawal', 'W Noto Arabic', 'Segoe UI', sans-serif;
+  --w-f-ar-text: 'Amiri', 'EB Garamond', 'W Noto Arabic', 'Times New Roman', serif;
+  --w-f-ar-action: 'Amiri', 'EB Garamond', 'Tajawal', 'W Noto Arabic', 'Times New Roman', serif;
+  --w-f-ar-label: 'Tajawal', 'Hapna Slab', 'W Noto Arabic', 'Segoe UI', sans-serif;
+  --w-f-ar-hand: 'Aref Ruqaa', 'Amiri', 'W Noto Arabic', serif;
+
+  /* direction switches the role classes read (0 = Latin, 1 = Arabic). A dir="ltr" island
+     inside an Arabic page gets the Latin values back, and the other way round. */
+  --w-rtl: 0;
+  --w-to-end: right;           /* linear-gradient(to var(--w-to-end), ...) runs toward the inline end */
+  --w-deg-end: 90deg;
+  /* per role: size factor (k), weight (wt), line-height (lh), tracking. The role classes in
+     base.css read these, so they follow the nearest dir without extra selectors. */
+  --w-k-display: 1;    --w-lh-display: 1.1;   --w-track-display: .05em;
+  --w-k-title: 1;      --w-lh-title: 1.12;    --w-track-title: .005em;  --w-wt-title: 600;
+  --w-k-text: 1;       --w-lh-text: 1.45;
+  --w-k-action: 1;     --w-lh-action: 1.3;    --w-wt-action: 500;
+  --w-k-label: 1;      --w-lh-label: 1.25;    --w-wt-label: 400;
+  --w-k-input: 1;      --w-wt-input: 400;
+  --w-k-hand: 1;       --w-lh-hand: 1.3;
+  --w-label-case: uppercase;   /* Latin labels are tracked caps; Arabic is never uppercased */
+  --w-label-track: .14em;      /* Arabic is never letter-spaced */
+
+  /* ── scale: 1 --w-rem = 20px at 1920x1080, 13.3px at 1280x720 (the loading / pause scale) ── */
+  --w-rem: clamp(12px, min(1.04vw, 1.85vh), 24px);
+  --w-u: calc(var(--w-rem) / 20);                    /* 1px at 1080p */
+  --w-fs-display: calc(var(--w-rem) * 3.2);
+  --w-fs-title: calc(var(--w-rem) * 1.6);
+  --w-fs-title-sm: calc(var(--w-rem) * 1.25);
+  --w-fs-text: calc(var(--w-rem) * .9);
+  --w-fs-action: calc(var(--w-rem) * 1.05);
+  --w-fs-label: calc(var(--w-rem) * .7);
+  --w-fs-input: calc(var(--w-rem) * .85);
+  --w-fs-hand: calc(var(--w-rem) * .7);
+  --w-edge: calc(var(--w-rem) * 1.35);              /* how deep the torn edge bites into a card */
+
+  /* ── motion ─────────────────────────────────────────────────────────────── */
+  --w-ease: cubic-bezier(.2, .7, .2, 1);
+  --w-t-fast: 120ms;
+  --w-t-med: 160ms;
+  --w-t-in: 260ms;
+
+  /* ── textures: absolute, so a stylesheet in another resource resolves them the same way.
+        The RDR brush art is white-on-alpha: it is used as a MASK and filled with a token. ── */
+  --w-tex-band: url('./tex/selection_box_bg_1a.png');
+  --w-tex-band-sm: url('./tex/selection_box_bg_1c.png');
+  --w-tex-sheet: url('./tex/help_text_bg.png');
+  --w-tex-header: url('./tex/menu_header_1a.png');
+  --w-tex-divider: url('./tex/divider_line.png');
+  --w-tex-title-divider: url('./tex/title_divider.png');
+  --w-tex-line: url('./tex/list_item_h_line_narrow.png');
+  --w-tex-vline: url('./tex/vertical_divider_line.png');
+  --w-tex-frame-t: url('./tex/crafting_highlight_t.png');
+  --w-tex-frame-b: url('./tex/crafting_highlight_b.png');
+  --w-tex-frame-l: url('./tex/crafting_highlight_l.png');
+  --w-tex-frame-r: url('./tex/crafting_highlight_r.png');
+  --w-tex-frame-tl: url('./tex/crafting_highlight_tl.png');
+  --w-tex-frame-tr: url('./tex/crafting_highlight_tr.png');
+  --w-tex-frame-bl: url('./tex/crafting_highlight_bl.png');
+  --w-tex-frame-br: url('./tex/crafting_highlight_br.png');
+  --w-tex-arrow-l: url('./tex/selection_arrow_left.png');
+  --w-tex-arrow-r: url('./tex/selection_arrow_right.png');
+  --w-tex-tick: url('./tex/tick.png');
+  --w-tex-cross: url('./tex/cross.png');
+  --w-tex-lock: url('./tex/lock.png');
+  --w-tex-swatch: url('./tex/swatch_bg_1a.png');
+  --w-tex-bar: url('./tex/weapon_stats_bar.png');
+  --w-tex-bar-mask: url('./tex/weapon_stats_bar_mask.png');
+  --w-tex-toast: url('./tex/toast_bg.png');
+  /* the pause menu's own two: a 9-slice torn edge (256px, 64px slices) and the paper grain */
+  --w-tex-tear: url('./tex/tear.png');
+  --w-tex-grain: url('./tex/grain.png');
+}
+
+/* RTL: the Arabic face first, so the spaces and punctuation it covers come from it too;
+   Latin words inside Arabic fall to the pairing face. */
+[dir=rtl], html[lang=ar]:not([dir=ltr]) {
+  --w-f-display: 'Lalezar', 'RDR Lino', 'Tajawal', 'W Noto Arabic', 'Segoe UI', sans-serif;
+  --w-f-title: 'Lalezar', 'EB Garamond', 'Tajawal', 'W Noto Arabic', 'Segoe UI', sans-serif;
+  --w-f-text: 'Amiri', 'EB Garamond', 'W Noto Arabic', 'Times New Roman', serif;
+  --w-f-action: 'Amiri', 'EB Garamond', 'Tajawal', 'W Noto Arabic', 'Times New Roman', serif;
+  --w-f-label: 'Tajawal', 'W Noto Arabic', 'Segoe UI', sans-serif;
+  --w-f-input: 'Tajawal', 'W Noto Arabic', 'Segoe UI', sans-serif;
+  --w-f-hand: 'Aref Ruqaa', 'Amiri', 'W Noto Arabic', serif;
+  --w-f-book: 'Amiri', 'EB Garamond', 'W Noto Arabic', 'Times New Roman', serif;
+  --w-rtl: 1;
+  --w-to-end: left;
+  --w-deg-end: 270deg;
+  /* the multipliers the two reference screens use: Lalezar runs a little smaller than the
+     Garamond it replaces, Amiri a little larger, Tajawal labels larger than tracked caps */
+  --w-k-display: 1.03; --w-lh-display: 1.2;   --w-track-display: 0em;
+  --w-k-title: .92;    --w-lh-title: 1.25;    --w-track-title: 0em;     --w-wt-title: 400;
+  --w-k-text: 1.06;    --w-lh-text: 1.6;
+  --w-k-action: 1;     --w-lh-action: 1.4;    --w-wt-action: 700;
+  --w-k-label: 1.12;   --w-lh-label: 1.3;     --w-wt-label: 700;
+  --w-k-input: 1.06;   --w-wt-input: 500;
+  --w-k-hand: 1.6;     --w-lh-hand: 1.7;
+  --w-label-case: none;
+  --w-label-track: 0em;
+}

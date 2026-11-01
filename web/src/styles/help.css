@@ -1,0 +1,156 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · styles/help.css
+ * The "؟" (an outlined circle, 18 px, hit area 28 px, at the inline end of a label) and the help note
+ * (the theme's paper note: torn edge, grain, an arrow to its "؟", Amiri reading text). Help mode
+ * outlines every "؟" and shows the quiet ones.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.k-help {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: var(--help-dot);
+  height: var(--help-dot);
+  margin: calc((var(--help-hit) - var(--help-dot)) / -2) 0;
+  padding: 0;
+  border: 1.5px solid var(--paper-faint);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--paper-dim);
+  font: 700 .72rem/1 var(--f-ui);
+  vertical-align: middle;
+  cursor: help;
+  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+}
+/* a 28 px hit area around the 18 px circle */
+.k-help::before {
+  content: '';
+  position: absolute;
+  inset: calc((var(--help-hit) - var(--help-dot)) / -2);
+}
+.k-help > span { display: block; transform: translateY(.04em); pointer-events: none; }
+.k-help--sm { width: 1rem; height: 1rem; font-size: .66rem; border-width: 1.3px; }
+.k-help--lg { width: 1.25rem; height: 1.25rem; font-size: .8rem; }
+.k-help:hover, .k-help.is-open, .k-help:focus-visible {
+  border-color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
+}
+.k-help.is-pinned { outline: 2px solid var(--paper); outline-offset: 2px; }
+.k-help--danger { border-color: var(--paper-dim); }
+.k-help.is-missing { border-style: dashed; }
+.k-help-missing {
+  font: 700 var(--fs-11)/1.2 var(--f-ui);
+  color: var(--paper-faint);
+  border: 1px dashed var(--rule-2);
+  padding: 0 .3rem;
+  white-space: nowrap;
+}
+
+/* quiet: the chrome's "؟" (nav, top bar) show only in help mode, on hover of their row, or on focus */
+.k-help--quiet { visibility: hidden; }
+.k-help--quiet:focus-visible,
+.sh-nav-item:hover > .k-help--quiet,
+.k-btnwrap:hover > .k-help--quiet,
+.sh-pillwrap:hover > .k-help--quiet,
+.sh-cmdwrap:hover > .k-help--quiet,
+.sh-who:hover .k-help--quiet { visibility: visible; }
+
+/* help mode: every "؟" stands out, the quiet ones appear */
+html.k-help-mode .k-help { visibility: visible; border-color: var(--paper); color: var(--paper); box-shadow: 0 0 0 3px rgba(242, 242, 242, .16); }
+html.k-help-mode .k-help:hover, html.k-help-mode .k-help.is-open { color: var(--ink); }
+html.k-help-mode .k-tab-help, html.k-help-mode .k-chip-help, html.k-help-mode .k-settings-help { visibility: visible; }
+
+/* ── the note ───────────────────────────────────────────────────────────── */
+/* The wrapper carries the drop shadow and the arrow: the torn mask on the card would clip both. */
+.k-note {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  z-index: var(--z-note);
+  width: var(--note-w);
+  max-width: calc(100vw - 24px);
+  pointer-events: none;
+  visibility: hidden;
+  filter: drop-shadow(0 .75rem 1.25rem rgba(0, 0, 0, .6));
+}
+.k-note.is-open { visibility: visible; pointer-events: auto; }
+/* the arrow to the "؟": a paper diamond that overlaps the card past its torn edge, so the two join */
+.k-note::after {
+  content: '';
+  position: absolute;
+  width: .875rem;
+  height: .875rem;
+  background: var(--note);
+  transform: rotate(45deg);
+  left: calc(var(--arrow-x, 20px) - .4375rem);
+  top: -.125rem;
+  pointer-events: none;
+}
+.k-note[data-side='above']::after { top: auto; bottom: -.125rem; }
+.k-note:not(.is-open)::after { display: none; }
+.k-note-card {
+  position: relative;
+  background-color: var(--note);
+  background-image: linear-gradient(var(--note-veil), var(--note-veil)), var(--tex-grain);
+  background-size: auto, 256px 256px;
+  color: var(--note-ink);
+  padding: 1.125rem 1.375rem 1rem;
+  box-shadow: inset 0 0 2.5rem var(--note-glow);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge) round;
+  font-family: var(--f-ui);
+  text-align: start;
+  animation: k-note-in var(--t-med) var(--ease);
+}
+/* danger: a red rule inside the torn edge (a border would be torn away with it) */
+.k-note-card.is-danger::after {
+  content: ''; position: absolute; inset-inline-start: .625rem; top: 1.25rem; width: 3px; height: 2.25rem;
+  background: var(--red); pointer-events: none;
+}
+@keyframes k-note-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+
+.k-note-cap { display: flex; align-items: baseline; gap: .5rem; }
+/* the handwritten caption: Aref Ruqaa needs room for its tails, never clipped */
+.k-note-hand { font: 1.375rem/1.4 var(--f-hand); color: var(--note-dim); }
+html[lang='en'] .k-note-hand { font: .8rem/1.2 var(--f-latin-caption); letter-spacing: .06em; text-transform: uppercase; }
+.k-note-pin {
+  margin-inline-start: auto;
+  font: 700 var(--fs-11)/1.4 var(--f-ui);
+  color: var(--note-dim);
+  border: 1px solid var(--note-rule);
+  padding: 0 .375rem;
+  white-space: nowrap;
+}
+/* the title is a title (Lalezar / EB Garamond), the note itself is reading text (Amiri / EB Garamond) */
+.k-note-title { font: 400 1.3125rem/1.25 var(--f-title-ar); margin: .25rem 0 .25rem; color: var(--note-ink); }
+html[lang='en'] .k-note-title { font: 600 1.1875rem/1.2 var(--f-title); }
+.k-note-text { font: 400 calc(var(--fs-text) * var(--k-text))/var(--lh-text) var(--f-text); }
+.k-note-missing { color: var(--note-dim); font-style: normal; }
+.k-note-example { margin-top: .375rem; font: 400 calc(var(--fs-15) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--note-ink); }
+.k-note-example b { color: var(--note-dim); font-weight: 700; }
+.k-note-warn {
+  margin-top: .5rem;
+  padding-inline-start: .5rem;
+  border-inline-start: 2px solid var(--note-ink);
+  font: 700 calc(var(--fs-15) * var(--k-text))/var(--lh-text) var(--f-text);
+}
+/* "cannot be undone": ink words, the red square is the mark (never red text) */
+.k-note-noundo { margin-top: .5rem; font: 700 var(--fs-135)/1.4 var(--f-ui); color: var(--note-ink); }
+.k-note-noundo::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-end: .5em; vertical-align: .12em; background: var(--red); }
+.k-note-facts {
+  margin-top: .5rem;
+  padding-top: .5rem;
+  border-top: 1px solid var(--note-rule);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .1875rem .625rem;
+  font-size: var(--fs-13);
+}
+.k-note-fact { display: contents; }
+.k-note-facts dt { color: var(--note-dim); }
+.k-note-facts dd { font-weight: 700; margin: 0; }
+
+/* inputs drawn on paper (confirm dialogs) */
+.k-onpaper .k-help { border-color: var(--note-dim); color: var(--note-dim); }
+.k-onpaper .k-help:hover, .k-onpaper .k-help.is-open { background: var(--note-ink); border-color: var(--note-ink); color: var(--note); }

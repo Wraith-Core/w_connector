@@ -1,0 +1,161 @@
+{
+  "bans": {
+    "tabBans": "Players who cannot join the server. A ban covers the whole account, so they cannot join with any character until it ends or you lift it.",
+    "tabBlocks": "Single characters that are suspended: the owner can still join with another character, but cannot play this one until you lift it.",
+    "search": "Filters the list by what you type: the player name, the reason, the staff member, the license or the ban number.",
+    "filter": {
+      "active": "Bans in force right now, permanent and temporary. These players cannot join at the moment.",
+      "permanent": "Bans with no end: they stay until a staff member lifts them on this page.",
+      "temporary": "Bans with a length: they end by themselves at the time shown, then the player can join.",
+      "expired": "Bans whose time is over. The player can join now; the line stays in the list for reference only.",
+      "all": "Every ban line: in force and ended."
+    },
+    "col": {
+      "id": "The ban's number on the server. Use it to point to one ban or to find it in the admin log.",
+      "name": "The account name at the time of the ban, with the license under it, which identifies the account even if the name changes.",
+      "reason": "The reason the staff member wrote. The player sees it every time they try to join.",
+      "by": "The staff member who placed the ban.",
+      "ends": "When the player can join again. Permanent never ends; Ended means they can join now.",
+      "actions": "What you can do with each line. Point at a button to see its own explanation."
+    },
+    "unban": {
+      "text": "Lifts the ban so the player can join right away with any character. For an ended ban it only clears the line from the list.",
+      "undo": "No; to restore it you must ban them again while they are online"
+    },
+    "drawer": "The full details of the chosen ban: the whole reason, the license and when it ends.",
+    "license": {
+      "text": "A fixed number of the player's Rockstar account. The ban is tied to it, so it holds even if the player changes their name.",
+      "example": "license:3f9a2c1d7e4b58a0aa11"
+    },
+    "remaining": "How long is left until the ban ends, from now. After that the player can join without you doing anything.",
+    "findChars": "Opens Characters and searches by this license, so you see every character of the account. Changes nothing.",
+    "openPlayers": "Opens Players. A ban itself is placed from the player's file while they are online, under Moderation.",
+    "blocks": {
+      "search": "Filters the list by citizen ID, character name, reason or staff member.",
+      "col": {
+        "cid": "The fixed citizen ID of the suspended character, with the session number # beside it when the owner is online now.",
+        "name": "The suspended character's name, and under it whether the owner is in the server now.",
+        "reason": "The reason the staff member wrote. The owner sees it when they try to pick this character.",
+        "by": "The staff member who suspended the character.",
+        "since": "How long the character has been suspended. A suspension has no end date; it stays until staff lift it."
+      },
+      "unblock": {
+        "text": "Lifts the suspension so the owner can pick this character and play it again.",
+        "undo": "Yes, suspend it again with Suspend a character"
+      },
+      "open": "Opens the character in Characters to see its details and belongings. Changes nothing.",
+      "new": {
+        "text": "Suspends one character by citizen ID: the owner cannot play it until you lift it, and if they are playing it now they leave the server.",
+        "example": "14 suspends character 14, or #5 the character of the player online in session 5",
+        "undo": "Yes, lift it from this list"
+      },
+      "who": {
+        "text": "The character you want to suspend. Type the citizen ID like 14, or # and the session number like #5 for a player online now.",
+        "example": "14 or #5"
+      },
+      "reason": "Why the character is suspended. The owner sees it when trying to pick the character, and it is kept in the admin log.",
+      "drawer": "The chosen suspension: the character, the reason, who suspended it and when."
+    }
+  },
+  "label": {
+    "bans": {
+      "tabs": "Bans and suspensions",
+      "refresh": "Refresh",
+      "tabBans": "Bans",
+      "tabBlocks": "Suspended characters",
+      "searchBans": "Search by name, reason or license…",
+      "searchBlocks": "Search by citizen ID, name or reason…",
+      "filters": "Ban filter",
+      "filter": {
+        "active": "In force",
+        "permanent": "Permanent",
+        "temporary": "Temporary",
+        "expired": "Ended",
+        "all": "All"
+      },
+      "col": {
+        "id": "No.",
+        "name": "Player",
+        "reason": "Reason",
+        "by": "By",
+        "ends": "Ends",
+        "actions": "Actions"
+      },
+      "permanent": "Permanent",
+      "ended": "Ended",
+      "endsIn": "in %s",
+      "endedAgo": "ended %s",
+      "unban": "Lift ban",
+      "unbanTitle": "Lift the ban on %s",
+      "unbanText": "\"%s\" will be able to join the server right away with any character.",
+      "unbanTextExpired": "This ban has already ended, so this only clears the line from the list.",
+      "showing": "Showing %s of %s",
+      "none": "Nobody is banned right now.",
+      "noMatch": "Nothing matches this search or filter.",
+      "noneNext": "To ban a player, open them in Players, then Moderation.",
+      "openPlayers": "Open Players",
+      "clear": "Clear search",
+      "waiting": "Waiting for the ban list from the server…",
+      "noReason": "No reason",
+      "unknownName": "No name",
+      "listLabel": "Ban list",
+      "d": {
+        "name": "Player",
+        "license": "License",
+        "reason": "Reason",
+        "by": "By",
+        "ends": "Ends on",
+        "remaining": "Time left",
+        "id": "Ban number",
+        "findChars": "This account's characters",
+        "state": "State"
+      },
+      "state": {
+        "active": "In force",
+        "expired": "Ended",
+        "permanent": "Permanent"
+      },
+      "blocks": {
+        "listLabel": "Suspended characters",
+        "chip": "Suspended",
+        "col": {
+          "cid": "Citizen ID",
+          "name": "Character",
+          "reason": "Reason",
+          "by": "Suspended by",
+          "since": "Since"
+        },
+        "unblock": "Lift suspension",
+        "open": "Open character",
+        "new": "Suspend a character",
+        "unblockTitle": "Lift the suspension of %s",
+        "unblockText": "The owner will be able to pick this character and play it again.",
+        "newTitle": "Suspend a character",
+        "newText": "The owner cannot play this character until you lift it here. If they are playing it now, they leave the server.",
+        "who": "Citizen ID",
+        "reason": "Reason",
+        "confirm": "Suspend character",
+        "needOne": "Type the citizen ID of an existing character first.",
+        "already": "This character is already suspended; the new suspension replaces its reason.",
+        "none": "No characters are suspended.",
+        "noneNext": "Suspend one with Suspend a character, or from Characters.",
+        "waiting": "Waiting for the suspension list from the server…",
+        "online": "Online · #%s",
+        "offline": "Offline",
+        "reasons": {
+          "cheat": "Cheating investigation",
+          "exploit": "Exploiting a bug",
+          "rules": "Breaking the play rules"
+        },
+        "d": {
+          "cid": "Citizen ID",
+          "name": "Character",
+          "reason": "Reason",
+          "by": "Suspended by",
+          "at": "Suspended on",
+          "state": "Owner now"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,167 @@
+{
+  "hud": {
+    "openPanel": {
+      "text": "Closes the admin panel and opens w_hud's own panel (F7). It has the same settings plus the HUD look each player picks for themselves.",
+      "undo": "Opening it changes nothing"
+    },
+    "group": {
+      "needs": "How fast every player gets hungry and thirsty. Changes reach everyone at once, with no restart.",
+      "damage": "What happens when a player gets very hungry or thirsty: health drops little by little, and they may die if you allow it.",
+      "features": "Turning an element off hides it from every player's screen at once, and players cannot bring it back from their settings.",
+      "identity": "The server name or logo shown in the corner of every player's screen, with its place and size.",
+      "player": "Changes one player's hunger and thirst now, for example if they got stuck or starved because of a bug. Nobody else's settings change."
+    },
+    "needs": {
+      "hungerRate": {
+        "text": "How much the hunger bar, out of 100, drops each cycle. Higher means hungrier faster; zero means never hungry.",
+        "example": "1 every 90 s takes a player from full to starving in about 2.5 hours"
+      },
+      "thirstRate": {
+        "text": "Same idea as hunger, for thirst. Higher means thirstier faster; zero means never thirsty.",
+        "example": "1.4 every 90 s leaves a player parched in about 1 hour 47 minutes"
+      },
+      "interval": {
+        "text": "Every how many seconds hunger and thirst drop. At least 5 seconds so the server stays light.",
+        "example": "90 means once every minute and a half"
+      }
+    },
+    "damage": {
+      "enabled": "On: a player whose hunger or thirst is under the limit slowly loses health. Off: the bars are for show only.",
+      "hungerAt": {
+        "text": "When the hunger bar falls under this number, health starts dropping.",
+        "example": "15 means when less than 15 of 100 hunger is left"
+      },
+      "thirstAt": {
+        "text": "When the thirst bar falls under this number, health starts dropping.",
+        "example": "15 means when less than 15 of 100 thirst is left"
+      },
+      "amount": {
+        "text": "How much health each hit takes, as a share of the full health bar.",
+        "example": "2 means two percent of health every hit"
+      },
+      "interval": "The seconds between two hits. A smaller number means hunger and thirst kill faster.",
+      "canKill": "Off: health drops to just above death and stops there, so nobody dies of hunger or thirst."
+    },
+    "features": {
+      "health": "Shows or hides the health circle for every player.",
+      "stamina": "Shows or hides the stamina circle for every player.",
+      "hunger": "Shows or hides the food circle. Hiding it does not stop hunger itself.",
+      "thirst": "Shows or hides the water circle. Hiding it does not stop thirst itself.",
+      "voice": "Shows the player's voice range and when they talk.",
+      "horse": "Shows the horse's health and stamina circles while the player rides.",
+      "buffs": "Shows badges for the effects running now, like buffs and poison.",
+      "ammo": "Shows how many rounds are in the weapon the player holds.",
+      "money": "Shows the player's money on screen.",
+      "identity": "Shows the character's name and ID on the HUD.",
+      "compass": "Shows the compass at the top of the screen.",
+      "location": "Shows the name of the place the player is in.",
+      "playerImages": "Lets players add their own images to their HUD. Turning it off hides them for everyone.",
+      "playerPanel": "Lets players change their HUD look and where things sit from the F7 panel. Turning it off fixes the staff layout for everyone."
+    },
+    "identity": {
+      "name": "The server name shown in the corner of every player's screen. At most 48 characters.",
+      "logoUrl": {
+        "text": "The logo image link. With a link, the logo shows instead of the name for everyone. It must start with https or it is cleared on save.",
+        "example": "https://example.com/logo.png"
+      },
+      "logoWidth": "How wide the logo is on screen, from 2 to 160.",
+      "logoHeight": "How tall the logo is. Zero means it follows the width by itself.",
+      "x": {
+        "text": "Where the name or logo sits from the left, as a share of the screen width.",
+        "example": "98 means almost at the right edge"
+      },
+      "y": {
+        "text": "Where the name or logo sits from the top, as a share of the screen height.",
+        "example": "2 means near the top of the screen"
+      },
+      "scale": "The size of the name or logo. 1 is normal size, 2 is double.",
+      "opacity": "How solid the name or logo is. 1 is fully solid, 0.5 is half see-through."
+    },
+    "player": {
+      "target": {
+        "text": "The citizen ID of the player whose hunger and thirst you want to change. They must be in the game.",
+        "example": "12, or #5 for a session number"
+      },
+      "now": "The player's hunger and thirst now, updated every 2 seconds.",
+      "hunger": "The new hunger value out of 100. 100 means completely full, zero means starving.",
+      "thirst": "The new thirst value out of 100. 100 means fully quenched, zero means parched.",
+      "applyHunger": {
+        "text": "Sets the player's hunger to the number you chose, now. They see the bar change at once.",
+        "undo": "Yes, pick another number and apply"
+      },
+      "applyThirst": {
+        "text": "Sets the player's thirst to the number you chose, now. They see the bar change at once.",
+        "undo": "Yes, pick another number and apply"
+      },
+      "refill": "Fills the player's hunger and thirst to 100 in one go."
+    }
+  },
+  "label": {
+    "hud": {
+      "openPanel": "Open the w_hud panel",
+      "unit": {
+        "points": "points",
+        "seconds": "s",
+        "percent": "%"
+      },
+      "group": {
+        "needs": "Hunger and thirst speed",
+        "damage": "Hunger and thirst damage",
+        "features": "HUD elements shown",
+        "identity": "Server name and logo",
+        "player": "One player's needs"
+      },
+      "needs": {
+        "hungerRate": "Hunger drop per cycle",
+        "thirstRate": "Thirst drop per cycle",
+        "interval": "Cycle length"
+      },
+      "damage": {
+        "enabled": "Hunger and thirst hurt health",
+        "hungerAt": "Damage starts when hunger is under",
+        "thirstAt": "Damage starts when thirst is under",
+        "amount": "Health lost per hit",
+        "interval": "Seconds between hits",
+        "canKill": "Hunger and thirst can kill"
+      },
+      "features": {
+        "health": "Health circle",
+        "stamina": "Stamina circle",
+        "hunger": "Food circle",
+        "thirst": "Water circle",
+        "voice": "Voice indicator",
+        "horse": "Horse circles",
+        "buffs": "Effect badges",
+        "ammo": "Ammo counter",
+        "money": "Wallet",
+        "identity": "Player info",
+        "compass": "Compass",
+        "location": "Place name",
+        "playerImages": "Player-added images",
+        "playerPanel": "Players edit their HUD"
+      },
+      "identity": {
+        "name": "Server name",
+        "logoUrl": "Logo link",
+        "logoWidth": "Logo width",
+        "logoHeight": "Logo height",
+        "x": "Horizontal place",
+        "y": "Vertical place",
+        "scale": "Size",
+        "opacity": "Opacity"
+      },
+      "player": {
+        "target": "Player",
+        "now": "Now",
+        "hunger": "Hunger",
+        "thirst": "Thirst",
+        "applyHunger": "Apply hunger",
+        "applyThirst": "Apply thirst",
+        "refill": "Fill both to 100",
+        "pick": "Type the citizen ID of a player in the game to change their hunger and thirst.",
+        "noNeeds": "This player has no hunger and thirst right now (maybe no character picked yet).",
+        "done": "The player's needs changed"
+      }
+    }
+  }
+}

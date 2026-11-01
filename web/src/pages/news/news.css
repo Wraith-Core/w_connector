@@ -1,0 +1,140 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · pages/news/news.css
+ * The News page: the list, the editor and the pause menu's card as the preview. Tokens only; red is a
+ * mark (a counter over its limit). The card copies w_pausemenu/web/src/menu.css "The news" in em on a
+ * 20 px em at 1080p (the pause menu's rem), so it is drawn at the size players see it.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.nw-page { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+.nw-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: .75rem; align-items: start; }
+.nw-col { min-width: 0; }
+.nw-side { position: sticky; top: 0; min-width: 0; }
+
+/* ── the list ───────────────────────────────────────────────────────────── */
+.nw-listacts { display: inline-flex; align-items: center; gap: .75rem; }
+.nw-countline { display: inline-flex; align-items: center; gap: .25rem; font: 700 var(--fs-135)/1.4 var(--f-ui); color: var(--paper-dim); white-space: nowrap; }
+.nw-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.nw-row {
+  display: grid; grid-template-columns: 1.5rem 8.5rem minmax(0, 1fr) auto; gap: .875rem; align-items: center;
+  padding: .75rem .625rem; border-bottom: 1px solid var(--rule);
+  transition: background-color var(--t-fast) var(--ease);
+}
+.nw-row:first-child { border-top: 1px solid var(--rule); }
+.nw-row.is-sel { background: var(--ink-2); }
+.nw-pos { font: 700 var(--fs-18)/1 var(--f-ui); color: var(--paper-faint); text-align: center; }
+.nw-row.is-sel .nw-pos { color: var(--paper); }
+.nw-thumb {
+  display: block; width: 8.5rem; height: 5.25rem; border: 1px solid var(--rule-2); background: var(--ink-3) center / cover no-repeat;
+  filter: grayscale(1);
+}
+.nw-main { display: flex; flex-direction: column; gap: .25rem; min-width: 0; }
+.nw-rtitle { font: 700 var(--fs-16)/1.4 var(--f-ui); color: var(--paper); overflow-wrap: anywhere; }
+.nw-rdate { font: 400 var(--fs-12)/1.5 var(--f-ui); color: var(--paper-faint); }
+.nw-rtext {
+  font: 400 calc(var(--fs-14) * var(--k-text))/1.6 var(--f-text); color: var(--paper-dim); overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.nw-tags { display: flex; flex-wrap: wrap; gap: .375rem; margin-top: .125rem; }
+.nw-tags:empty { display: none; }
+.nw-acts { display: flex; align-items: center; gap: .25rem; }
+.nw-full { font: 400 var(--fs-135)/1.5 var(--f-ui); color: var(--paper-dim); }
+
+/* ── the editor ─────────────────────────────────────────────────────────── */
+.nw-form { display: flex; flex-direction: column; gap: 1rem; }
+.nw-form > * + * { margin-top: 0; }
+.nw-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.nw-count { font: 700 var(--fs-12)/1.4 var(--f-ui); color: var(--paper-faint); white-space: nowrap; }
+.nw-count.is-over { color: var(--paper); }
+.nw-count.is-over::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-end: .375em; vertical-align: .1em; background: var(--red); }
+.nw-apply { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding-top: .25rem; }
+.nw-why { font: 400 var(--fs-135)/1.5 var(--f-ui); color: var(--paper-dim); }
+
+/* the plates: a row of thumbnails (the Segmented, drawn as tiles; the chosen one is the paper band) */
+.nw-plates .k-seg { display: flex; flex-wrap: wrap; gap: .5rem; border: 0; background: transparent; }
+.nw-plates .k-seg-item + .k-seg-item { border-inline-start: 0; }
+.nw-plates .k-seg-item { border: 1px solid var(--rule-2); }
+.nw-plates .k-seg-btn { height: auto; padding: .375rem; }
+.nw-opt { display: flex; flex-direction: column; align-items: center; gap: .375rem; }
+.nw-opt-img { display: block; width: 7rem; height: 4.25rem; object-fit: cover; filter: grayscale(1); border: 1px solid var(--rule); }
+.nw-opt-own {
+  display: flex; align-items: center; justify-content: center; background: var(--ink-3);
+  /* EB Garamond (the theme's Latin face): Tajawal's small bold "i" reads as an "l" ("nul://") */
+  font: 600 var(--fs-16)/1 'EB Garamond', Georgia, serif; color: var(--paper-dim); direction: ltr;
+}
+.k-seg-btn.is-on .nw-opt-own { background: transparent; }
+.nw-opt-name { font: 700 var(--fs-13)/1.3 var(--f-ui); }
+/* the "?" of "my own picture" keeps clear of its tile's edge (help.css .k-help resets the kit's margin) */
+.nw-plates .k-seg-item .k-seg-help { margin-inline: .125rem .5rem; }
+
+/* ── the preview ────────────────────────────────────────────────────────── */
+.nw-pvsec { width: calc(19.7 * 1.25rem + 2rem + 2px); max-width: 100%; }
+.nw-pvsec .k-section-head { flex-wrap: wrap; }
+.nw-pv { display: flex; flex-direction: column; align-items: center; gap: .625rem; }
+.nw-pv-note { font: 400 var(--fs-12)/1.5 var(--f-ui); color: var(--paper-faint); text-align: center; }
+
+/* w_pausemenu's news card (menu.css .pm-card / .pm-news), in em */
+.nw-card-wrap {
+  font-size: 1.25rem;
+  width: 19.7em; max-width: 100%;
+  filter: drop-shadow(0 .55em .9em rgba(0, 0, 0, .55));
+  color: var(--paper);
+  user-select: none;
+}
+.nw-card {
+  position: relative; overflow: hidden; aspect-ratio: 393 / 437;
+  background-color: var(--ink-2);
+  box-shadow: inset 0 0 1.25em rgba(242, 242, 242, .11), inset 0 0 .45em rgba(242, 242, 242, .1);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / 1.35em round;
+}
+.nw-card::after {
+  content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none;
+  background-image: var(--tex-grain); background-size: 256px 256px; opacity: .1; mix-blend-mode: screen; filter: invert(1);
+}
+.nw-plate { position: absolute; inset: 0; background: var(--ink-3) center / cover no-repeat; filter: grayscale(1); transform: scale(1.03); }
+.nw-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(0deg, rgba(10, 10, 10, .72) 0%, rgba(10, 10, 10, 0) 18%); }
+.nw-body {
+  position: relative; z-index: 2; padding: 1.55em 1.8em 3.4em;
+  background: linear-gradient(180deg, rgba(10, 10, 10, .95) 0%, rgba(10, 10, 10, .9) calc(100% - 2.9em), rgba(10, 10, 10, .5) calc(100% - 1.5em), rgba(10, 10, 10, 0) 100%);
+}
+.nw-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1em; }
+.nw-heads { min-width: 0; }
+.nw-kicker {
+  margin: 0 0 .35em; font: 500 .95em/1.2 'EB Garamond', 'Tajawal', Georgia, serif; color: var(--paper-dim);
+  font-variant-caps: all-small-caps; letter-spacing: .1em;
+}
+.nw-title {
+  margin: 0; font: 600 2.15em/1.05 'EB Garamond', 'Lalezar', Georgia, serif; color: var(--paper);
+  letter-spacing: .005em; text-shadow: 0 1px .6em rgba(0, 0, 0, .45); overflow-wrap: anywhere;
+}
+.nw-text {
+  margin: .4em 0 0; max-width: 94%; font: 400 1.02em/1.38 'EB Garamond', 'Amiri', Georgia, serif; color: #D5D5D5;
+  text-shadow: 0 1px .5em rgba(10, 10, 10, .9); overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.nw-date { margin: .55em 0 0; font: italic 400 .98em/1.2 'EB Garamond', 'Amiri', Georgia, serif; color: var(--paper-dim); }
+.nw-title.is-empty, .nw-text.is-empty { color: var(--paper-faint); }
+.nw-ico { flex: none; width: 1.6em; height: 1.6em; margin-top: .2em; color: var(--paper-dim); }
+.nw-dots { position: absolute; z-index: 2; left: 50%; bottom: 1.35em; transform: translateX(-50%); display: flex; align-items: center; gap: .5em; }
+.nw-dot { width: .5em; height: .5em; border-radius: 50%; background: rgba(242, 242, 242, .45); }
+.nw-dot.is-on { width: 1.8em; border-radius: .3em; background: var(--paper); }
+
+/* Arabic (menu.css "Arabic"): never letter-spaced, never small caps, never slanted.
+   The pause menu loads Amiri and Tajawal for the Arabic letters only (w_pausemenu/web/src/main.tsx), so the
+   spaces, figures and stops between its Arabic words are EB Garamond's, which are narrower. w_lib's Amiri and
+   Tajawal also carry Latin letters: EB Garamond goes first here (it has no Arabic letter, those fall to Amiri
+   / Tajawal), and the card's Arabic lines break where the pause menu's do. */
+.nw-card-wrap[dir='rtl'] .nw-kicker { font: 700 .86em/1.2 'EB Garamond', 'Tajawal', 'Noto Sans Arabic', sans-serif; letter-spacing: 0; font-variant-caps: normal; }
+.nw-card-wrap[dir='rtl'] .nw-title { font: 400 2em/1.25 'Lalezar', 'EB Garamond', 'Tajawal', 'Noto Sans Arabic', serif; letter-spacing: 0; }
+.nw-card-wrap[dir='rtl'] .nw-text { font-family: 'EB Garamond', 'Amiri', 'Noto Sans Arabic', Georgia, serif; font-size: 1.08em; line-height: 1.55; }
+/* menu.css sets only the size and the upright style here: the line stays 1.2 */
+.nw-card-wrap[dir='rtl'] .nw-date { font: normal 400 1.02em/1.2 'EB Garamond', 'Amiri', 'Noto Sans Arabic', Georgia, serif; }
+/* menu.css .pm-ar: no Latin spacing, caps or slant, and no line height of its own (an Arabic text on the
+   English card keeps the English card's lines, as in the pause menu) */
+.nw-ar { letter-spacing: 0; word-spacing: normal; font-variant-caps: normal; text-transform: none; font-style: normal; }
+.nw-title .nw-ar { font-weight: 400; }
+
+@media (max-width: 1100px) {
+  .nw-grid { grid-template-columns: minmax(0, 1fr); }
+  .nw-side { position: static; }
+  .nw-pair { grid-template-columns: minmax(0, 1fr); }
+}

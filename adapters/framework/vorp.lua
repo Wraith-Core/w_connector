@@ -121,4 +121,9 @@ function Vorp.offline(charId)
     return r and vorpRow(r) or nil
 end
 
+-- Raw, framework-owned definitions for the shared admin UI.
+function Vorp.consoleCatalog()
+    return { jobs = core().GetRegisteredJobs() }
+end
+
 WC.Adapters.register('framework', 'vorp', Vorp)

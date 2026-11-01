@@ -1,0 +1,118 @@
+{
+  "dashboard": {
+    "kpi": {
+      "online": {
+        "text": "How many players are in the server now, out of the most it accepts. Press it to open the player list.",
+        "example": "10 / 64 means 10 are in and there is room for 64"
+      },
+      "uptime": "How long the server has been running since its last start or restart. It goes back to zero after every restart; the start time is under it.",
+      "bans": "Bans that have not ended yet, timed and permanent. Press it to see the list and lift any of them.",
+      "blocks": "Characters that are suspended: the owner can still join the server but cannot play that character. Press it to see them.",
+      "scripts": "How many of the server's scripts are running. A stopped script means its feature may not work for players. Press it to open Resources."
+    },
+    "attention": "Players who may need you now: dead, hunger or thirst under 20, badly hurt, frozen or with a weak connection. Press a row to open their file.",
+    "filter": {
+      "all": "Shows everyone on the list, whatever the reason. The number beside each choice says how many players it has.",
+      "dead": "Only players who are dead and waiting for a revive. Revive them with the Revive button on their row.",
+      "low": "Only players whose hunger or thirst is under 20 of 100. Under the damage limit in the HUD settings (15 unless changed) their health starts dropping.",
+      "hurt": "Only living players whose health is under 20%. One more hit could kill them.",
+      "frozen": "Only players who are frozen in place. Remember to unfreeze them when you are done.",
+      "ping": "Only players with a weak connection, a ping of 200 ms or more. They may lag or drop; it usually comes from their own internet."
+    },
+    "col": {
+      "player": "The character name and the fixed citizen ID, then the session number (#). Press the row to open the player's file.",
+      "reason": "Why the player is listed: dead, low needs with the numbers, hurt, frozen or high ping.",
+      "action": "The quickest fix in one press. Actions follow your permissions; a locked one explains why it is unavailable.",
+      "when": {
+        "text": "When it happened, counted back from now.",
+        "example": "5 minutes ago"
+      },
+      "admin": "The staff member who did it, as saved in the admin log.",
+      "what": "What happened and to whom in a few words, with the line as the server kept it under it (the reason or the amount). Press the line to open the player or character."
+    },
+    "revive": {
+      "text": "Brings the dead player back to life on the spot with full health. They notice at once, and it is written in the admin log.",
+      "undo": "No, but it harms nobody"
+    },
+    "refill": {
+      "text": "Fills the player's hunger and thirst to 100. They see it on their status bars at once.",
+      "undo": "Not needed: hunger and thirst drop again over time"
+    },
+    "heal": {
+      "text": "Restores the living player's health to full. They notice at once.",
+      "undo": "No, but it harms nobody"
+    },
+    "unfreeze": {
+      "text": "Unfreezes the player so they can move again.",
+      "undo": "Yes, freeze them again from their file"
+    },
+    "open": "Opens the player's file on the Players page, with every action: travel, health, money, items and moderation.",
+    "world": "Changes the weather and time for every player at once and sends an announcement everyone sees. The full tools are on the Weather, time and notices page.",
+    "openWorld": "Opens the Weather, time and notices page, with every kind of weather, ready times of day and the latest changes.",
+    "recent": "The latest things staff did from this panel: who did what, to whom and when. It updates by itself.",
+    "openLog": "Opens the full admin log with search and filters, the last 500 actions.",
+    "shortcuts": "Quick links to pages your website role allows. Press the ? beside a link to learn what is there."
+  },
+  "label": {
+    "dashboard": {
+      "kpi": {
+        "online": "Online now",
+        "onlineSub": "Room for %s",
+        "uptime": "Uptime",
+        "uptimeSub": "Started at %s",
+        "uptimeSubDate": "Started %s",
+        "bans": "Active bans",
+        "bansSub": "Timed and permanent",
+        "blocks": "Suspended characters",
+        "blocksSub": "Owners can play others",
+        "scripts": "Scripts running",
+        "scriptsAll": "All running",
+        "scriptsStopped": "%s stopped",
+        "unknown": "Unknown"
+      },
+      "attention": "Needs attention",
+      "filter": {
+        "label": "Filter by reason",
+        "all": "All",
+        "dead": "Dead",
+        "low": "Low needs",
+        "hurt": "Hurt",
+        "frozen": "Frozen",
+        "ping": "Weak connection"
+      },
+      "reason": {
+        "dead": "Dead, waiting for a revive",
+        "low": "Hunger %s · thirst %s",
+        "hurt": "Health %s",
+        "frozen": "Frozen in place",
+        "ping": "Ping %s"
+      },
+      "col": {
+        "player": "Player",
+        "reason": "Reason",
+        "action": "Action",
+        "when": "When",
+        "admin": "Who",
+        "what": "What happened"
+      },
+      "act": {
+        "revive": "Revive",
+        "refill": "Refill",
+        "heal": "Heal",
+        "unfreeze": "Unfreeze",
+        "open": "Open file"
+      },
+      "allClear": "Nobody needs help right now.",
+      "noneHere": "Nobody in this group right now.",
+      "openPlayers": "Open the player list",
+      "world": "World now",
+      "openWorld": "All world tools",
+      "recent": "Recent admin actions",
+      "recentEmpty": "No actions logged yet.",
+      "openLog": "Open the admin log",
+      "shortcuts": "Shortcuts",
+      "palette": "Quick search",
+      "refresh": "Refresh"
+    }
+  }
+}

@@ -30,6 +30,8 @@ local KEYS = GAME == 'redm'
 local ID_DISTANCE = 150.0
 
 local state = { noclip = false, godmode = false, frozen = false, ids = false }
+local noclipSpeed = 1.0
+local noclipEntity, noclipPed
 local back = nil -- the last place we teleported away from
 local spect = nil -- { target, ped, saved, gen }
 local gen = 0
@@ -40,6 +42,7 @@ local function pressed(k) return IsControlPressed(0, k) or IsDisabledControlPres
 function WMenu.selfState()
     return { noclip = state.noclip, godmode = state.godmode, frozen = state.frozen, ids = state.ids, back = back ~= nil, spectating = spect ~= nil }
 end
+function WMenu.spectateTarget() return spect and spect.target or false end
 
 function WMenu.remember()
     local c = GetEntityCoords(ped())
@@ -89,19 +92,25 @@ end
 local function setNoclip(on)
     if on == state.noclip then return end
     state.noclip = on
-    if not on then return end
+    if not on then
+        gen = gen + 1
+        -- Restore synchronously: resource-stop handlers cannot wait for a worker's next frame.
+        if not spect then restoreEntity(noclipEntity); restoreEntity(noclipPed) end
+        noclipEntity, noclipPed = nil, nil
+        return
+    end
     gen = gen + 1
     local my = gen
     local p = ped()
     local e = flyingEntity()
+    noclipEntity, noclipPed = e, p
     CreateThread(function()
-        local speed = 1.0
         while state.noclip and gen == my and DoesEntityExist(e) do
             local rot = GetGameplayCamRot(2)
             local yaw, pitch = math.rad(rot.z), math.rad(rot.x)
             local fx, fy, fz = -math.sin(yaw) * math.cos(pitch), math.cos(yaw) * math.cos(pitch), math.sin(pitch)
             local rx, ry = math.cos(yaw), math.sin(yaw)
-            local step = math.min(GetFrameTime(), 0.05) * 12.0 * speed * (pressed(KEYS.fast) and 4 or 1)
+            local step = math.min(GetFrameTime(), 0.05) * 12.0 * noclipSpeed * (pressed(KEYS.fast) and 4 or 1)
             local lr, ud = GetDisabledControlNormal(0, KEYS.moveX), GetDisabledControlNormal(0, KEYS.moveY)
             local vz = (pressed(KEYS.up) and 1 or 0) - (pressed(KEYS.down) and 1 or 0)
             if WMenu.open then lr, ud, vz = 0, 0, 0 end
@@ -124,11 +133,11 @@ local function setNoclip(on)
             Wait(0)
         end
         -- Spectate took over the ped (it hides and parks it itself): leave it alone.
-        if not spect then
+        if gen == my and not spect then
             restoreEntity(e)
             if e ~= p then restoreEntity(p) end
         end
-        if gen == my then state.noclip = false end
+        if gen == my then state.noclip = false; noclipEntity, noclipPed = nil, nil end
     end)
 end
 
@@ -243,7 +252,7 @@ function WMenu.stopSpectate()
     SetEntityCollision(p, true, true)
     SetEntityVisible(p, true)
     SetEntityInvincible(p, state.godmode)
-    WMenu.self('spectate.stop', { target = s.target }, function() end)
+    TriggerServerEvent('w_connector:console:modeOff', 'player.spectate')
 end
 
 local function near(c)
@@ -315,6 +324,30 @@ end
 
 -- ── The menu's self actions ───────────────────────────────────────────────────────────────────────
 local TOGGLES = { ['self.noclip'] = setNoclip, ['self.godmode'] = setGod, ['self.freeze'] = setFrozen, ['self.viewids'] = setIds }
+
+-- Called by the signed console execution reply. The legacy menu still uses runSelf below;
+-- both paths share these implementations instead of maintaining two flight/spectate systems.
+function WMenu.applySelf(action, d)
+    d = d or {}
+    local toggle = TOGGLES[action]
+    if toggle then toggle(d.on == true); return { ok = true, active = d.on == true } end
+    if action == 'self.noclipSpeed' then noclipSpeed = tonumber(d.speed) or 1; return { ok = true } end
+    if action == 'self.tpWaypoint' then
+        local x, y = waypoint()
+        if not x then return { ok = false, error = 'no_waypoint' } end
+        return { ok = teleport(x, y, nil), error = 'no_ground' }
+    elseif action == 'self.tpCoords' then
+        return { ok = teleport(d.x, d.y, d.z), error = 'no_ground' }
+    elseif action == 'self.tpBack' then
+        if not back then return { ok = false, error = 'nothing_to_return_to' } end
+        local saved = back
+        return { ok = teleport(saved.x, saved.y, saved.z), error = 'no_ground' }
+    elseif action == 'self.stopSpectate' then WMenu.stopSpectate(); return { ok = true }
+    end
+    return { ok = false, error = 'unknown_action' }
+end
+WMenu.drawWorldText = drawText
+WMenu.entityControl = control
 
 --- Run one self action for the page: OFF at once, anything else after the server says yes.
 function WMenu.runSelf(action, d, cb)

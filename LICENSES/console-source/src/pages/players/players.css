@@ -1,0 +1,86 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · pages/players/players.css  (prefix pl-)
+ * Only what the kit does not already give the Players page. Tokens only; red only for the
+ * destructive outline of Kick / Ban (filled only inside the confirm dialog) and critical states.
+ * Chrome 87: no :has(), no container queries, no aspect-ratio.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── the list ───────────────────────────────────────────────────────────── */
+.pl-list { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+
+.pl-toolbar { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: .625rem .875rem; margin-bottom: .875rem; }
+.pl-toolbar > .pl-search { flex: 1 1 16rem; max-width: 24rem; }
+.pl-toolbar > .pl-search .k-input { flex: 1; }
+.pl-toolbar-end { margin-inline-start: auto; display: inline-flex; align-items: center; gap: .75rem; }
+.pl-count { font-size: var(--fs-135); color: var(--paper-faint); white-space: nowrap; }
+
+/* the option "؟" of the column switch shows on hover, focus and in help mode (like the chips) */
+.pl-mode .k-seg-item:not(:hover) .k-seg-help, .pl-seg .k-seg-item:not(:hover) .k-seg-help { visibility: hidden; }
+.pl-mode .k-seg-help:focus-visible, .pl-seg .k-seg-help:focus-visible,
+html.k-help-mode .pl-mode .k-seg-help, html.k-help-mode .pl-seg .k-seg-help { visibility: visible; }
+
+.pl-table { border-top: 1px solid var(--rule); }
+.pl-table .k-table td { font-size: var(--fs-145); }
+.pl-table th.pl-col-cid, .pl-table td.pl-col-cid { width: 1%; white-space: nowrap; }
+
+.pl-cid { display: inline-flex; align-items: baseline; gap: .5rem; white-space: nowrap; }
+.pl-cid b { font-size: var(--fs-16); color: var(--paper); }
+.pl-sid { font-size: var(--fs-12); color: var(--paper-faint); }
+
+.pl-name, .pl-job { display: block; min-width: 0; }
+/* page CSS loads before the kit's: equal-specificity rules would lose, hence the double classes */
+.pl-name .pl-name-main { display: flex; align-items: center; gap: .375rem; }
+.pl-name .pl-name-text { flex: none; }
+.pl-tag { flex: none; font-weight: 700; }
+
+.pl-status { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .25rem .75rem; }
+.pl-ping-bad { color: var(--paper); font-weight: 700; }
+.pl-ping-bad::after { content: ''; display: inline-block; width: .4rem; height: .4rem; margin-inline-start: .375rem; border: 1.5px solid var(--paper); vertical-align: middle; }
+
+/* ── the file (drawer) ──────────────────────────────────────────────────── */
+/* six sections must fit one row: each tab's "؟" sits inside the tab's end padding instead of
+   after it (still a sibling of the tab button, never inside it) */
+.pl-drawer .k-tabs { gap: 0; }
+.pl-drawer .k-tab-wrap { gap: 0; flex: none; }
+.pl-drawer .k-tab { padding-inline: .5rem 1.5rem; }
+.pl-drawer .k-tab-wrap .k-tab-help { position: absolute; top: 50%; inset-inline-end: .3125rem; margin: -.5rem 0 0; z-index: 1; }
+/* a section above the admin's level: a small lock over the tab's start corner, taking no width */
+.pl-drawer .k-tab-badge { position: absolute; top: .3125rem; inset-inline-start: .0625rem; border: 0; padding: 0; line-height: 1; display: inline-flex; }
+.pl-drawer .pl-tab-lock { width: .625rem; height: .625rem; opacity: .8; }
+
+/* the three fixed actions stay on one row; the note gives way */
+.pl-drawer .k-drawer-foot-actions { flex-wrap: nowrap; flex: none; }
+.pl-drawer .k-drawer-foot-note { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: end; }
+.pl-sub-account { max-width: 14rem; }
+
+.pl-note { font-size: var(--fs-13); color: var(--paper-faint); line-height: 1.5; }
+.pl-section-note { margin-top: .5rem; }
+
+.pl-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem 1rem; }
+.pl-grid-pick { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: .75rem 1rem; }
+.pl-grid-item { display: grid; grid-template-columns: minmax(0, 1fr) 8.5rem; gap: .75rem 1rem; align-items: start; }
+
+/* Kick / Ban: the kit's danger button, a red underline under the label (kind="danger" helpDanger={false}: both can be lifted) */
+
+/* narrow screens (1280×720 with the file open): the essential columns must fit without scrolling
+   sideways, so ping and distance step back (both stay in the file's Profile section), the bars get
+   shorter and a low value is underlined in red as well (red marks, it never colours text) */
+@media (max-width: 1500px) {
+  .pl-toolbar > .pl-search { flex-basis: 12rem; max-width: none; }
+  .pl-grid-2 { grid-template-columns: minmax(0, 1fr); }
+  .pl-page.has-drawer .pl-table .k-meter-bar { width: 1.75rem; }
+  .pl-page.has-drawer .pl-table .k-meter.is-low b { box-shadow: inset 0 -2px 0 var(--red); }
+  .pl-page.has-drawer .pl-table-essential .pl-col-ping,
+  .pl-page.has-drawer .pl-table-essential .pl-col-dist { display: none; }
+  .pl-page.has-drawer .pl-table .k-table th, .pl-page.has-drawer .pl-table .k-table td { padding-inline: .5rem; }
+  /* long names and jobs are cut with an ellipsis, only here */
+  .pl-page.has-drawer .pl-name, .pl-page.has-drawer .pl-job { overflow: hidden; }
+  .pl-page.has-drawer .pl-name { width: 10rem; }
+  .pl-page.has-drawer .pl-job { width: 7rem; }
+  .pl-page.has-drawer .pl-name-text { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .pl-page.has-drawer .pl-name .pl-name-sub, .pl-page.has-drawer .pl-job .k-cell-main, .pl-page.has-drawer .pl-job .k-cell-sub { overflow: hidden; text-overflow: ellipsis; }
+  .pl-page.has-drawer .pl-table td .k-status { white-space: normal; max-width: 6.5rem; line-height: 1.25; }
+}
+
+/* a second, quieter line inside a confirm dialog (on paper) */
+.pl-dialog-sub { margin-top: .375rem; color: var(--note-dim); font-size: var(--fs-14); }

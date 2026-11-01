@@ -1,0 +1,220 @@
+{
+  "ranks": {
+    "tabRanks": "The ranks and what each one allows. Pick a rank to edit its name, colour and permissions, or create a new one.",
+    "tabStaff": "Who holds which rank. Give a rank to a player or take it away, online or not.",
+    "list": "Every rank, highest order first. Press a rank to open it in the editor.",
+    "col": {
+      "rank": "The rank's display name and colour, with the fixed name the server uses under it.",
+      "members": "How many people hold this rank now."
+    },
+    "new": "Opens an empty editor for a new rank. Nothing is saved until you press Create rank.",
+    "editor": "Edit one of the website roles. Member permissions refresh automatically after saving.",
+    "editorNew": "A new rank: give it a fixed name, a display name, a colour and an order, then switch on the permissions it should have.",
+    "name": {
+      "text": "The fixed name of the rank: lowercase letters, digits and _, starting with a letter, 2 to 32 long. It cannot change after the rank is created.",
+      "example": "moderator"
+    },
+    "label": "The displayed rank name, 1 to 60 characters.",
+    "color": {
+      "text": "The rank's colour as #rrggbb. It shows as a dot beside its name in the panel.",
+      "example": "#c0392b"
+    },
+    "colorPreset": "Ready colours: pick one and the colour box fills with it.",
+    "sort": "The rank's order, 0 to 999. A higher number is listed first.",
+    "master": "This role exceeds your delegable permissions. You cannot edit, delete or assign it.",
+    "danger": "This role includes sensitive actions such as money changes or role management. Check the person and selected permissions.",
+    "perms": "The permissions the rank gives. Each switch opens one thing in the scripts or the commands.",
+    "permSearch": "Filters the permissions by name, description or key. Example: type ban.",
+    "group": "A group of related permissions. Switch on only the ones the rank needs.",
+    "node": "One permission. When it is on, everyone with the rank can use it.",
+    "custom": "Enter only a website or reported script permission you may delegate. This field cannot create global administrative authority.",
+    "customInput": {
+      "text": "A permission available to you, up to 146 characters. Example: w_stables:w_stables.admin.",
+      "example": "w_stables:w_stables.admin"
+    },
+    "customAdd": "Adds the typed permission to the rank. It is kept only when you save.",
+    "customRemove": "Removes this permission from the rank. It is kept only when you save.",
+    "save": {
+      "text": "Saves the rank and applies it at once to everyone who holds it.",
+      "undo": "Yes, edit it and save again"
+    },
+    "discard": "Puts the fields back to the last saved version without saving anything.",
+    "cancelNew": "Closes the new rank editor without creating the rank.",
+    "delete": {
+      "text": "Deletes the rank for good and takes it from everyone who holds it.",
+      "undo": "No, you would have to create it again and give it out again"
+    },
+    "confirmDelete": "Confirms deleting the rank. When it has members you type its fixed name, so it is not deleted by mistake.",
+    "discardChanges": "You have unsaved changes on the current rank. They are lost if you go on.",
+    "loadFailed": "Could not load the website roles. Check the connector link and try again.",
+    "saveFailed": "The server refused the save and nothing changed. Read the reason, fix the field and save again.",
+    "staff": {
+      "search": "Filters the list by name, identifier or rank name.",
+      "filter": {
+        "all": "Everyone who holds a rank, online or not.",
+        "online": "Only those in the server right now.",
+        "offline": "Only those not in the server right now."
+      },
+      "col": {
+        "name": "The person and Discord identifier used by their website roles.",
+        "online": "Online now with the session number, or offline.",
+        "ranks": "The person’s roles. The × removes a role; a lock means it exceeds your management authority.",
+        "give": "Pick a rank and press Give to add it to this person at once."
+      },
+      "revoke": {
+        "text": "Remove this website role. Permissions refresh automatically, and disallowed actions fail their next authorization check.",
+        "undo": "Yes, give the rank again"
+      },
+      "locked": "This role exceeds your delegable permissions. You cannot edit, delete or assign it.",
+      "give": "Choose an online player or paste a Discord user ID, then select the website role to assign.",
+      "source": "How to pick the person: from those online now, or by typing the identifier of someone offline.",
+      "player": "The online player to give the rank to. Search by name, session number or citizen ID.",
+      "identifier": {
+        "text": "The Discord user ID. Enable Discord developer mode and copy the user ID; digits alone are accepted.",
+        "example": "123456789012345678"
+      },
+      "idName": "A name to show in the staff list until the person joins. Optional.",
+      "rank": "The rank to give.",
+      "giveBtn": {
+        "text": "Gives the rank to the chosen person; its permissions open for them at once.",
+        "undo": "Yes, take it back from the staff list"
+      },
+      "confirmGive": "Confirms giving a powerful rank. Make sure of the person before you go on.",
+      "confirmRevoke": "Confirms taking the rank from the person."
+    }
+  },
+  "label": {
+    "ranks": {
+      "tabs": "Ranks sections",
+      "tabRanks": "Ranks",
+      "tabStaff": "Staff",
+      "refresh": "Refresh",
+      "new": "New rank",
+      "listLabel": "Rank list",
+      "col": {
+        "rank": "Rank",
+        "members": "Members"
+      },
+      "protected": "Protected",
+      "count": "Ranks: %s",
+      "newTitle": "New rank",
+      "unsaved": "Unsaved",
+      "name": "Fixed name",
+      "namePh": "e.g. moderator",
+      "nameHint": "Lowercase letters, digits and _, starting with a letter (2 to 32). It cannot change later.",
+      "nameBad": "The name does not match the rule",
+      "nameTaken": "A rank with this name already exists",
+      "label": "Display name",
+      "labelPh": "e.g. Moderator",
+      "labelBad": "Write 1 to 64 characters",
+      "color": "Colour",
+      "colorBad": "Write the colour as #rrggbb",
+      "colorPreset": "Ready colours",
+      "colors": {
+        "red": "Red",
+        "orange": "Orange",
+        "gold": "Gold",
+        "green": "Green",
+        "teal": "Teal",
+        "blue": "Blue",
+        "purple": "Purple",
+        "pink": "Pink",
+        "brown": "Brown",
+        "grey": "Grey"
+      },
+      "sort": "Order",
+      "sortBad": "A whole number from 0 to 999",
+      "members": "Members: %s",
+      "masterTitle": "The master rank",
+      "masterText": "It holds every permission and is managed only by the server config and the panel's master. It cannot be edited or deleted here.",
+      "everything": "Every permission",
+      "dangerTitle": "Powerful permissions",
+      "dangerText": "The rank includes %s. These open almost everything, so give it only to people you trust.",
+      "perms": "Permissions",
+      "permsOn": "%s of %s on",
+      "permSearch": "Search permissions…",
+      "noMatch": "No permission matches this search.",
+      "danger": "Dangerous",
+      "noCatalog": "The server sent no permission list. You can still add permissions by hand below.",
+      "custom": "Extra permissions",
+      "customPh": "e.g. w_stables.admin",
+      "customAdd": "Add",
+      "customNone": "No extra permissions.",
+      "customBad": "Bad format: letters, digits and _ . - only, 64 characters at most",
+      "customReserved": "Reserved: it cannot start with wranks. or wrank.",
+      "customHave": "Already in the rank",
+      "customGroup": "Joins the group %s",
+      "tooMany": "200 permissions at most per rank",
+      "remove": "Remove %s",
+      "save": "Save",
+      "create": "Create rank",
+      "discard": "Discard",
+      "cancel": "Cancel",
+      "delete": "Delete rank",
+      "deleteTitle": "Delete the rank %s?",
+      "deleteText": "The rank is deleted for good.",
+      "deleteMembers": "It is also taken from everyone who holds it (%s).",
+      "deleteConfirm": "Delete",
+      "discardTitle": "Drop your changes?",
+      "discardText": "You have unsaved changes on this rank. They are lost if you go on.",
+      "discardConfirm": "Drop changes",
+      "loadFailed": "Could not load the ranks",
+      "retry": "Try again",
+      "pickRank": "Pick a rank from the list to edit it, or create a new one.",
+      "none": "No ranks yet.",
+      "needFix": "Fix the marked fields before saving",
+      "staff": {
+        "search": "Search by name, identifier or rank…",
+        "filters": "Staff filters",
+        "filter": {
+          "all": "All",
+          "online": "Online",
+          "offline": "Offline"
+        },
+        "listLabel": "Staff",
+        "col": {
+          "name": "Person",
+          "online": "Status",
+          "ranks": "Ranks",
+          "give": "Give a rank"
+        },
+        "online": "Online · #%s",
+        "locked": "Outside your authority",
+        "revoke": "Take %s",
+        "revokeTitle": "Take the rank %s from %s?",
+        "revokeText": "Permissions refresh automatically after removal.",
+        "revokeConfirm": "Take the rank",
+        "give": "Give a rank",
+        "sourceLabel": "Pick by",
+        "from": {
+          "online": "Online player",
+          "identifier": "Identifier"
+        },
+        "player": "Player",
+        "playerPh": "Pick an online player",
+        "playerSub": "#%s · citizen ID %s",
+        "noOnline": "No players online",
+        "identifier": "Discord user ID",
+        "identifierBad": "Enter a Discord user ID of 15 to 21 digits.",
+        "idName": "Name (optional)",
+        "idNamePh": "Shown until they join",
+        "rank": "Rank",
+        "rankPh": "Pick a rank",
+        "giveBtn": "Give",
+        "already": "Already holds this rank",
+        "hasRanks": "Current ranks",
+        "noRanks": "No ranks",
+        "giveTitle": "Give the rank %s to %s?",
+        "giveText": "This role includes sensitive actions such as money changes or role management. Check the person and selected permissions.",
+        "giveConfirm": "Give the rank",
+        "none": "Nobody holds a rank yet.",
+        "noneNext": "Pick a player above and give them a rank.",
+        "noMatch": "Nobody matches this search.",
+        "clear": "Clear search",
+        "showing": "Showing %s of %s",
+        "pick": "Rank…",
+        "rowGive": "Give"
+      }
+    }
+  }
+}

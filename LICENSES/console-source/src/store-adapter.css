@@ -1,0 +1,37 @@
+/* Store appearance, with the interface's geometry and interaction regions retained. */
+.wst-panel::after,.wst-button::after,.wst-tab::after,.wst-card::after { display:none!important; }
+.wst-button,.wst-tab,.wst-card { text-shadow:none!important; }
+.wst-frame { flex:none; }
+body.wst-root { --font-body:var(--wst-f-body);--font-display:var(--wst-f-display);--font-number:var(--wst-f-num);--wc-gold:var(--wst-gold);--wc-ok:var(--wst-ok); }
+.wa-ground { display:none; }
+.wa-root .wa-nav,.wa-root .wa-main,.wa-root .wa-body { background:transparent; }
+.wa-head.wst-header,.qa-header.wst-header { text-align:start; }
+.wa-head-title.wst-title { font-size:clamp(22px,2.8vh,32px); }
+.wa-head-description.wst-sub { font-size:clamp(13px,1.6vh,18px); }
+.wa-dialog-veil { background:transparent!important;backdrop-filter:none!important; }
+.wa-dialog-band.wst-header { padding:clamp(16px,2.2vh,26px) clamp(20px,2.5vw,34px); }
+.wa-dialog-title.wst-title { font-size:clamp(22px,2.8vh,32px); }
+.qa-groups .wst-tab { min-height:38px;padding:6px 10px; }
+.qa-row.wst-card { text-align:start; }
+.qa-root input:not([type=checkbox]):not([type=range]),.qa-root select,.qa-root textarea { font-family:var(--wst-f-body);background:#1f1f1f;color:#fff;border:0;border-radius:0; }
+.qa-search input { background:transparent!important; }
+.wa-root .wa-tab { border:0; }
+.wa-root .wa-brand-mark,.qa-brand { background:transparent; }
+.wa-root .wa-brand-mark::before,.qa-brand::before { background:var(--wst-red); }
+.wst-root.is-rtl { font-family:var(--wst-f-ar); }
+
+.wa-root .wst-plate,.qa-root .wst-plate { position:relative; }
+
+.qa-root .qa-close { position:relative; }
+
+/* Window density follows screen height, not ultrawide width. Native world surfaces remain unscaled. */
+:root { --w-ui-scale:1; }
+@media(min-height:1300px){:root{--w-ui-scale:1.333333}}
+@media(min-height:1800px){:root{--w-ui-scale:2}}
+
+html { font-size:clamp(5px,.59vh,14px); }
+.wa-root { inset:4vh max(3vw,calc((100vw - 166vh)/2)); }
+.wa-head-title.wst-title,.wa-dialog-title.wst-title { font-size:clamp(22px,2.8vh,64px); }
+.wa-head-description.wst-sub { font-size:clamp(13px,1.6vh,36px); }
+.qa-floating { zoom:var(--w-ui-scale);top:calc(4.5vh / var(--w-ui-scale));bottom:calc(4.5vh / var(--w-ui-scale));right:calc(2.5vw / var(--w-ui-scale));width:clamp(380px,calc(27vw / var(--w-ui-scale)),470px);max-width:calc(95vw / var(--w-ui-scale)); }
+.qa-embedded { zoom:var(--w-ui-scale); }

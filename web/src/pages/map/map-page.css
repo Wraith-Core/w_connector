@@ -1,0 +1,56 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · pages/map/map-page.css
+ * The map at the reading start, the side panel (24 rem) at the end; a compact toolbar above the
+ * map. Each part scrolls on its own. Tokens only.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.mp-root { display: grid; grid-template-columns: minmax(0, 1fr) 24rem; height: 100%; min-height: 0; }
+.mp-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+
+.mp-toolbar { flex: none; margin: 0; padding: .5rem 1rem; border-bottom: 1px solid var(--rule); gap: .375rem .5rem; }
+.mp-group { display: inline-flex; align-items: center; gap: .375rem; }
+.mp-sep { align-self: stretch; width: 1px; margin: .25rem .125rem; background: var(--rule); }
+.mp-layer.k-btn { gap: .4375rem; }
+.mp-layer .k-shape-sq, .mp-layer .k-shape-hollow { margin-inline-end: .4375rem; vertical-align: .05em; }
+.mp-layer.k-btn.is-on { color: var(--paper); border-color: var(--rule-2); }
+/* under the cursor a shown layer takes the kit's band like any button: ink words */
+.mp-layer.k-btn.is-on:hover:not(:disabled), .mp-layer.k-btn.is-on:focus-visible { color: var(--ink); border-color: transparent; }
+.mp-cursor { margin-inline-start: auto; display: inline-flex; align-items: center; gap: .375rem; font-size: var(--fs-13); color: var(--paper-faint); white-space: nowrap; }
+.mp-cursor .k-num { min-width: 9.5rem; text-align: end; }
+
+.mp-canvas { flex: 1; min-height: 0; position: relative; display: flex; }
+.mp-canvas > .mc-map { flex: 1; }
+.mp-canvas > .k-empty { flex: 1; }
+
+/* ── side panel ─────────────────────────────────────────────────────────── */
+.mp-side { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--ink-2); border-inline-start: 1px solid var(--rule-2); }
+.mp-tabs { flex: none; padding: .375rem 1rem 0; }
+.mp-filters { flex: none; display: flex; flex-direction: column; gap: .5rem; padding: .75rem 1rem .625rem; }
+.mp-filters > .k-ctlwrap { display: flex; width: 100%; }
+.mp-filters > .k-ctlwrap > .k-input { flex: 1; }
+.mp-table { flex: 1; min-height: 5.5rem; border-top: 1px solid var(--rule); }
+.mp-table .k-table th { background: var(--ink-2); }
+.mp-table .k-table td { padding: 0 .625rem; }
+.mp-table tr.is-dead .k-cell-main { color: var(--paper-dim); }
+.mp-hint { flex: none; padding: .875rem 1rem; border-top: 1px solid var(--rule-2); font-size: var(--fs-13); color: var(--paper-faint); line-height: 1.5; }
+
+/* the picked player */
+.mp-card {
+  flex: none; max-height: 62%; overflow-y: auto; display: flex; flex-direction: column; gap: .5rem;
+  padding: .75rem 1rem .875rem; background: var(--ink-3); border-top: 1px solid var(--rule-2);
+}
+.mp-card-head { display: flex; align-items: flex-start; gap: .5rem; }
+.mp-card-titles { flex: 1; min-width: 0; }
+.mp-card-name { display: flex; align-items: center; gap: .375rem; font: 700 var(--fs-18)/1.25 var(--f-ui); color: var(--paper); min-width: 0; }
+.mp-card-ids { display: flex; flex-wrap: wrap; gap: .125rem .75rem; margin-top: .125rem; font-size: var(--fs-13); color: var(--paper-dim); }
+.mp-card-ids b { color: var(--paper); }
+.mp-card-chips { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; }
+.mp-card .k-kv { min-height: 2.125rem; }
+.mp-card-acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .375rem .5rem; }
+.mp-card-acts > .k-btnwrap { min-width: 0; }
+.mp-card-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; padding-top: .25rem; }
+
+/* tools tab */
+.mp-tools { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding: 1rem; }
+.mp-tools .k-section-body > .k-btnwrap { margin-top: .625rem; }
+.mp-tools-block { padding-top: 1rem; border-top: 1px solid var(--rule); }

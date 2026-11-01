@@ -1,0 +1,61 @@
+{
+  "reports": {
+    "search": "Filters the reports by what you type: the sender, the title, the text or the number.",
+    "filter": {
+      "open": "New reports nobody on the staff has taken yet.",
+      "claimed": "Reports a staff member took and is working on.",
+      "resolved": "Closed reports. They stay here for review and can be reopened.",
+      "all": "Every report: new, taken and closed."
+    },
+    "col": {
+      "id": "The report number. The same number as on the website Reports page.",
+      "who": "The player who sent the report, with its title under the name.",
+      "status": "The report state: new, taken or closed.",
+      "by": "The staff member who took the report.",
+      "at": "When the report was sent."
+    },
+    "drawer": "The report and its messages. What you write here shows on the website too, and reaches the player in chat when he is on.",
+    "claim": "Takes the report under your name, so the other staff see you are on it.",
+    "resolve": "Closes the report. The note you write is kept with it.",
+    "reopen": "Opens a closed report again, back among the new ones.",
+    "against": "The player the report is about, when it names one.",
+    "thread": "The report messages in order: the player and the staff, from the game and the website.",
+    "reply": "A written answer. It is kept with the report and reaches the player in chat when he is on.",
+    "send": "Sends the answer and adds it to the report messages.",
+    "notes": "A staff-only note kept with the report when it is closed. The player does not see it."
+  },
+  "label": {
+    "reports": {
+      "search": "Search the reports",
+      "filters": "Report state",
+      "listLabel": "The reports",
+      "none": "No reports",
+      "unknown": "Unknown player",
+      "untitled": "Untitled report",
+      "status": {
+        "open": "New",
+        "claimed": "Taken",
+        "resolved": "Closed"
+      },
+      "filter": {
+        "all": "All"
+      },
+      "col": {
+        "id": "No.",
+        "who": "Sender",
+        "status": "State",
+        "by": "Taken by",
+        "at": "Sent"
+      },
+      "claim": "Take",
+      "resolve": "Close",
+      "reopen": "Reopen",
+      "against": "Against",
+      "thread": "Messages",
+      "system": "System",
+      "reply": "Answer",
+      "send": "Send answer",
+      "notes": "Closing note"
+    }
+  }
+}

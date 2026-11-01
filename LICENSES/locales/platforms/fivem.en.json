@@ -1,0 +1,13 @@
+{
+  "label.quick.group.vehicle": "Vehicle",
+  "label.tools.section.vehicle": "Vehicle",
+  "label.tools.kind.wagons": "Vehicles",
+  "label.tools.tool.repairVehicle": "Repair vehicle",
+  "label.tools.tool.flipVehicle": "Flip vehicle upright",
+  "label.tools.tool.vehicleBoost": "Vehicle speed burst",
+  "label.tools.tool.deleteVehicle": "Delete nearby vehicle",
+  "label.tools.hint.repairVehicle": "Your vehicle or the nearest empty one",
+  "label.tools.hint.deleteVehicle": "An empty vehicle within 6 metres",
+  "label.tools.confirm.deleteVehicle": "The nearby empty vehicle will be deleted. Get out first.",
+  "label.tools.confirm.deleteYes": "Delete vehicle"
+}

@@ -1,0 +1,150 @@
+{
+  "common": {
+    "citizenId": {
+      "text": "Type the player's fixed citizen ID, like 12. For the current session number put # in front, like #5. Old IDs like OMG95204 still work.",
+      "example": "12, #5 or OMG95204"
+    },
+    "serverId": "The session number changes every time the player joins, so we rely on the citizen ID. If you need it, put # in front, like #5.",
+    "copy": "Copies the value so you can paste it somewhere else, like a message or a command. Changes nothing.",
+    "confirm": "Carries out the action written in this window now. Read it before you press; some actions cannot be undone.",
+    "cancel": "Closes the window without doing anything.",
+    "close": "Closes this panel. Nothing you did or saved is cancelled.",
+    "typeToConfirm": {
+      "text": "Protection against a slip: type the requested text exactly, then the confirm button unlocks.",
+      "example": "To delete character 14, type 14"
+    },
+    "save": {
+      "text": "Saves your changes and applies them to every player at once, without a restart.",
+      "undo": "Yes, by setting the value back or with Restore"
+    },
+    "discard": "Throws away the changes you have not saved and puts the values back. Nothing changes on the server.",
+    "resetDefault": {
+      "text": "Puts this setting back to the value the script came with.",
+      "undo": "Yes, type your value again and save"
+    },
+    "search": "Filters the list by what you type: a name, a number or a word from the text.",
+    "density": "Essential shows only the important columns; Detailed adds more, like money and health. It changes your view only.",
+    "level": "Levels from lowest to highest: mod, then admin, then god. Each level can do everything below it.",
+    "locked": "This is locked because your level is lower than required. Ask the owner to raise your level if you need it.",
+    "refresh": "Fetches the latest data from the server now instead of waiting for the automatic update.",
+    "coords": {
+      "text": "A spot on the map as three numbers X, Y and Z. You can paste text like vector3(1.0, 2.0, 3.0) and it splits by itself.",
+      "example": "vector3(-175.3, 626.8, 113.2)"
+    },
+    "duration": "How long the penalty lasts. After that things return automatically; Permanent lasts until you lift it yourself.",
+    "reason": "The reason is shown to the player and kept in the log. Write something clear, or pick a ready reason.",
+    "dismiss": "Hides this notice. Nothing changes on the server.",
+    "unsaved": "How many values you changed and have not saved. Players only get them after Save and apply.",
+    "status": "The player's state now: Well, Low needs when hunger or thirst is under 20, Dead, or Frozen when staff are holding them in place.",
+    "retry": "Tries to fetch the data from the server again.",
+    "refresh": "Fetches the latest copy of this list from the server now. Changes nothing for players."
+  },
+  "label": {
+    "common": {
+      "whatIsThis": "What is this?",
+      "pinned": "Pinned · Esc to close",
+      "needsLevel": "Needs level",
+      "orHigher": "%s or higher",
+      "canUndo": "Can it be undone?",
+      "noUndo": "Cannot be undone",
+      "allowed": "Allowed",
+      "range": "%s to %s",
+      "default": "Default",
+      "example": "Example",
+      "appliesTo": "Applies to",
+      "noHelp": "No explanation",
+      "helpFor": "Explain: %s",
+      "level": {
+        "mod": "Moderator (mod)",
+        "admin": "Admin",
+        "god": "Owner (god)",
+        "owner": "Server owner",
+        "master": "Master"
+      },
+      "on": "On",
+      "off": "Off",
+      "yes": "Yes",
+      "no": "No",
+      "copy": "Copy",
+      "copied": "Copied",
+      "confirm": "Confirm",
+      "cancel": "Cancel",
+      "close": "Close",
+      "save": "Save and apply to everyone",
+      "saving": "Saving…",
+      "discard": "Discard",
+      "unsaved": "You have %s unsaved changes",
+      "unsavedN": {
+        "one": "You have 1 unsaved change",
+        "two": "You have 2 unsaved changes",
+        "few": "You have %s unsaved changes",
+        "many": "You have %s unsaved changes"
+      },
+      "refresh": "Refresh",
+      "reset": "Restore",
+      "dirty": "Changed",
+      "typeToConfirm": "To confirm, type: %s",
+      "cannotUndo": "This action cannot be undone",
+      "search": "Search…",
+      "empty": "Nothing here",
+      "loading": "Loading…",
+      "loadError": "Could not load",
+      "retry": "Try again",
+      "locked": "Locked",
+      "lockedNeeds": "Needs %s",
+      "essential": "Essential",
+      "detail": "Detailed",
+      "chooseOne": "Choose…",
+      "noMatch": "No match",
+      "restartNeeded": "Needs a restart",
+      "citizen": {
+        "label": "Citizen ID",
+        "placeholder": "e.g. 12 or #5",
+        "online": "Online · #%s",
+        "offline": "Offline",
+        "invalid": "Invalid citizen ID",
+        "notFound": "No player with this ID",
+        "checking": "Looking up…",
+        "server": "Session %s"
+      },
+      "coords": {
+        "x": "X",
+        "y": "Y",
+        "z": "Z",
+        "h": "Heading",
+        "paste": "Paste vector3 or vector4 here"
+      },
+      "duration": {
+        "permanent": "Permanent",
+        "custom": "Other length",
+        "unitMinutes": "minutes",
+        "unitHours": "hours",
+        "unitDays": "days"
+      },
+      "reason": {
+        "placeholder": "Write the reason…",
+        "templates": "Ready reasons"
+      },
+      "status": {
+        "ok": "Well",
+        "low": "Low needs",
+        "dead": "Dead",
+        "frozen": "Frozen",
+        "blocked": "Suspended",
+        "offline": "Offline",
+        "online": "Online",
+        "stopped": "Stopped",
+        "running": "Running"
+      },
+      "unit": {
+        "day": { "one": "day", "two": "days", "few": "days", "many": "days" },
+        "hour": { "one": "hour", "two": "hours", "few": "hours", "many": "hours" },
+        "minute": { "one": "minute", "two": "minutes", "few": "minutes", "many": "minutes" },
+        "second": { "one": "second", "two": "seconds", "few": "seconds", "many": "seconds" }
+      },
+      "gold": "gold",
+      "ago": "%s ago",
+      "justNow": "just now"
+    }
+  }
+}

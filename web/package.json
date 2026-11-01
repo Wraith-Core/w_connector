@@ -1,0 +1,26 @@
+{
+  "name": "w_admin",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "help:keys": "node scripts/gen-help-keys.mjs",
+    "help:check": "node scripts/gen-help-keys.mjs && node scripts/check-help.mjs",
+    "typecheck": "node scripts/gen-help-keys.mjs && tsc --noEmit",
+    "build": "node scripts/gen-help-keys.mjs && node scripts/check-help.mjs && tsc && vite build",
+    "build:mock": "node scripts/gen-help-keys.mjs && tsc && vite build --mode mock",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  }
+}

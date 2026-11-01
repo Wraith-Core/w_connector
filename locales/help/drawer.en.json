@@ -1,0 +1,294 @@
+{
+  "drawer": {
+    "player": "The file of the player you picked. The sections hold everything you can do with them; the buttons at the bottom stay in every section.",
+    "tab": {
+      "profile": "Their data: IDs, job, money, condition and location. View only; it changes nothing.",
+      "travel": "Go to them, bring them to you, send them back, or move them to coordinates you type.",
+      "health": "Revive them if dead, heal them, or set their hunger, thirst and stamina yourself.",
+      "money": "Change their job and gang, and add money, remove it or set their balance.",
+      "items": "Give them items, open their satchel or wardrobe, or clear their satchel.",
+      "moderation": "Private message, freeze and spectate, kick and ban, and a link to their staff ranks."
+    },
+    "sec": {
+      "identity": "The numbers and names that identify the player. The copy button beside each one copies it for you.",
+      "work": "Their job and gang right now. Change them in the Money & job section.",
+      "money": "The money they have now. Change it in the Money & job section.",
+      "condition": "Their health, needs and connection right now. Updated every two seconds.",
+      "location": "Where they are in the world now and how far from you.",
+      "quick": "The fastest ways to move between you and the player.",
+      "coords": {
+        "text": "Moves the player to a point you type. Leave Z empty and they land on the ground by themselves.",
+        "example": "vector3(-175.3, 626.8, 113.2)"
+      },
+      "restore": "Brings the player's health and needs back to full.",
+      "needs": "Set their hunger, thirst and stamina yourself. They see the change on their HUD right away.",
+      "job": "The job they work and their grade, like sheriff or doctor.",
+      "gang": "The gang they belong to and their rank in it.",
+      "cash": "Add money, remove money, or set their balance exactly.",
+      "give": "Adds an item to the player's satchel.",
+      "bag": "Look into their satchel yourself or open the wardrobe for them.",
+      "danger": "Actions that cannot be reversed. Read before you press.",
+      "message": "A message only this player sees; nobody else does.",
+      "control": "Temporary actions: each one is lifted with the same button.",
+      "kick": "Removes the player from the server now, with a reason they see.",
+      "ban": "Keeps the player out of the server for a length you choose.",
+      "level": "The player's staff ranks decide what they may open and do in the admin panel. They are managed on the Ranks page."
+    },
+    "account": "The player's RedM account name. One for all their characters, and different from the character name.",
+    "character": "The first and last name of the character they are playing now.",
+    "discord": "The Discord account linked to the player. Copy it to find them on the Discord server.",
+    "duty": "'On duty' means they are working their job right now; 'Off duty' means they are not.",
+    "bank": "Their bank balance in dollars, apart from the cash they carry.",
+    "coords": {
+      "text": "Their spot on the map as three numbers X, Y and Z. The copy button copies it as vector3 to paste into a command or a file.",
+      "example": "vector3(2500.10, -1300.40, 134.00)"
+    },
+    "heading": "The direction they face, in degrees from 0 to 360. The copy button here copies the spot with the direction as vector4.",
+    "openCharacter": "Opens their character on the Characters page: all their data and property, with tools that work even after they leave.",
+    "goto": "Takes you to the player's spot and closes the panel so you can see. They do not move and get no message.",
+    "bring": {
+      "text": "Moves the player to you. Their old spot is saved so Send back can return them.",
+      "undo": "Yes, with Send back in the Travel section"
+    },
+    "bringBack": "Returns the player to where they were before you brought them. Works only if you brought them from this panel.",
+    "tpCoords": {
+      "text": "Moves the player to the coordinates written above. They notice the sudden move.",
+      "undo": "They do not return by themselves; Send back works only after Bring"
+    },
+    "fillTheirs": "Fills the boxes with the player's current spot so you can adjust it instead of typing it from scratch.",
+    "revive": "Brings a dead or downed player back to life with full health, and fills hunger, thirst and stamina to 100.",
+    "heal": "Fills the player's health, hunger, thirst and stamina to 100. For a dead player use Revive.",
+    "hunger": {
+      "text": "How full you want them, out of 100. 100 is completely fed; under 20 counts as hungry. Health starts dropping under the damage limit in the HUD settings (15 unless changed).",
+      "example": "50 means half fed"
+    },
+    "thirst": {
+      "text": "How quenched you want them, out of 100. 100 is not thirsty at all; under 20 counts as thirsty. Health starts dropping under the damage limit in the HUD settings (15 unless changed).",
+      "example": "50 means half quenched"
+    },
+    "stamina": "How much stamina (energy for running) you want them to have, out of 100. It drops again with effort as usual.",
+    "applyNeeds": {
+      "text": "Applies the values above to the player now; after that they drop over time as usual.",
+      "undo": "Yes, move the bars and apply again"
+    },
+    "refill": "Fills hunger, thirst and stamina to 100 in one press.",
+    "job": "The job you want to give them. Search by name, then pick their grade.",
+    "jobGrade": {
+      "text": "Their grade inside the job. Higher grades get more rights in the job's script.",
+      "example": "0 = the first grade"
+    },
+    "setJob": {
+      "text": "Changes the player's job and grade now; they see the change on their HUD.",
+      "undo": "Yes, set their old job back the same way"
+    },
+    "gang": "The gang you want to put them in. 'No Gang' takes them out of their gang.",
+    "gangGrade": "Their rank inside the gang, from new member to leader.",
+    "setGang": {
+      "text": "Changes the player's gang and rank now.",
+      "undo": "Yes, set their old gang back the same way"
+    },
+    "moneyType": "Which money to change: the cash they carry, their gold, or their bank balance.",
+    "typeCash": "The cash the player carries, in dollars.",
+    "typeGold": "The gold the player carries. It takes decimals, like 2.5.",
+    "typeBank": "The player's bank balance, which they do not carry.",
+    "moneyOp": "Add puts the amount on top, Remove takes it away, and Set makes their balance exactly the number you type.",
+    "opAdd": "Adds the amount to what they have. Example: they have 100, you add 50, they get 150.",
+    "opRemove": "Takes the amount from what they have. If they do not have enough, nothing is removed.",
+    "opSet": "Makes their balance exactly this amount, whatever they had. You are asked to confirm because it wipes the old number.",
+    "amount": {
+      "text": "The amount in dollars or gold. Gold takes decimals; cash and bank are whole numbers.",
+      "example": "500 = five hundred dollars"
+    },
+    "moneyReason": "Why you add the money. It is kept in the admin log, and it is required because added money comes out of the central bank reserve.",
+    "applyMoney": {
+      "text": "Carries out the operation on their money now; they see their balance change.",
+      "undo": "Yes, with the opposite operation: Remove instead of Add"
+    },
+    "item": {
+      "text": "The item you want to give. Search by its name or its code name.",
+      "example": "bread"
+    },
+    "count": "How many to give, from 1 to 1000. If their satchel has no room, nothing arrives.",
+    "giveItem": {
+      "text": "Puts the item in the player's satchel now and tells them they received it.",
+      "undo": "Open their satchel and take the item out"
+    },
+    "openInventory": "Closes the panel and opens the player's satchel for you: see their items, take or add. The player sees nothing.",
+    "wardrobe": "Opens the wardrobe on the player's screen so they can change clothes. Needs the character script running.",
+    "clearInventory": {
+      "text": "Deletes every item in the player's satchel for good. To confirm you type the citizen ID.",
+      "warn": "There is no way to bring the items back after clearing"
+    },
+    "message": {
+      "text": "The message text. The player sees it as a staff notification for 8 seconds.",
+      "example": "Please come to the Valentine bank"
+    },
+    "send": "Sends the message to this player only, now. The log records that you sent one.",
+    "freeze": {
+      "text": "Holds the player in place until you unfreeze them. Useful while investigating or explaining.",
+      "undo": "Yes, with Unfreeze"
+    },
+    "unfreeze": "Lifts the freeze so the player moves normally again.",
+    "spectate": {
+      "text": "Closes the panel and lets you watch the player up close while you are hidden. The player does not know.",
+      "undo": "Yes, with Stop spectating or from My tools"
+    },
+    "unspectate": "Stops spectating and returns you to your spot.",
+    "sitOnMount": "Seats the player on the horse nearest to them. Useful if they are stuck or fell off.",
+    "kickReason": "Why you kick them. The player sees it on the leaving screen and it is kept in the log.",
+    "kick": {
+      "text": "Removes the player from the server now. They can join again right away, so it is a warning, not a ban. They see your reason.",
+      "undo": "Not needed: they can join again right away"
+    },
+    "banReason": "Why you ban them. The player sees it every time they try to join, and it shows on the Bans and suspensions page.",
+    "banDuration": {
+      "text": "How long the player cannot join. After that they can join automatically; Permanent lasts until you lift it yourself.",
+      "undo": "Yes, from the Bans and suspensions page"
+    },
+    "ban": {
+      "text": "Removes the player now and keeps them out for the chosen length; the ban is announced in chat to everyone.",
+      "undo": "Yes, lift the ban on the Bans and suspensions page"
+    },
+    "openRanks": "Opens the Ranks page on this player, to give them a rank or take one away."
+  },
+  "label": {
+    "drawer": {
+      "tabs": "Player file sections",
+      "tab": {
+        "profile": "Profile",
+        "travel": "Travel",
+        "health": "Health",
+        "money": "Money & job",
+        "items": "Items",
+        "moderation": "Moderation"
+      },
+      "cid": "Citizen ID",
+      "session": "Session",
+      "footNote": "These stay in every section",
+      "self": "This is you: some actions do not work on yourself.",
+      "spectating": "You are watching",
+      "done": "Done",
+      "sec": {
+        "identity": "Identity",
+        "work": "Work",
+        "money": "Money",
+        "condition": "Condition",
+        "location": "Location",
+        "quick": "Quick moves",
+        "coords": "Move to coordinates",
+        "restore": "Revive and heal",
+        "needs": "Needs",
+        "job": "Job",
+        "gang": "Gang",
+        "cash": "Money",
+        "give": "Give an item",
+        "bag": "Satchel and clothes",
+        "danger": "Danger zone",
+        "message": "Private message",
+        "control": "Temporary control",
+        "kick": "Kick",
+        "ban": "Ban",
+        "level": "Staff ranks"
+      },
+      "account": "Account",
+      "character": "Character",
+      "discord": "Discord",
+      "duty": "Duty",
+      "bank": "Bank",
+      "coords": "Coordinates",
+      "heading": "Heading",
+      "openCharacter": "Open in Characters",
+      "goto": "Go to",
+      "bring": "Bring",
+      "bringBack": "Send back",
+      "noReturn": "No saved spot: Send back works after Bring from here.",
+      "tpCoords": "Move them there",
+      "fillTheirs": "Their current spot",
+      "revive": "Revive",
+      "heal": "Heal",
+      "hunger": "Hunger",
+      "thirst": "Thirst",
+      "stamina": "Stamina",
+      "now": "Now %s",
+      "applyNeeds": "Apply values",
+      "refill": "Fill all",
+      "noNeeds": "Hunger and thirst are not tracked for this player because the HUD script is stopped. Only stamina can be set.",
+      "job": "Job",
+      "grade": "Grade",
+      "setJob": "Set job",
+      "gang": "Gang",
+      "setGang": "Set gang",
+      "current": "Now: %s",
+      "moneyType": "Money type",
+      "typeCash": "Cash",
+      "typeGold": "Gold",
+      "typeBank": "Bank",
+      "moneyOp": "Operation",
+      "opAdd": "Add",
+      "opRemove": "Remove",
+      "opSet": "Set to",
+      "amount": "Amount",
+      "moneyReason": "Reason for adding",
+      "moneyTpl": {
+        "a": "Compensation for a bug",
+        "b": "Event prize",
+        "c": "Fixing a staff mistake"
+      },
+      "applyMoney": "Apply",
+      "preview": "Has %s now, becomes %s",
+      "previewShort": "More than they have (%s), so the removal will not go through.",
+      "setMoneyTitle": "Set the balance of %s?",
+      "setMoneyText": "They have %s now. After you confirm their balance becomes exactly %s.",
+      "item": "Item",
+      "itemSearch": "Type the item name…",
+      "count": "Count",
+      "giveItem": "Give",
+      "giveN": "Give ×%s",
+      "openInventory": "Open their satchel",
+      "wardrobe": "Their wardrobe",
+      "clearInventory": "Clear all their items",
+      "clearTitle": "Clear the satchel of %s?",
+      "clearText": "Every item they carry is deleted for good and does not come back.",
+      "message": "Message",
+      "messagePh": "Write your message…",
+      "send": "Send",
+      "freeze": "Freeze",
+      "unfreeze": "Unfreeze",
+      "spectate": "Spectate",
+      "unspectate": "Stop spectating",
+      "sitOnMount": "Seat on nearest horse",
+      "kickReason": "Kick reason",
+      "kick": "Kick from server",
+      "kickTitle": "Kick %s?",
+      "kickText": "They leave the server now and see this reason: %s",
+      "banReason": "Ban reason",
+      "banDuration": "Ban length",
+      "ban": "Ban",
+      "banTitle": "Ban %s?",
+      "banText": "Length: %s. Reason: %s",
+      "banWhat": "They leave the server now, see the reason every time they try to join, and the ban is announced in chat to everyone.",
+      "reasonNeeded": "Write the reason first",
+      "group": "New level",
+      "setGroup": "Apply level",
+      "groupTitle": "Change the level of %s?",
+      "groupText": "From '%s' to '%s'. The change is immediate.",
+      "groupHigher": "Their level is the same as yours or higher, so you cannot change it.",
+      "groupNow": "Now: %s",
+      "groupUser": "Regular player (user)",
+      "kickTpl": {
+        "a": "Griefing players",
+        "b": "Abusive language",
+        "c": "Ignoring staff instructions",
+        "d": "Exploiting a bug"
+      },
+      "banTpl": {
+        "a": "Cheating",
+        "b": "Repeated griefing",
+        "c": "Abusing staff",
+        "d": "Repeat offense after warnings"
+      },
+      "openRanks": "Ranks…",
+      "ranksLead": "Staff rights now come from ranks. Open the Ranks page to give this player a rank or take one away."
+    }
+  }
+}

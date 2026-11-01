@@ -1,0 +1,758 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   Wraith Core theme · base.css - the w-* primitives (opt-in)
+
+   Classes only: no element selectors, no !important, nothing styled unless a page puts a
+   w-* class on it. Needs tokens.css and fonts.css (link them first, or link
+   nui/assets/wraith-theme.css which pulls all three). Chromium 87 safe: no :has(), :is(),
+   :where(), container queries or aspect-ratio.
+
+   The look is the original game menus in white and black: neutral ink sheets with brushed or
+   torn edges, paper text, hairlines instead of boxes, and ONE state for "the cursor is here"
+   (mouse hover, keyboard or pad focus, the active tab, the selected row): the brushed paper
+   band with ink text. Red is a mark only (w-tick, w-pin, a destructive button, the progress
+   tick, an invalid underline).
+
+   Sizes use --w-rem (20px at 1080p, the loading / pause scale), so a primitive looks the
+   same whatever the page's own root font-size. Override a role's size per element with its
+   --w-fs-* variable (e.g. style="--w-fs-text:18px"); the Arabic factor still applies.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ══════════════════ Type roles ══════════════════ */
+.w-t-display {
+  font-family: var(--w-f-display);
+  font-weight: 400;
+  font-size: calc(var(--w-fs-display) * var(--w-k-display));
+  line-height: var(--w-lh-display);
+  letter-spacing: var(--w-track-display);
+  color: var(--w-paper);
+}
+.w-t-title {
+  font-family: var(--w-f-title);
+  font-weight: var(--w-wt-title);
+  font-size: calc(var(--w-fs-title) * var(--w-k-title));
+  line-height: var(--w-lh-title);
+  letter-spacing: var(--w-track-title);
+  color: var(--w-paper);
+}
+.w-t-title.is-sm { font-size: calc(var(--w-fs-title-sm) * var(--w-k-title)); }
+.w-t-text {
+  font-family: var(--w-f-text);
+  font-weight: 400;
+  font-size: calc(var(--w-fs-text) * var(--w-k-text));
+  line-height: var(--w-lh-text);
+  letter-spacing: 0;
+}
+.w-t-action {
+  font-family: var(--w-f-action);
+  font-weight: var(--w-wt-action);
+  font-size: calc(var(--w-fs-action) * var(--w-k-action));
+  line-height: var(--w-lh-action);
+  letter-spacing: 0;
+}
+.w-t-label {
+  font-family: var(--w-f-label);
+  font-weight: var(--w-wt-label);
+  font-size: calc(var(--w-fs-label) * var(--w-k-label));
+  line-height: var(--w-lh-label);
+  text-transform: var(--w-label-case);
+  letter-spacing: var(--w-label-track);
+}
+.w-t-input {
+  font-family: var(--w-f-input);
+  font-weight: var(--w-wt-input);
+  font-size: calc(var(--w-fs-input) * var(--w-k-input));
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+.w-t-hand {
+  font-family: var(--w-f-hand);
+  font-weight: 400;
+  font-size: calc(var(--w-fs-hand) * var(--w-k-hand));
+  line-height: var(--w-lh-hand);
+  text-transform: var(--w-label-case);
+  letter-spacing: var(--w-label-track);
+}
+/* big figures (money, counters, KPIs) and figures inside text: Western digits, left to right */
+.w-num {
+  font-family: var(--w-f-num);
+  font-weight: 400;
+  letter-spacing: .04em;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+.w-fig {
+  font-family: var(--w-f-figure);
+  font-variant-numeric: lining-nums tabular-nums;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/* Arabic from the server inside a Latin run: no spacing, caps, slant or synthetic weight */
+.w-ar {
+  letter-spacing: 0;
+  word-spacing: normal;
+  text-transform: none;
+  font-variant-caps: normal;
+  font-style: normal;
+}
+.w-dim { color: var(--w-paper-dim); }
+.w-faint { color: var(--w-paper-faint); }
+.w-kicker {
+  font-family: var(--w-f-label);
+  font-weight: var(--w-wt-label);
+  font-size: calc(var(--w-fs-label) * var(--w-k-label));
+  line-height: var(--w-lh-label);
+  text-transform: var(--w-label-case);
+  letter-spacing: calc(var(--w-label-track) + var(--w-label-track) * .3);
+  color: var(--w-paper-dim);
+}
+
+/* ══════════════════ Surfaces ══════════════════ */
+/* A side sheet or menu: top-lit ink (neutral grey) with the game's brushed help_text_bg edge. One per side. */
+.w-sheet {
+  position: relative;
+  isolation: isolate;
+  color: var(--w-paper);
+  background: radial-gradient(130% 90% at 50% 0%, rgba(25, 25, 25, .96) 0%, rgba(17, 17, 17, .97) 42%, rgba(10, 10, 10, .98) 100%);
+  box-shadow: 0 18px 55px -18px rgba(0, 0, 0, .85), 0 0 0 1px rgba(242, 242, 242, .08);
+}
+.w-sheet::before {
+  content: '';
+  position: absolute;
+  inset: -4px -6px;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(10, 10, 10, .91);
+  -webkit-mask: var(--w-tex-sheet) center / 100% 100% no-repeat;
+  mask: var(--w-tex-sheet) center / 100% 100% no-repeat;
+}
+/* The eight-piece crafting_highlight frame in paper, as one child: <i class="w-frame"></i>
+   inside any positioned box. Decorative, never interactive. */
+.w-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  --w-frame-px: clamp(10px, 1.3vh, 16px);
+  background: var(--w-paper);
+  opacity: .5;
+  -webkit-mask-image: var(--w-tex-frame-tl), var(--w-tex-frame-tr), var(--w-tex-frame-bl), var(--w-tex-frame-br),
+    var(--w-tex-frame-t), var(--w-tex-frame-b), var(--w-tex-frame-l), var(--w-tex-frame-r);
+  -webkit-mask-position: left top, right top, left bottom, right bottom, center top, center bottom, left center, right center;
+  -webkit-mask-size: var(--w-frame-px) var(--w-frame-px), var(--w-frame-px) var(--w-frame-px),
+    var(--w-frame-px) var(--w-frame-px), var(--w-frame-px) var(--w-frame-px),
+    calc(100% - 2 * var(--w-frame-px)) var(--w-frame-px), calc(100% - 2 * var(--w-frame-px)) var(--w-frame-px),
+    var(--w-frame-px) calc(100% - 2 * var(--w-frame-px)), var(--w-frame-px) calc(100% - 2 * var(--w-frame-px));
+  -webkit-mask-repeat: no-repeat;
+  mask-image: var(--w-tex-frame-tl), var(--w-tex-frame-tr), var(--w-tex-frame-bl), var(--w-tex-frame-br),
+    var(--w-tex-frame-t), var(--w-tex-frame-b), var(--w-tex-frame-l), var(--w-tex-frame-r);
+  mask-position: left top, right top, left bottom, right bottom, center top, center bottom, left center, right center;
+  mask-size: var(--w-frame-px) var(--w-frame-px), var(--w-frame-px) var(--w-frame-px),
+    var(--w-frame-px) var(--w-frame-px), var(--w-frame-px) var(--w-frame-px),
+    calc(100% - 2 * var(--w-frame-px)) var(--w-frame-px), calc(100% - 2 * var(--w-frame-px)) var(--w-frame-px),
+    var(--w-frame-px) calc(100% - 2 * var(--w-frame-px)), var(--w-frame-px) calc(100% - 2 * var(--w-frame-px));
+  mask-repeat: no-repeat;
+}
+/* The header of a sheet: menu_header_1a art, faint */
+.w-header { position: relative; isolation: isolate; text-align: center; }
+.w-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(242, 242, 242, .06);
+  -webkit-mask: var(--w-tex-header) center / 100% 100% no-repeat;
+  mask: var(--w-tex-header) center / 100% 100% no-repeat;
+}
+
+/* The pause menu's torn-paper card. The mask clips the card's own shadow, so the drop shadow
+   goes on a wrapper: <div class="w-card-wrap"><div class="w-card">...</div></div>. The card's
+   ::after is its grain; .is-focus (on the wrap or the card) lifts it and lights the torn edge. */
+.w-card-wrap {
+  position: relative;
+  filter: drop-shadow(0 calc(var(--w-rem) * .55) calc(var(--w-rem) * .9) rgba(0, 0, 0, .55));
+  transition: transform var(--w-t-med) var(--w-ease);
+}
+.w-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--w-paper);
+  background-color: var(--w-ink-2);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .035), rgba(242, 242, 242, 0) 55%);
+  box-shadow: inset 0 0 calc(var(--w-rem) * 1.25) rgba(242, 242, 242, .11), inset 0 0 calc(var(--w-rem) * .45) rgba(242, 242, 242, .1);
+  -webkit-mask-box-image: var(--w-tex-tear) 64 fill / var(--w-edge) round;
+  transition: background-color var(--w-t-med) var(--w-ease), box-shadow var(--w-t-med) var(--w-ease);
+}
+.w-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--w-tex-grain);
+  background-size: 256px 256px;
+  opacity: .1;
+  mix-blend-mode: screen;
+  filter: invert(1);
+}
+.w-card-wrap.is-focus { transform: translate3d(0, calc(var(--w-rem) * -.18), 0); }
+.w-card-wrap.is-focus .w-card,
+.w-card.is-focus {
+  background-color: var(--w-ink-3);
+  box-shadow: inset 0 0 0 calc(var(--w-rem) * .45) rgba(242, 242, 242, .16), inset 0 0 calc(var(--w-rem) * 1.7) rgba(242, 242, 242, .3);
+}
+/* A thin torn strip (the camera help bar, a key-hint row) */
+.w-card.is-strip { -webkit-mask-box-image: var(--w-tex-tear) 64 fill / calc(var(--w-edge) * .5) round; }
+
+/* The red ribbon on the card the player is on: put it inside .w-card-wrap, beside the card */
+.w-tick {
+  position: absolute;
+  inset-inline-start: calc(var(--w-rem) * .15);
+  top: calc(var(--w-rem) * 1.5);
+  width: calc(var(--w-rem) * .4);
+  height: calc(var(--w-rem) * 3.2);
+  background: var(--w-red);
+  -webkit-mask-box-image: var(--w-tex-tear) 64 fill / calc(var(--w-rem) * .22) round;
+  pointer-events: none;
+  opacity: 0;
+  transform: scaleY(.4);
+  transform-origin: top;
+  transition: opacity 140ms var(--w-ease), transform 180ms var(--w-ease);
+}
+.w-card-wrap.is-focus .w-tick,
+.w-tick.is-on { opacity: 1; transform: none; }
+
+/* The paper note: confirm dialogs, help notes, a receipt, a tooltip. The only light surface. */
+.w-note {
+  position: relative;
+  isolation: isolate;
+  color: var(--w-note-ink);
+  background: var(--w-note);
+  -webkit-mask-box-image: var(--w-tex-tear) 64 fill / var(--w-edge) round;
+  box-shadow: inset 0 0 calc(var(--w-rem) * 2.4) var(--w-note-glow);
+}
+.w-note::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--w-tex-grain);
+  background-size: 256px 256px;
+  opacity: .45;
+}
+.w-note-wrap { filter: drop-shadow(0 calc(var(--w-rem) * .8) calc(var(--w-rem) * 1.4) rgba(0, 0, 0, .6)); }
+.w-note .w-dim { color: var(--w-note-dim); }
+.w-note .w-rule { background: var(--w-note-rule); }
+/* a choice on the note (Yes / No): ink at 60%, the one under the cursor full ink with a red underline */
+.w-choice {
+  position: relative;
+  padding: calc(var(--w-rem) * .3) calc(var(--w-rem) * .8) calc(var(--w-rem) * .45);
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: rgba(17, 17, 17, .6);
+  font-family: var(--w-f-action);
+  font-weight: var(--w-wt-action);
+  font-size: calc(var(--w-fs-action) * var(--w-k-action) * 1.2);
+  line-height: 1;
+}
+.w-choice::after {
+  content: '';
+  position: absolute;
+  inset-inline: 15%;
+  bottom: 0;
+  height: calc(var(--w-rem) * .18);
+  background: var(--w-red);
+  opacity: 0;
+  transition: opacity 140ms var(--w-ease);
+}
+.w-choice:hover, .w-choice:focus-visible, .w-choice.is-here { color: var(--w-note-ink); outline: none; }
+.w-choice:hover::after, .w-choice:focus-visible::after, .w-choice.is-here::after { opacity: 1; }
+
+/* Scrims: the whole screen for a modal; only the panel's side for menus over the world */
+.w-scrim { position: fixed; inset: 0; background: var(--w-scrim); }
+.w-scrim-side {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(var(--w-deg-end),
+    rgba(10, 10, 10, .8) 0%, rgba(10, 10, 10, .62) 26%, rgba(10, 10, 10, .3) 46%, rgba(10, 10, 10, .08) 60%, rgba(10, 10, 10, 0) 70%);
+}
+.w-scrim-side.is-end {
+  background: linear-gradient(calc(var(--w-deg-end) + 180deg),
+    rgba(10, 10, 10, .8) 0%, rgba(10, 10, 10, .62) 26%, rgba(10, 10, 10, .3) 46%, rgba(10, 10, 10, .08) 60%, rgba(10, 10, 10, 0) 70%);
+}
+
+/* The full-screen grain of a scene (loading screen, curtain) */
+.w-grain {
+  position: fixed;
+  inset: -8%;
+  pointer-events: none;
+  background: var(--w-tex-grain);
+  opacity: .22;
+  mix-blend-mode: multiply;
+  animation: w-grain .9s steps(1) infinite;
+}
+@keyframes w-grain {
+  0% { transform: translate(0, 0); }
+  12.5% { transform: translate(-3%, 2%); }
+  25% { transform: translate(2%, -4%); }
+  37.5% { transform: translate(-5%, -1%); }
+  50% { transform: translate(4%, 3%); }
+  62.5% { transform: translate(-1%, 5%); }
+  75% { transform: translate(3%, -2%); }
+  87.5% { transform: translate(-4%, -5%); }
+}
+
+/* ══════════════════ Hairlines and rules ══════════════════ */
+.w-rule { display: block; height: 1px; border: 0; background: var(--w-rule); }
+.w-rule.is-strong { background: var(--w-rule-2); }
+.w-vrule { display: block; width: 1px; align-self: stretch; background: var(--w-rule); }
+.w-rule-brush {
+  display: block;
+  height: 4px;
+  border: 0;
+  background: var(--w-rule-3);
+  -webkit-mask: var(--w-tex-divider) center / 100% 100% no-repeat;
+  mask: var(--w-tex-divider) center / 100% 100% no-repeat;
+}
+.w-lined { border-bottom: 1px solid var(--w-rule); }
+
+/* ══════════════════ The paper band (the cursor) ══════════════════ */
+/* Always-on band: the primary action, the chosen option, a highlighted line */
+.w-band, .w-band-sm { position: relative; isolation: isolate; color: var(--w-ink); }
+.w-band::before, .w-band-sm::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--w-paper);
+  -webkit-mask: var(--w-tex-band) center / 100% 100% no-repeat;
+  mask: var(--w-tex-band) center / 100% 100% no-repeat;
+}
+.w-band-sm::before { -webkit-mask-image: var(--w-tex-band-sm); mask-image: var(--w-tex-band-sm); }
+
+/* A list row / menu item: transparent on a hairline at rest, the band under the cursor.
+   States: :hover, :focus-visible, .is-here (pad / keyboard cursor), .is-active, .is-selected,
+   [aria-selected=true]. "Equipped / current" that is NOT the cursor: .is-current (a paper tick,
+   never a second band). Disabled: .is-disabled, [aria-disabled=true], :disabled. */
+.w-item {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--w-rem) * .6);
+  min-height: calc(var(--w-rem) * 2.3);
+  padding: calc(var(--w-rem) * .35) calc(var(--w-rem) * .9);
+  border: 0;
+  border-bottom: 1px solid var(--w-rule);
+  background: none;
+  color: var(--w-paper);
+  text-align: start;
+  cursor: pointer;
+  font-family: var(--w-f-action);
+  font-weight: var(--w-wt-action);
+  font-size: calc(var(--w-fs-action) * var(--w-k-action));
+  line-height: var(--w-lh-action);
+  transition: color var(--w-t-fast) var(--w-ease), border-color var(--w-t-fast) var(--w-ease);
+}
+.w-item::before {
+  content: '';
+  position: absolute;
+  inset: -1px calc(var(--w-rem) * -.25) 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--w-paper);
+  opacity: 0;
+  -webkit-mask: var(--w-tex-band) center / 100% 100% no-repeat;
+  mask: var(--w-tex-band) center / 100% 100% no-repeat;
+  transition: opacity var(--w-t-fast) var(--w-ease), background-color 80ms var(--w-ease);
+}
+.w-item:hover:not(:disabled):not(.is-disabled):not([aria-disabled=true]),
+.w-item:focus-visible,
+.w-item.is-here, .w-item.is-active, .w-item.is-selected, .w-item[aria-selected=true] {
+  color: var(--w-ink);
+  border-bottom-color: transparent;
+  outline: none;
+}
+.w-item:hover:not(:disabled):not(.is-disabled):not([aria-disabled=true])::before,
+.w-item:focus-visible::before,
+.w-item.is-here::before, .w-item.is-active::before, .w-item.is-selected::before, .w-item[aria-selected=true]::before { opacity: 1; }
+.w-item:active:not(:disabled):not(.is-disabled)::before { background: var(--w-paper-dim); }
+.w-item.is-current::after {
+  content: '';
+  flex: none;
+  width: 1em;
+  height: 1em;
+  margin-inline-start: auto;
+  background: currentColor;
+  -webkit-mask: var(--w-tex-tick) center / contain no-repeat;
+  mask: var(--w-tex-tick) center / contain no-repeat;
+}
+.w-item:disabled, .w-item.is-disabled, .w-item[aria-disabled=true] { opacity: .4; cursor: default; }
+/* a chevron or icon that follows the row's colour (ink on the band) */
+.w-item-end { margin-inline-start: auto; flex: none; color: inherit; opacity: .8; }
+
+/* Tabs: a strip on a hairline, wraps to two rows before it clips. Active = band. */
+.w-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--w-rem) * .2) calc(var(--w-rem) * .3);
+  padding-bottom: calc(var(--w-rem) * .3);
+  border-bottom: 1px solid var(--w-rule);
+}
+.w-tab {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--w-rem) * .4);
+  min-height: calc(var(--w-rem) * 1.9);
+  padding: 0 calc(var(--w-rem) * .8);
+  border: 0;
+  background: none;
+  color: var(--w-paper-dim);
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--w-f-label);
+  font-weight: var(--w-wt-label);
+  font-size: calc(var(--w-fs-label) * var(--w-k-label) * 1.1);
+  line-height: 1;
+  text-transform: var(--w-label-case);
+  letter-spacing: var(--w-label-track);
+  transition: color var(--w-t-fast) var(--w-ease);
+}
+.w-tab::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--w-paper);
+  opacity: 0;
+  -webkit-mask: var(--w-tex-band-sm) center / 100% 100% no-repeat;
+  mask: var(--w-tex-band-sm) center / 100% 100% no-repeat;
+  transition: opacity var(--w-t-fast) var(--w-ease);
+}
+.w-tab:hover:not(:disabled):not(.is-disabled), .w-tab:focus-visible, .w-tab.is-here,
+.w-tab.is-active, .w-tab[aria-selected=true] { color: var(--w-ink); outline: none; }
+.w-tab:hover:not(:disabled):not(.is-disabled)::before, .w-tab:focus-visible::before, .w-tab.is-here::before,
+.w-tab.is-active::before, .w-tab[aria-selected=true]::before { opacity: 1; }
+.w-tab:disabled, .w-tab.is-disabled { opacity: .45; cursor: default; }
+/* a step number or a count inside a tab */
+.w-tab-num { font-family: var(--w-f-figure); font-variant-numeric: lining-nums tabular-nums; direction: ltr; unicode-bidi: isolate; opacity: .7; }
+/* attention (an incomplete required step): a small red square, a mark not a colour */
+.w-attn::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-inline-start: .4em;
+  vertical-align: middle;
+  background: var(--w-red);
+}
+
+/* Segmented control (two to four options, e.g. sex): the chosen one on the band */
+.w-seg { display: inline-flex; border-bottom: 1px solid var(--w-rule); }
+.w-seg-opt {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 0;
+  min-height: calc(var(--w-rem) * 2);
+  padding: 0 calc(var(--w-rem) * 1);
+  border: 0;
+  background: none;
+  color: var(--w-paper-dim);
+  cursor: pointer;
+  font-family: var(--w-f-action);
+  font-weight: var(--w-wt-action);
+  font-size: calc(var(--w-fs-action) * var(--w-k-action) * .9);
+  line-height: 1;
+}
+.w-seg-opt::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--w-paper);
+  opacity: 0;
+  -webkit-mask: var(--w-tex-band-sm) center / 100% 100% no-repeat;
+  mask: var(--w-tex-band-sm) center / 100% 100% no-repeat;
+  transition: opacity var(--w-t-fast) var(--w-ease);
+}
+.w-seg-opt:hover:not(:disabled) { color: var(--w-paper); }
+.w-seg-opt.is-on, .w-seg-opt[aria-checked=true], .w-seg-opt[aria-pressed=true] { color: var(--w-ink); }
+.w-seg-opt.is-on::before, .w-seg-opt[aria-checked=true]::before, .w-seg-opt[aria-pressed=true]::before { opacity: 1; }
+.w-seg-opt:focus-visible { outline: none; box-shadow: inset 0 -2px 0 var(--w-red); }
+.w-seg-opt:disabled { opacity: .45; cursor: default; }
+
+/* ══════════════════ Buttons ══════════════════ */
+/* Secondary: an ink plate with the brushed edge, the band under the cursor.
+   .is-primary: the band at rest.  .is-danger: a red underline, at rest and on the band under the cursor.
+   .is-text: a bare text button, underlined under the cursor. */
+.w-btn {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--w-rem) * .45);
+  min-height: calc(var(--w-rem) * 2.1);
+  padding: 0 calc(var(--w-rem) * 1.1);
+  border: 0;
+  background: none;
+  color: var(--w-paper-dim);
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--w-f-label);
+  font-weight: var(--w-wt-label);
+  font-size: calc(var(--w-fs-label) * var(--w-k-label) * 1.15);
+  line-height: 1;
+  text-transform: var(--w-label-case);
+  letter-spacing: var(--w-label-track);
+  transition: color var(--w-t-fast) var(--w-ease);
+}
+.w-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--w-ink-3);
+  -webkit-mask: var(--w-tex-band-sm) center / 100% 100% no-repeat;
+  mask: var(--w-tex-band-sm) center / 100% 100% no-repeat;
+  transition: background-color var(--w-t-fast) var(--w-ease);
+}
+.w-btn:hover:not(:disabled):not(.is-disabled), .w-btn:focus-visible, .w-btn.is-here { color: var(--w-ink); outline: none; }
+.w-btn:hover:not(:disabled):not(.is-disabled)::before, .w-btn:focus-visible::before, .w-btn.is-here::before { background: var(--w-paper); }
+.w-btn:active:not(:disabled):not(.is-disabled)::before { background: var(--w-paper-dim); }
+.w-btn.is-primary { color: var(--w-ink); }
+.w-btn.is-primary::before { background: var(--w-paper); }
+.w-btn.is-primary:hover:not(:disabled):not(.is-disabled)::before, .w-btn.is-primary:focus-visible::before, .w-btn.is-primary.is-here::before { background: var(--w-paper-lit); }
+.w-btn.is-danger { color: var(--w-paper); }
+.w-btn.is-danger::after {
+  content: '';
+  position: absolute;
+  inset-inline: 22%;
+  bottom: calc(var(--w-rem) * .28);
+  height: 2px;
+  background: var(--w-red);
+  pointer-events: none;
+}
+.w-btn.is-danger:hover:not(:disabled):not(.is-disabled), .w-btn.is-danger:focus-visible, .w-btn.is-danger.is-here { color: var(--w-ink); }
+/* under the cursor: the paper band like every button, the red underline stays under the ink word */
+.w-btn.is-text { min-height: 0; padding: calc(var(--w-rem) * .2) calc(var(--w-rem) * .3); }
+.w-btn.is-text::before { display: none; }
+.w-btn.is-text:hover:not(:disabled), .w-btn.is-text:focus-visible, .w-btn.is-text.is-here {
+  color: var(--w-paper);
+  text-decoration: underline;
+  text-underline-offset: .3em;
+}
+.w-btn:disabled, .w-btn.is-disabled { opacity: .45; cursor: default; }
+.w-btn.is-primary:disabled, .w-btn.is-primary.is-disabled { opacity: .35; }
+/* the reason a primary action is unavailable, under it */
+.w-reason {
+  font-family: var(--w-f-text);
+  font-size: calc(var(--w-fs-text) * var(--w-k-text) * .9);
+  line-height: var(--w-lh-text);
+  color: var(--w-paper-faint);
+}
+
+/* ══════════════════ Fields ══════════════════ */
+.w-input, .w-field {
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--w-rem) * 2.1);
+  padding: 0 calc(var(--w-rem) * .8);
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  background: var(--w-ink-2);
+  color: var(--w-paper);
+  box-shadow: inset 0 -1px 0 var(--w-rule-2);
+  font-family: var(--w-f-input);
+  font-weight: var(--w-wt-input);
+  font-size: calc(var(--w-fs-input) * var(--w-k-input));
+  line-height: 1.3;
+  caret-color: var(--w-paper);
+  transition: background-color var(--w-t-fast) var(--w-ease), box-shadow var(--w-t-fast) var(--w-ease);
+}
+.w-input::placeholder { color: var(--w-paper-faint); opacity: 1; }
+.w-input::selection { background: rgba(242, 242, 242, .85); color: var(--w-ink); }
+.w-input:focus, .w-field:focus-within { background: var(--w-ink-3); box-shadow: inset 0 -2px 0 var(--w-paper); }
+.w-field .w-input { flex: 1 1 auto; min-width: 0; min-height: 0; height: 100%; padding: 0; background: transparent; box-shadow: none; }
+.w-input.is-invalid, .w-field.is-invalid, .w-input[aria-invalid=true] { box-shadow: inset 0 -2px 0 var(--w-red); }
+.w-input:disabled, .w-field.is-disabled { opacity: .4; }
+/* the message under an invalid field: reading text in paper, marked by a red square, never red text */
+.w-error {
+  display: flex;
+  align-items: baseline;
+  gap: .5em;
+  font-family: var(--w-f-text);
+  font-size: calc(var(--w-fs-text) * var(--w-k-text) * .9);
+  line-height: var(--w-lh-text);
+  color: var(--w-paper);
+}
+.w-error::before { content: ''; flex: none; width: 6px; height: 6px; background: var(--w-red); transform: translateY(-.15em); }
+.w-label {
+  font-family: var(--w-f-label);
+  font-weight: var(--w-wt-label);
+  font-size: calc(var(--w-fs-label) * var(--w-k-label) * 1.1);
+  line-height: var(--w-lh-label);
+  text-transform: var(--w-label-case);
+  letter-spacing: var(--w-label-track);
+  color: var(--w-paper-dim);
+}
+
+/* The store's square checkbox, on the input itself: <input type="checkbox" class="w-checkbox"> */
+.w-checkbox {
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid var(--w-paper-faint);
+  border-radius: 0;
+  background: var(--w-ink);
+  cursor: pointer;
+  outline: none;
+}
+.w-checkbox:checked { background: var(--w-paper); border-color: var(--w-paper); }
+.w-checkbox:checked::after { content: ''; width: 8px; height: 8px; background: var(--w-ink); }
+.w-checkbox:focus-visible { box-shadow: 0 0 0 2px var(--w-ink), 0 0 0 3px var(--w-paper); }
+.w-checkbox:disabled { opacity: .4; cursor: default; }
+
+/* The pause menu's on / off chip: outline at rest, paper when on, a red underline when it is the cursor */
+.w-switch {
+  flex: none;
+  min-width: calc(var(--w-rem) * 3.2);
+  padding: calc(var(--w-rem) * .18) calc(var(--w-rem) * .55) calc(var(--w-rem) * .24);
+  border: 1px solid rgba(242, 242, 242, .35);
+  background: none;
+  color: var(--w-paper-dim);
+  text-align: center;
+  cursor: pointer;
+  font-family: var(--w-f-label);
+  font-weight: var(--w-wt-label);
+  font-size: calc(var(--w-fs-label) * var(--w-k-label) * 1.1);
+  line-height: 1.1;
+  text-transform: var(--w-label-case);
+  letter-spacing: calc(var(--w-label-track) * .6);
+}
+.w-switch.is-on, .w-switch[aria-checked=true], .w-switch[data-on=true] { background: var(--w-paper); border-color: var(--w-paper); color: var(--w-ink); }
+.w-switch:focus-visible, .w-switch.is-here { outline: none; border-color: var(--w-paper); box-shadow: inset 0 -.14em 0 var(--w-red); }
+
+/* A slider: <input type="range" class="w-range" style="--w-fill:40%"> (the page keeps --w-fill in step) */
+.w-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 18px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  --w-fill: 50%;
+}
+.w-range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(to var(--w-to-end), var(--w-paper) var(--w-fill), rgba(242, 242, 242, .18) var(--w-fill));
+}
+.w-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 16px;
+  margin-top: -7px;
+  border: 0;
+  background: var(--w-paper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .6);
+}
+.w-range:focus { outline: none; }
+.w-range:focus-visible::-webkit-slider-thumb, .w-range:active::-webkit-slider-thumb { box-shadow: 0 0 0 2px var(--w-ink), inset 0 -3px 0 var(--w-red); }
+
+/* Progress: a hairline track, a paper fill, the red leading tick (the loading screen's) */
+.w-progress { position: relative; height: 1px; background: var(--w-rule); }
+.w-progress-fill { position: absolute; inset-block: -.5px; inset-inline-start: 0; height: 2px; background: var(--w-paper); transition: width 220ms var(--w-ease); }
+.w-progress-fill::after { content: ''; position: absolute; inset-inline-end: -1px; top: -3.5px; width: 2px; height: 9px; background: var(--w-red); }
+
+/* ══════════════════ Marks, keys, pins ══════════════════ */
+/* A key cap in a hint or prompt */
+.w-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7em;
+  height: 1.7em;
+  padding: 0 .45em;
+  border: 1px solid rgba(242, 242, 242, .4);
+  box-shadow: inset 0 -2px 0 rgba(242, 242, 242, .14);
+  color: var(--w-paper);
+  font-family: var(--w-f-label);
+  font-weight: 400;
+  font-size: .82em;
+  line-height: 1;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+/* "You are here": the pause map pin (a red dot in a paper ring). Also the face-pad handle. */
+.w-pin {
+  position: absolute;
+  width: calc(var(--w-rem) * .8);
+  height: calc(var(--w-rem) * .8);
+  margin: calc(var(--w-rem) * -.4) 0 0 calc(var(--w-rem) * -.4);
+  border-radius: 50%;
+  background: var(--w-red);
+  box-shadow: 0 0 0 calc(var(--w-rem) * .16) var(--w-paper), 0 calc(var(--w-rem) * .2) calc(var(--w-rem) * .5) rgba(0, 0, 0, .6);
+}
+.w-pin.is-ping::after {
+  content: '';
+  position: absolute;
+  inset: calc(var(--w-rem) * -.55);
+  border-radius: 50%;
+  border: calc(var(--w-rem) * .12) solid var(--w-red);
+  opacity: 0;
+  animation: w-ping 2.4s var(--w-ease) 600ms infinite;
+}
+@keyframes w-ping {
+  0% { opacity: .8; transform: scale(.4); }
+  70%, 100% { opacity: 0; transform: scale(1.5); }
+}
+/* glyphs from the game's art, drawn in currentColor */
+.w-glyph { display: inline-block; flex: none; width: 1em; height: 1em; background: currentColor; -webkit-mask: var(--w-glyph) center / contain no-repeat; mask: var(--w-glyph) center / contain no-repeat; }
+.w-glyph.is-tick { --w-glyph: var(--w-tex-tick); }
+.w-glyph.is-cross { --w-glyph: var(--w-tex-cross); }
+.w-glyph.is-lock { --w-glyph: var(--w-tex-lock); }
+.w-glyph.is-prev { --w-glyph: var(--w-tex-arrow-l); }
+.w-glyph.is-next { --w-glyph: var(--w-tex-arrow-r); }
+
+/* ══════════════════ Scroll, motion ══════════════════ */
+.w-scroll { overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; scrollbar-color: rgba(242, 242, 242, .3) transparent; }
+.w-scroll::-webkit-scrollbar { width: 4px; height: 0; }
+.w-scroll::-webkit-scrollbar-track { background: transparent; }
+.w-scroll::-webkit-scrollbar-thumb { background: rgba(242, 242, 242, .3); border-radius: 0; }
+.w-scroll::-webkit-scrollbar-thumb:hover { background: rgba(242, 242, 242, .5); }
+.w-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+
+/* blocks arrive in a short stagger: style="--i:3" */
+.w-rise { animation: w-rise var(--w-t-in) var(--w-ease) both; animation-delay: calc(var(--i, 0) * 34ms); }
+@keyframes w-rise {
+  from { opacity: 0; transform: translate3d(0, calc(var(--w-rem) * .8), 0); }
+  to { opacity: 1; transform: none; }
+}
+.w-fade { animation: w-fade 220ms var(--w-ease) both; }
+@keyframes w-fade { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .w-grain, .w-rise, .w-fade, .w-pin.is-ping::after { animation: none; }
+  .w-card-wrap, .w-tick { transition: none; }
+}

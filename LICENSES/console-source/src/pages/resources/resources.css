@@ -1,0 +1,25 @@
+/* w_admin · pages/resources: counts, a toolbar, one table per group. Tokens only. */
+
+.rs-page { display: flex; flex-direction: column; gap: .875rem; min-width: 0; }
+.rs-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.k-toolbar.rs-toolbar { margin-bottom: 0; }
+.rs-search { flex: 0 1 22rem; }
+.rs-search > .k-input { flex: 1; }
+.rs-count { font-size: var(--fs-135); color: var(--paper-faint); white-space: nowrap; }
+
+.rs-group .k-section-head { flex-wrap: wrap; }
+.rs-group .k-table-wrap { overflow: visible; }
+.rs-group .k-table th { position: static; background: transparent; }
+
+.k-table td.rs-namecol { white-space: normal; padding-top: .375rem; padding-bottom: .375rem; }
+.rs-name { font-family: var(--f-mono); font-size: var(--fs-15); direction: ltr; unicode-bidi: isolate; letter-spacing: 0; }
+.rs-desc { max-width: 40rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.k-table td.rs-actions, .k-table th.rs-actions { width: 1%; }
+.rs-btns { display: inline-flex; align-items: center; gap: .375rem; }
+.rs-lock { display: inline-flex; align-items: center; gap: .4rem; color: var(--paper-faint); font-size: var(--fs-135); }
+.rs-lock .k-glyph { width: .95rem; height: .95rem; }
+
+/* a stopped script reads quieter, its state chip already says why */
+.k-table tbody tr.rs-row-off .rs-name { color: var(--paper-dim); }
+
+.rs-core-note { margin-top: .5rem; font-weight: 700; }

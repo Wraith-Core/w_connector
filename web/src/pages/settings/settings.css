@@ -1,0 +1,37 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_admin · pages/settings/settings.css
+ * Panel settings: the preferences on the reading-start side, the account and the keys at the end.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.cst { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+.cst .k-section + .k-section { margin-top: 0; }
+.cst-note {
+  display: inline-flex; align-self: flex-start; padding: .375rem .75rem;
+  border: 1px dashed var(--rule-2); font-size: var(--fs-135); color: var(--paper-dim);
+}
+.cst-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: .75rem; align-items: start; }
+.cst-col { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+
+.cst .k-setrow:first-child { padding-top: .25rem; }
+.cst .k-setrow:last-child { border-bottom: 0; }
+.cst-control { display: flex; flex-direction: column; align-items: flex-start; gap: .375rem; }
+
+.cst-preview-wrap { padding-top: .25rem; }
+.cst-preview { display: flex; flex-direction: column; gap: .375rem; }
+.cst-preview-head { display: inline-flex; align-items: center; gap: .375rem; font: 700 var(--fs-13)/1.3 var(--f-ui); color: var(--paper-dim); }
+.cst-preview-table { border: 1px solid var(--rule); max-height: none; }
+
+.cst-side .k-btnrow { margin-top: .5rem; }
+
+.cst-keys { display: flex; flex-direction: column; }
+.cst-key {
+  display: flex; align-items: center; gap: 1rem; min-height: 2.375rem;
+  border-bottom: 1px solid var(--rule);
+}
+.cst-key:last-child { border-bottom: 0; }
+.cst-key dt { flex: 0 0 6.5rem; }
+.cst-key dd { margin: 0; font-size: var(--fs-14); color: var(--paper-dim); }
+
+@media (max-width: 1400px) {
+  .cst-grid { grid-template-columns: minmax(0, 1fr); }
+}

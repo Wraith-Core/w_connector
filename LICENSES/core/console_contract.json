@@ -1,0 +1,490 @@
+{
+  "query.players": {
+    "permission": "players.view",
+    "area": "players"
+  },
+  "query.server": {
+    "permission": "overview.view",
+    "area": "overview"
+  },
+  "query.resources": {
+    "permission": "resources.view",
+    "area": "resources"
+  },
+  "query.hud": {
+    "permission": "settings.manage",
+    "area": "hud"
+  },
+  "query.catalog": {
+    "permission": "players.view",
+    "area": "players"
+  },
+  "query.self": {
+    "permission": "overview.view",
+    "area": "perms"
+  },
+  "query.bans": {
+    "permission": "bans.view",
+    "area": "bans"
+  },
+  "query.map": {
+    "permission": "players.view",
+    "area": "map"
+  },
+  "citizen.lookup": {
+    "permission": "players.view",
+    "area": "players"
+  },
+  "player.teleportTo": {
+    "permission": "players.manage",
+    "area": "teleport"
+  },
+  "player.bring": {
+    "permission": "players.manage",
+    "area": "teleport"
+  },
+  "player.bringBack": {
+    "permission": "players.manage",
+    "area": "teleport"
+  },
+  "player.tpCoords": {
+    "permission": "players.manage",
+    "area": "teleport"
+  },
+  "player.revive": {
+    "permission": "players.manage",
+    "area": "revive"
+  },
+  "player.heal": {
+    "permission": "players.manage",
+    "area": "revive"
+  },
+  "player.needs": {
+    "permission": "players.manage",
+    "area": "needs"
+  },
+  "player.setJob": {
+    "permission": "players.manage",
+    "area": "job"
+  },
+  "player.setGang": {
+    "permission": "players.manage",
+    "area": "job"
+  },
+  "player.money": {
+    "permission": "players.money",
+    "area": "money"
+  },
+  "player.giveItem": {
+    "permission": "players.inventory",
+    "area": "items"
+  },
+  "player.clearInventory": {
+    "permission": "players.inventory",
+    "area": "items"
+  },
+  "player.openInventory": {
+    "permission": "players.inventory",
+    "area": "items"
+  },
+  "player.wardrobe": {
+    "permission": "players.inventory",
+    "area": "items"
+  },
+  "player.kick": {
+    "permission": "players.kick",
+    "area": "kick"
+  },
+  "player.ban": {
+    "permission": "bans.manage",
+    "area": "ban"
+  },
+  "player.freeze": {
+    "permission": "players.manage",
+    "area": "players"
+  },
+  "player.spectate": {
+    "permission": "players.spectate",
+    "area": "players"
+  },
+  "player.notify": {
+    "permission": "players.warn",
+    "area": "players"
+  },
+  "player.sitOnMount": {
+    "permission": "players.manage",
+    "area": "players"
+  },
+  "self.noclip": {
+    "permission": "self.playermode",
+    "area": "teleport"
+  },
+  "self.invisible": {
+    "permission": "self.playermode",
+    "area": "players"
+  },
+  "self.godmode": {
+    "permission": "self.playermode",
+    "area": "revive"
+  },
+  "self.names": {
+    "permission": "self.viewids",
+    "area": "players"
+  },
+  "self.boost": {
+    "permission": "self.playermode",
+    "area": "revive"
+  },
+  "self.stamina": {
+    "permission": "self.playermode",
+    "area": "revive"
+  },
+  "self.cleanPed": {
+    "permission": "self.playermode",
+    "area": "revive"
+  },
+  "self.noclipSpeed": {
+    "permission": "self.playermode",
+    "area": "teleport"
+  },
+  "self.tpWaypoint": {
+    "permission": "self.teleport",
+    "area": "teleport"
+  },
+  "self.tpBack": {
+    "permission": "self.teleport",
+    "area": "teleport"
+  },
+  "self.tpForward": {
+    "permission": "self.teleport",
+    "area": "teleport"
+  },
+  "self.tpCoords": {
+    "permission": "self.teleport",
+    "area": "teleport"
+  },
+  "self.heal": {
+    "permission": "players.manage",
+    "area": "revive"
+  },
+  "self.revive": {
+    "permission": "players.manage",
+    "area": "revive"
+  },
+  "self.stopSpectate": {
+    "permission": "players.spectate",
+    "area": "players"
+  },
+  "self.spawnHorse": {
+    "permission": "self.spawn",
+    "area": "spawn"
+  },
+  "self.spawnWagon": {
+    "permission": "self.spawn",
+    "area": "spawn"
+  },
+  "self.spawnAnimal": {
+    "permission": "self.spawn",
+    "area": "spawn"
+  },
+  "self.spawnPed": {
+    "permission": "self.spawn",
+    "area": "spawn"
+  },
+  "self.cleanupSpawned": {
+    "permission": "self.spawn",
+    "area": "spawn"
+  },
+  "self.repairVehicle": {
+    "permission": "self.vehicle",
+    "area": "vehicle"
+  },
+  "self.flipVehicle": {
+    "permission": "self.vehicle",
+    "area": "vehicle"
+  },
+  "self.vehicleBoost": {
+    "permission": "self.vehicle",
+    "area": "vehicle"
+  },
+  "self.healMount": {
+    "permission": "self.vehicle",
+    "area": "vehicle"
+  },
+  "self.deleteVehicle": {
+    "permission": "self.entities",
+    "area": "entities"
+  },
+  "self.laser": {
+    "permission": "self.entities",
+    "area": "entities"
+  },
+  "self.clearArea": {
+    "permission": "self.entities",
+    "area": "entities"
+  },
+  "self.deleteEntity": {
+    "permission": "self.entities",
+    "area": "entities"
+  },
+  "self.copyCoords": {
+    "permission": "self.developer",
+    "area": "dev"
+  },
+  "self.showCoords": {
+    "permission": "self.developer",
+    "area": "dev"
+  },
+  "self.hashes": {
+    "permission": "self.developer",
+    "area": "dev"
+  },
+  "server.announce": {
+    "permission": "server.announce",
+    "area": "server"
+  },
+  "server.announceClear": {
+    "permission": "server.announce",
+    "area": "server"
+  },
+  "server.weather": {
+    "permission": "world.control",
+    "area": "server"
+  },
+  "server.time": {
+    "permission": "world.control",
+    "area": "server"
+  },
+  "server.freezeTime": {
+    "permission": "world.control",
+    "area": "server"
+  },
+  "server.dynamicWeather": {
+    "permission": "world.control",
+    "area": "server"
+  },
+  "server.blackout": {
+    "permission": "world.control",
+    "area": "server"
+  },
+  "server.startResource": {
+    "permission": "resources.control",
+    "area": "resources"
+  },
+  "server.stopResource": {
+    "permission": "resources.control",
+    "area": "resources"
+  },
+  "server.restartResource": {
+    "permission": "resources.control",
+    "area": "resources"
+  },
+  "bans.unban": {
+    "permission": "bans.manage",
+    "area": "bans"
+  },
+  "map.players": {
+    "permission": "players.view",
+    "area": "map"
+  },
+  "map.teleport": {
+    "permission": "self.teleport",
+    "area": "map"
+  },
+  "map.waypoint": {
+    "permission": "self.teleport",
+    "area": "map"
+  },
+  "map.clearWaypoint": {
+    "permission": "self.teleport",
+    "area": "map"
+  },
+  "map.copyCoords": {
+    "permission": "self.developer",
+    "area": "dev"
+  },
+  "map.setTheme": {
+    "permission": "world.control",
+    "area": "map"
+  },
+  "scripts.list": {
+    "permission": "modules.use",
+    "area": "scripts"
+  },
+  "scripts.open": {
+    "permission": "modules.use",
+    "area": "scripts"
+  },
+  "scripts.run": {
+    "permission": "modules.use",
+    "area": "scriptsRun"
+  },
+  "scripts.start": {
+    "permission": "resources.control",
+    "area": "resources"
+  },
+  "characters.search": {
+    "permission": "characters.manage",
+    "area": "characters"
+  },
+  "characters.get": {
+    "permission": "characters.manage",
+    "area": "characters"
+  },
+  "characters.blocks": {
+    "permission": "characters.manage",
+    "area": "characters"
+  },
+  "characters.block": {
+    "permission": "characters.manage",
+    "area": "characters"
+  },
+  "characters.unblock": {
+    "permission": "characters.manage",
+    "area": "characters"
+  },
+  "characters.delete": {
+    "permission": "characters.manage",
+    "area": "charDelete"
+  },
+  "characters.deleteStatus": {
+    "permission": "characters.manage",
+    "area": "charDelete"
+  },
+  "characters.reassign": {
+    "permission": "characters.manage",
+    "area": "citizenId"
+  },
+  "characters.transfer": {
+    "permission": "characters.manage",
+    "area": "citizenId"
+  },
+  "characters.transferStatus": {
+    "permission": "characters.manage",
+    "area": "citizenId"
+  },
+  "characters.money": {
+    "permission": "players.money",
+    "area": "money"
+  },
+  "characters.giveItem": {
+    "permission": "players.inventory",
+    "area": "items"
+  },
+  "characters.setJob": {
+    "permission": "characters.manage",
+    "area": "job"
+  },
+  "characters.setGang": {
+    "permission": "characters.manage",
+    "area": "job"
+  },
+  "hud.save": {
+    "permission": "settings.manage",
+    "area": "hud"
+  },
+  "hud.setNeed": {
+    "permission": "players.manage",
+    "area": "needs"
+  },
+  "settings.list": {
+    "permission": "settings.manage",
+    "area": "settings"
+  },
+  "settings.schema": {
+    "permission": "settings.manage",
+    "area": "settings"
+  },
+  "settings.values": {
+    "permission": "settings.manage",
+    "area": "settings"
+  },
+  "settings.apply": {
+    "permission": "settings.manage",
+    "area": "settings"
+  },
+  "settings.reset": {
+    "permission": "settings.manage",
+    "area": "settings"
+  },
+  "settings.history": {
+    "permission": "settings.manage",
+    "area": "settings"
+  },
+  "settings.openPanel": {
+    "permission": "modules.use",
+    "area": "scripts"
+  },
+  "settings.export": {
+    "permission": "settings.manage",
+    "area": "settingsImport"
+  },
+  "settings.import": {
+    "permission": "settings.manage",
+    "area": "settingsImport"
+  },
+  "settings.presets": {
+    "permission": "settings.manage",
+    "area": "settingsImport"
+  },
+  "news.newsList": {
+    "permission": "news.manage",
+    "area": "news"
+  },
+  "news.newsSave": {
+    "permission": "news.manage",
+    "area": "news"
+  },
+  "news.newsReset": {
+    "permission": "news.manage",
+    "area": "news"
+  },
+  "reports.list": {
+    "permission": "reports.view",
+    "area": "reports"
+  },
+  "reports.stats": {
+    "permission": "reports.view",
+    "area": "reports"
+  },
+  "reports.claim": {
+    "permission": "reports.manage",
+    "area": "reports"
+  },
+  "reports.resolve": {
+    "permission": "reports.manage",
+    "area": "reports"
+  },
+  "reports.reopen": {
+    "permission": "reports.manage",
+    "area": "reports"
+  },
+  "reports.message": {
+    "permission": "reports.manage",
+    "area": "reports"
+  },
+  "ranks.state": {
+    "permission": "roles.manage",
+    "area": "ranks"
+  },
+  "ranks.save": {
+    "permission": "roles.manage",
+    "area": "ranks"
+  },
+  "ranks.delete": {
+    "permission": "roles.manage",
+    "area": "ranks"
+  },
+  "ranks.assign": {
+    "permission": "roles.manage",
+    "area": "ranks"
+  },
+  "ranks.revoke": {
+    "permission": "roles.manage",
+    "area": "ranks"
+  },
+  "logs.query": {
+    "permission": "logs.view",
+    "area": "logs"
+  }
+}

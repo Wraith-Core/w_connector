@@ -1,0 +1,117 @@
+[
+  {
+    "resource": "w_hud", "group": "player", "state": "started", "version": "2.0.0", "pinned": true,
+    "label": { "ar": "الواجهة والأكل", "en": "HUD and food" },
+    "description": { "ar": "دوائر الصحة والتحمّل والجوع والعطش، وما يسويه الأكل.", "en": "Health, stamina, hunger and thirst rings, and what food does." },
+    "help": { "ar": "يرسم واجهة اللاعب ويحسب الجوع والعطش. من هنا تعدّل سرعتهما وما يعطيه كل أكل، وواجهته الأصلية تبقى كما هي.", "en": "Draws the player HUD and runs hunger and thirst. Change their speed and what each food gives here; its own panel stays as it is." },
+    "panel": { "how": { "ar": "الأمر /hudmenu أو زر F7", "en": "The /hudmenu command or F7" } },
+    "settings": { "level": "admin", "groups": 7, "overridden": 3 }
+  },
+  {
+    "resource": "w_stables", "group": "animals", "state": "started", "version": "3.0.0",
+    "label": { "ar": "الإسطبلات", "en": "Stables" },
+    "description": { "ar": "الخيول والعربات والإسطبلات وأصحابها.", "en": "Horses, wagons, stables and their owners." },
+    "help": { "ar": "يدير الخيول والعربات والإسطبلات. لوحته الأصلية فيها المواقع والكتالوج والتوازن وسجل التعديلات.", "en": "Runs horses, wagons and stables. Its own panel holds places, the catalogue, balancing and the change log." },
+    "panel": { "how": { "ar": "الأمر /stables", "en": "The /stables command" } }
+  },
+  {
+    "resource": "w_pets", "group": "animals", "state": "started", "version": "1.0.0",
+    "label": { "ar": "الحيوانات الأليفة", "en": "Pets" },
+    "description": { "ar": "متاجر الحيوانات الأليفة وأسعارها واحتياجاتها.", "en": "Pet shops, their prices and pet needs." },
+    "help": { "ar": "يدير الحيوانات الأليفة ومتاجرها. لوحته الإدارية قيد البناء، والزر يعمل لما تكتمل.", "en": "Runs pets and their shops. Its admin panel is being built; the button works once it lands." },
+    "panel": { "how": { "ar": "الأمر /petshops", "en": "The /petshops command" }, "note": { "ar": "اللوحة قيد البناء", "en": "The panel is being built" } }
+  },
+  {
+    "resource": "w_store", "group": "economy", "state": "started", "version": "1.0.0",
+    "label": { "ar": "المتاجر", "en": "Stores" },
+    "description": { "ar": "كل المتاجر وأصحابها وأسعارها ومخزونها.", "en": "Every store, its owners, prices and stock." },
+    "help": { "ar": "يدير المتاجر. هوامش المتاجر الحكومية إعدادات اقتصادية، فتعديلها لمستوى المالك فقط.", "en": "Runs the stores. Government store margins are economy settings, so only the owner level may change them." },
+    "panel": { "how": { "ar": "الأمر /wstore", "en": "The /wstore command" } },
+    "settings": { "level": "god", "groups": 2 }
+  },
+  {
+    "resource": "w_legal", "group": "economy", "state": "started", "version": "1.1.0",
+    "label": { "ar": "التهريب وغسيل الأموال", "en": "Smuggling and laundering" },
+    "description": { "ar": "مراحل التهريب وحدودها اليومية والسوق السوداء.", "en": "Smuggling stages, daily limits and the black market." },
+    "help": { "ar": "يدير الأعمال غير القانونية: التهريب وغسيل الأموال والسوق السوداء. لوحته الأصلية تعدّل المراحل والحدود.", "en": "Runs illegal work: smuggling, laundering and the black market. Its own panel edits the stages and limits." },
+    "panel": { "how": { "ar": "الأمر /wlegal", "en": "The /wlegal command" } }
+  },
+  {
+    "resource": "w_crafting", "group": "economy", "state": "started", "version": "1.1.0",
+    "label": { "ar": "الصناعة", "en": "Crafting" },
+    "description": { "ar": "محطات الصناعة ووصفاتها وأقسامها.", "en": "Crafting stations, recipes and categories." },
+    "help": { "ar": "يدير الصناعة: المحطات والوصفات ومن يقدر يستخدمها. لوحته تقبل الإدارة الكاملة فقط.", "en": "Runs crafting: stations, recipes and who may use them. Its panel accepts full admins only." },
+    "panel": { "how": { "ar": "الأمر /craftadmin", "en": "The /craftadmin command" }, "locked": { "level": "admin", "text": { "ar": "لوحة هذا السكربت للإداري والمالك فقط (مستوى admin أو أعلى)، والمشرف ما يقدر يفتحها.", "en": "The panel of this script is for full admins only (admin or higher); a moderator cannot open it." } } }
+  },
+  {
+    "resource": "w_logs", "group": "system", "state": "started", "version": "1.0.0",
+    "label": { "ar": "سجلات السيرفر", "en": "Server logs" },
+    "description": { "ar": "كل سجلات السيرفر وقنوات ديسكورد.", "en": "Every server log and the Discord channels." },
+    "help": { "ar": "يجمع كل سجلات السيرفر في مكان واحد ويرسلها لديسكورد. لوحته تعرض السجلات لكل لاعب.", "en": "Gathers every server log in one place and sends it to Discord. Its panel shows the logs per player." },
+    "panel": { "how": { "ar": "الأمر /logs", "en": "The /logs command" } }
+  },
+  {
+    "resource": "w_map", "group": "world", "state": "started", "version": "1.1.0",
+    "label": { "ar": "الخريطة", "en": "Map" },
+    "description": { "ar": "خريطة العالم ومحرر أماكنها.", "en": "The world map and its place editor." },
+    "help": { "ar": "يرسم خريطة العالم. محرره الأصلي يضيف أماكن وأسماء على الخريطة للكل.", "en": "Draws the world map. Its own editor adds places and names on the map for everyone." },
+    "panel": { "how": { "ar": "الأمر /mapedit", "en": "The /mapedit command" } }
+  },
+  {
+    "resource": "w_level", "group": "player", "state": "started", "version": "1.0.0",
+    "label": { "ar": "المستويات والخبرة", "en": "Levels and XP" },
+    "description": { "ar": "خبرة اللاعبين ومستوياتهم ومضاعفات الخبرة.", "en": "Player XP, levels and XP boosts." },
+    "help": { "ar": "يحسب خبرة كل لاعب ومستواه. من هنا تعطي خبرة أو تحدد مستوى لاعب متصل.", "en": "Tracks each player's XP and level. Give XP or set the level of an online player here." },
+    "commands": [
+      { "id": "addxp", "level": "admin", "needsOnline": true,
+        "label": { "ar": "إعطاء خبرة", "en": "Give XP" },
+        "help": { "ar": "يزيد خبرة اللاعب بالرقم اللي تكتبه. يمكن ترتفع مرتبته إذا وصل الحد.", "en": "Adds the XP you type to the player. Their level may go up if they pass the limit." },
+        "args": [
+          { "key": "target", "type": "citizen", "required": true, "label": { "ar": "اللاعب", "en": "Player" }, "help": { "ar": "رقم المواطن للاعب، ولازم يكون متصلًا.", "en": "The player's citizen ID; they must be online." } },
+          { "key": "amount", "type": "int", "required": true, "min": 1, "max": 100000, "label": { "ar": "كمية الخبرة", "en": "XP amount" }, "help": { "ar": "كم نقطة خبرة تنضاف للاعب.", "en": "How many XP points the player gets." } }
+        ] },
+      { "id": "setlevel", "level": "admin", "needsOnline": true, "danger": true,
+        "label": { "ar": "تحديد المستوى", "en": "Set level" },
+        "help": { "ar": "يضع مستوى اللاعب على الرقم اللي تختاره ويمسح خبرته الحالية في هذا المستوى.", "en": "Puts the player's level at the number you choose and clears their XP inside that level." },
+        "args": [
+          { "key": "target", "type": "citizen", "required": true, "label": { "ar": "اللاعب", "en": "Player" }, "help": { "ar": "رقم المواطن للاعب، ولازم يكون متصلًا.", "en": "The player's citizen ID; they must be online." } },
+          { "key": "level", "type": "int", "required": true, "min": 1, "max": 100, "label": { "ar": "المستوى", "en": "Level" }, "help": { "ar": "المستوى الجديد للاعب.", "en": "The player's new level." } }
+        ] }
+    ]
+  },
+  {
+    "resource": "w_tribes", "group": "tribes", "state": "started", "version": "2.0.0",
+    "label": { "ar": "القبائل", "en": "Tribes" },
+    "description": { "ar": "القبائل وإنذاراتها وانتخاباتها.", "en": "Tribes, their warnings and elections." },
+    "help": { "ar": "يدير القبائل. الإنذارات والانتخابات تحتاج إدارة كاملة، وكل أمر يتسجل في سجل الإدارة.", "en": "Runs the tribes. Warnings and elections need a full admin, and every command is kept in the admin log." },
+    "commands": [
+      { "id": "warnplayer", "level": "admin", "needsOnline": true,
+        "label": { "ar": "إنذار لاعب", "en": "Warn a player" },
+        "help": { "ar": "يعطي اللاعب إنذارًا في قبيلته. ثلاث إنذارات تطرده من القبيلة.", "en": "Gives the player a warning in their tribe. Three warnings remove them from the tribe." },
+        "args": [
+          { "key": "target", "type": "citizen", "required": true, "label": { "ar": "اللاعب", "en": "Player" }, "help": { "ar": "رقم المواطن للاعب، ولازم يكون متصلًا.", "en": "The player's citizen ID; they must be online." } },
+          { "key": "reason", "type": "text", "required": true, "maxLength": 120, "label": { "ar": "السبب", "en": "Reason" }, "help": { "ar": "السبب يظهر للاعب ولزعيم القبيلة.", "en": "The reason is shown to the player and to the tribe leader." } }
+        ] }
+    ]
+  },
+  {
+    "resource": "w_baloot", "group": "fun", "state": "started", "version": "0.1.0",
+    "label": { "ar": "البلوت", "en": "Baloot" },
+    "description": { "ar": "طاولات البلوت وكراسيها ومستوى القيد.", "en": "Baloot tables, chairs and the qayd level." },
+    "help": { "ar": "لعبة البلوت داخل السيرفر. لوحته الأصلية تضيف الطاولات وتحدد مستوى القيد.", "en": "The baloot card game in the server. Its own panel adds tables and sets the qayd level." },
+    "panel": { "how": { "ar": "الأمر /baloot", "en": "The /baloot command" } }
+  },
+  {
+    "resource": "w_centralbank", "group": "economy", "state": "started",
+    "label": { "ar": "البنك المركزي", "en": "Central bank" },
+    "description": { "ar": "خزينة السيرفر وضرائبها وحاكم البنك.", "en": "The server treasury, its taxes and the governor." },
+    "help": { "ar": "يحفظ خزينة السيرفر. قرارات الضرائب للحاكم داخل اللعبة، فالإدارة تفتح الواجهة فقط.", "en": "Holds the server treasury. Tax decisions belong to the in-game governor, so staff only open the interface." },
+    "panel": { "how": { "ar": "الأمر /central", "en": "The /central command" }, "note": { "ar": "تفتح لك واجهة شخصيتك: إذا شخصيتك مو من موظفي البنك تشوف واجهة العميل.", "en": "It opens your character's view: unless your character is bank staff you see the customer view." } }
+  },
+  {
+    "resource": "w_banking", "group": "economy", "state": "stopped", "version": "1.2.0",
+    "label": { "ar": "الحسابات البنكية", "en": "Bank accounts" },
+    "description": { "ar": "حسابات اللاعبين والتحويلات.", "en": "Player accounts and transfers." },
+    "help": { "ar": "يدير حسابات اللاعبين البنكية. متوقف الآن: شغّله من هنا إذا مستواك يسمح.", "en": "Runs player bank accounts. It is stopped now: start it from here if your level allows." }
+  }
+]

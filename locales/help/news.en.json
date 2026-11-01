@@ -1,0 +1,153 @@
+{
+  "news": {
+    "list": "The news players see on the news card of the pause menu (Esc in the game), in this order. The card turns to the next item by itself, and players can click its dots.",
+    "count": "How many news items there are now, and the most the pause menu shows. When it is full, delete one to add another.",
+    "add": {
+      "text": "Opens an empty form for a new news item. It goes to the top, so players see it first. Nothing changes in the game until you save it.",
+      "example": "A horse race on Saturday at 9 PM"
+    },
+    "up": "Moves this item one place earlier on the card. The change reaches every pause menu at once.",
+    "down": "Moves this item one place later on the card. The change reaches every pause menu at once.",
+    "edit": "Opens this item in the form, with the card's preview beside it. Players keep seeing the old text until you save.",
+    "delete": {
+      "text": "Removes this item from every pause menu. A second step asks you to confirm first.",
+      "undo": "No. Write it again with Add news, or bring back the default news"
+    },
+    "reset": {
+      "text": "Replaces all the news now with the default list written in the config file of w_pausemenu. A second step asks you to confirm first.",
+      "undo": "No. The news added here is lost and must be written again"
+    },
+    "confirmDelete": {
+      "text": "Press Delete the news to remove it from every pause menu now. Cancel keeps it as it is.",
+      "undo": "No, you would write it again to bring it back"
+    },
+    "confirmReset": {
+      "text": "Press the button to put back the default news of the w_pausemenu config. Every item added here is removed.",
+      "undo": "No, the news added here must be written again"
+    },
+    "discard": "You changed this item without saving. Leave it drops those changes; Cancel keeps the form so you can save first.",
+    "missing": "The pause menu script w_pausemenu keeps the news. It is stopped now, so this page can neither read nor save them. Start it from Resources (owner level), then press Try again.",
+    "loadFailed": "The server did not answer the news request. Press Try again; if it keeps failing, check the server console.",
+    "openResources": "Opens the Resources page, where the owner can start w_pausemenu again.",
+    "retry": "Asks the server for the news again.",
+    "preview": "The news card as players see it in the pause menu, at its real size on a 1080p screen. It follows what you type; nothing is sent until you save.",
+    "previewLang": "Draws the card in Arabic or in English, as players with that game language see it. An empty English text shows the Arabic one.",
+    "newItem": "A new news item. Write the Arabic title at least, pick a picture and check the preview. Add the news puts it at the top of the card.",
+    "editItem": "Change the texts or the picture of this item. Save the change updates every pause menu at once.",
+    "titleAr": {
+      "text": "The headline in Arabic, required. Keep it short: it is drawn large. An Arabic letter counts as two of the 80 allowed.",
+      "example": "Horse Race, written in Arabic"
+    },
+    "titleEn": {
+      "text": "The headline for players whose game is in English. Leave it empty and they see the Arabic one. Up to 80 letters.",
+      "example": "Horse Race"
+    },
+    "textAr": {
+      "text": "The news itself in Arabic, a line or two; the card shows four lines at most. An Arabic letter counts as two of the 400 allowed, and a new line becomes a space.",
+      "example": "The race starts at the Valentine stables. The winner takes 50 dollars."
+    },
+    "textEn": {
+      "text": "The same text in English, up to 400 letters. Empty shows the Arabic text to English players.",
+      "example": "The race starts at the Valentine stables. The winner takes $50."
+    },
+    "dateAr": {
+      "text": "An optional small line under the text: when, or how often. An Arabic letter counts as two of the 60 allowed.",
+      "example": "Saturdays, 9 PM, written in Arabic"
+    },
+    "dateEn": {
+      "text": "The date line in English, up to 60 letters. Empty shows the Arabic line.",
+      "example": "Saturdays, 9 PM"
+    },
+    "image": "The picture behind the card, drawn in black and white. Pick one of the newspaper plates that come with the pause menu, or use your own picture.",
+    "plateCustom": "Uses a picture another script of the server serves, by its path. The path field shows under the plates.",
+    "path": {
+      "text": "The path of a picture another script serves: nui://<script>/<file> or https://cfx-nui-<script>/<file>, ending in .webp, .png, .jpg or .gif. Website links are not allowed.",
+      "example": "nui://my_posters/images/race.webp"
+    },
+    "save": {
+      "text": "Saves the item and shows it at once in every pause menu, even ones open right now. It stays after a server restart.",
+      "undo": "Yes, edit it again or delete it"
+    },
+    "cancel": "Closes the form without saving; if you changed something it asks first. The news in the game stays as it was.",
+    "saveFailed": "The server refused the save for the reason shown. Fix it and save again; nothing changed in the game."
+  },
+  "label": {
+    "news": {
+      "refresh": "Refresh",
+      "reset": "Back to the default news",
+      "deleteTitle": "Delete “%s”?",
+      "deleteText": "The item disappears from every pause menu at once, even ones open now.",
+      "deleteConfirm": "Delete the news",
+      "resetTitle": "Bring back the default news?",
+      "resetText": "The %s news items now are replaced with the default list of the w_pausemenu config. What was added here is lost.",
+      "resetConfirm": "Bring back the default",
+      "discardTitle": "Leave without saving?",
+      "discardText": "Your changes to this item are not saved yet.",
+      "discardConfirm": "Leave it",
+      "gone": "This item was deleted meanwhile. Close the form and add it again.",
+      "plate": {
+        "saloon": "Saloon",
+        "wagons": "Wagons",
+        "frontier": "Frontier"
+      },
+      "missingTitle": "The pause menu is stopped",
+      "loadFailed": "The news could not be read",
+      "openResources": "Open Resources",
+      "retry": "Try again",
+      "preview": "Preview",
+      "previewLang": "Preview language",
+      "lang": {
+        "ar": "عربي",
+        "en": "English"
+      },
+      "previewDraft": "What you are writing, as players will see it. Nothing is sent before you save.",
+      "previewRow": "Item %s of %s. Point at a row to preview it.",
+      "previewEmpty": "No news: players see this empty card.",
+      "tooLong": "Too long: at most %s (an Arabic letter counts as two)",
+      "needTitle": "Write the Arabic title first.",
+      "needShorter": "Shorten the marked text first.",
+      "needImage": "Type a valid picture path, or pick a plate.",
+      "plateCustom": "My own picture",
+      "newTitle": "New news item",
+      "editTitle": "Edit the news item",
+      "unsaved": "Not saved",
+      "titleAr": "Title (Arabic)",
+      "titleArPh": "سباق الخيول",
+      "titleEn": "Title (English)",
+      "enEmpty": "Empty: the Arabic shows",
+      "textAr": "Text (Arabic)",
+      "textArPh": "اكتب الخبر في سطر أو سطرين…",
+      "textEn": "Text (English)",
+      "dateAr": "Date line (Arabic)",
+      "dateArPh": "كل سبت · 9 مساءً",
+      "dateEn": "Date line (English)",
+      "image": "Picture",
+      "path": "Picture path",
+      "pathBad": "Not a path this page accepts: nui://<script>/<file> or https://cfx-nui-<script>/<file>, a .webp .png .jpg or .gif picture",
+      "pathHint": "Type the path of the picture.",
+      "saveNew": "Add the news",
+      "saveEdit": "Save the change",
+      "cancel": "Cancel",
+      "list": "News in carousel order",
+      "lead": "What players see on the news card of the pause menu (Esc), in this order. The card turns to the next item by itself.",
+      "count": "%s of %s",
+      "add": "Add news",
+      "empty": "No news now. The pause menu shows an empty news card until you add one.",
+      "noEnglish": "No English: the Arabic shows",
+      "autoPlate": "Plate in turn",
+      "up": "Move up",
+      "down": "Move down",
+      "edit": "Edit",
+      "delete": "Delete",
+      "full": "The pause menu shows at most %s news items. Delete one to add another.",
+      "card": {
+        "kickerAr": "أخبار البلدة",
+        "kickerEn": "Town News",
+        "noTitle": "No title yet",
+        "noText": "The text shows here.",
+        "emptyAr": "لا أخبار الآن. تابِع هذه الورقة.",
+        "emptyEn": "No news right now. Keep an eye on this sheet."
+      }
+    }
+  }
+}

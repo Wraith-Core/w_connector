@@ -1,0 +1,116 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   Wraith Core theme · fonts.css
+   @font-face rules only. URLs are relative to this file, so the faces load from
+   w_lib/nui/theme/fonts/ whichever resource links or @imports this sheet.
+
+   The files are byte-identical to w_loading/html/fonts (the loading screen keeps its own
+   copy because it runs before any other NUI) plus Amiri 700 and EB Garamond from
+   w_pausemenu/web/public/fonts, Amiri 700 Latin and Tajawal 500 Latin (the Google Fonts
+   subsets of the same releases). Licences sit next to the files (fonts/OFL-*.txt).
+
+   Weights exist only as shipped. A single-weight face is declared over a weight RANGE so
+   a bold request renders the face as drawn instead of a smeared synthetic bold (Chromium
+   only synthesises bold when the matched face's range stays below 600). Arabic is never
+   faux-bold, never slanted.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Latin: the RDR faces (from the game; see THEME.md, licence not verified) ── */
+@font-face { font-family: 'RDR Lino'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRLino-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Hapna Slab'; font-weight: 100 900; font-display: swap; src: url('fonts/HapnaSlabSerif-DemiBold.woff2') format('woff2'); }
+@font-face { font-family: 'RDR Catalogue'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); }
+
+/* ── Latin: EB Garamond, the pause menu's text face (variable 400-800, SIL OFL 1.1) ── */
+@font-face {
+  font-family: 'EB Garamond'; font-style: normal; font-weight: 400 800; font-display: swap;
+  src: url('fonts/EBGaramond-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'EB Garamond'; font-style: italic; font-weight: 400 800; font-display: swap;
+  src: url('fonts/EBGaramond-Italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ── Arabic (SIL OFL 1.1) ─────────────────────────────────────────────────── */
+/* ONE Arabic face on the whole server (owner, 2026-10-22): Lalezar, the poster lettering that is
+   the Arabic counterpart of the wood type, for titles, text, labels and buttons alike. The role
+   names stay -- Amiri (reading text), Aref Ruqaa (captions), Tajawal (labels, controls), Noto Sans
+   Arabic (w_chat / w_baloot's main face) -- so every stack on every page keeps working, but their
+   Arabic range draws Lalezar now. Where a name has Latin faces too, its Arabic faces keep the SAME
+   weights (Amiri 400/700, Tajawal 400/500/700): Chromium joins unicode-range faces only inside one
+   weight bucket, so a 100-900 Arabic face beside a 700 Latin face would never be picked and Noto
+   would draw. Lalezar is drawn as is at every weight (a face declared 700 is never faux-bolded).
+   The Latin faces are unchanged; the old Arabic files stay in fonts/ (a rollback is this block). */
+@font-face {
+  font-family: 'Lalezar'; font-weight: 100 900; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Amiri'; font-weight: 400; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Amiri'; font-weight: 700; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Amiri'; font-weight: 400; font-display: swap;
+  src: url('fonts/Amiri-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Amiri'; font-weight: 700; font-display: swap;
+  src: url('fonts/Amiri-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Aref Ruqaa'; font-weight: 100 900; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Tajawal'; font-weight: 400; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Tajawal'; font-weight: 500; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Tajawal'; font-weight: 700; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200F, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Tajawal'; font-weight: 400; font-display: swap;
+  src: url('fonts/tajawal-latin-400-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Tajawal'; font-weight: 500; font-display: swap;
+  src: url('fonts/tajawal-latin-500-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Tajawal'; font-weight: 700; font-display: swap;
+  src: url('fonts/tajawal-latin-700-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Noto Sans Arabic'; font-weight: 100 900; font-display: swap;
+  src: url('fonts/Lalezar-400-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+/* 'W Noto Arabic' stays the real Noto Sans Arabic: the theme's stacks end with it, so a letter
+   Lalezar lacks (rare Persian / Urdu / Quranic marks) still draws. Its line box is tamed (its own
+   box is 2.11em), so it cannot swell every line-height:normal row by 75% (Chromium 87+). */
+@font-face {
+  font-family: 'W Noto Arabic'; font-weight: 100 900; font-display: swap;
+  src: url('fonts/NotoSansArabic.woff2') format('woff2');
+  ascent-override: 100%; descent-override: 45%; line-gap-override: 0%;
+}

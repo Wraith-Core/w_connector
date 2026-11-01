@@ -1,0 +1,91 @@
+{
+  "settings": {
+    "onlyYou": "Everything on this page is yours only and is saved on your PC. It changes nothing on the server, for players or for other staff.",
+    "language": {
+      "text": "The language of this panel and every script's screens for you. It changes at once for this session; to keep it next time use the w_lib settings button.",
+      "example": "Pick English and every text turns English, left to right",
+      "undo": "Yes, pick the other language"
+    },
+    "languageDialog": {
+      "text": "Closes the panel and opens the w_lib settings, where your language choice is saved for good. Nobody else is affected.",
+      "undo": "Yes, open it again and pick another language"
+    },
+    "density": {
+      "text": "Changes the row height of tables. Comfortable reads easier; Compact fits more rows on the screen.",
+      "example": "Compact shows about 20 players instead of 16 on the same screen",
+      "undo": "Yes, pick the other size"
+    },
+    "tableMode": {
+      "text": "Picks the columns of the Players and Characters tables together: Essential for the important ones only, Detailed adds cash, gold, health, gang and license.",
+      "undo": "Yes, pick the other one"
+    },
+    "motion": {
+      "text": "Turns off movement and transitions in the panel. Useful if motion bothers you or the PC is slow; nothing else changes.",
+      "undo": "Yes, turn it off"
+    },
+    "helpMode": {
+      "text": "Makes every ? in the panel stand out; press any ? to learn what the thing beside it does. Shortcut F1; your choice is remembered.",
+      "undo": "Yes, turn it off here or with F1"
+    },
+    "preview": "A live sample of how tables look with your settings. Change the row size or the columns and watch it change here.",
+    "reset": {
+      "text": "Puts all your own panel settings back to how they came: row size, columns, motion and help mode. The server and players are not touched.",
+      "undo": "Yes, set them again"
+    },
+    "account": "Your staff account as the server sees it. Your level decides which pages and buttons you can use.",
+    "accName": "Your account name on the server, shown in the admin log next to everything you do.",
+    "accLevel": "Your staff level: mod, then admin, then god; each level can do everything below it. Only the owner can change it.",
+    "accCid": "The fixed citizen ID of your current character. Type it into any player box to pick yourself.",
+    "accSession": "Your session number (#) for this visit. It changes every time you join, which is why we use the citizen ID.",
+    "openPerms": "Opens the Permissions page showing what each level can do. Read only; it changes nothing.",
+    "keys": "Keyboard shortcuts. They work while the panel is open; F10 and PgUp also open it from the game."
+  },
+  "label": {
+    "settings": {
+      "onlyYou": "These settings are yours only and are saved on your PC.",
+      "appliesYou": "Only you, at once",
+      "language": "Language",
+      "languageRow": "Panel language",
+      "languageDesc": "Every script's screens follow it for you in this session.",
+      "langAr": "العربية",
+      "langEn": "English",
+      "languageDialog": "Keep the language (/w_lib)",
+      "display": "Display",
+      "density": "Row size",
+      "densityDesc": "The row height in every table.",
+      "comfortable": "Comfortable",
+      "compact": "Compact",
+      "tableMode": "Table columns",
+      "tableModeDesc": "How many columns the Players and Characters tables show.",
+      "motion": "Reduce motion",
+      "motionDesc": "No animations or transitions.",
+      "help": "Help",
+      "helpMode": "Help mode",
+      "helpModeDesc": "Every ? stands out and explains what is beside it.",
+      "preview": "Table preview",
+      "previewName": "Name",
+      "previewJob": "Job",
+      "previewCash": "Cash",
+      "previewHealth": "Health",
+      "previewStatus": "Status",
+      "reset": "Reset my settings",
+      "resetDone": "Your settings are back to how they came",
+      "account": "Your account",
+      "accName": "Name",
+      "accLevel": "Level",
+      "accCid": "Citizen ID",
+      "accSession": "Session number",
+      "openPerms": "What does my level allow?",
+      "keys": "Keyboard shortcuts",
+      "key": {
+        "open": "Open or close the panel",
+        "quick": "Quick menu",
+        "close": "Close the panel or a window",
+        "palette": "Quick search",
+        "help": "Help mode",
+        "pages": "Previous or next page",
+        "rows": "Move between table rows"
+      }
+    }
+  }
+}

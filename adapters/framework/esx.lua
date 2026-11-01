@@ -104,4 +104,9 @@ function Esx.offline(charId)
     return r and esxRow(r) or nil
 end
 
+-- Raw, framework-owned definitions for the shared admin UI.
+function Esx.consoleCatalog()
+    return { jobs = esx().GetJobs() }
+end
+
 WC.Adapters.register('framework', 'esx', Esx)

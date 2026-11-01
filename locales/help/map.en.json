@@ -1,0 +1,164 @@
+{
+  "map": {
+    "zoomIn": "Zooms the map in one step. The mouse wheel up or the + key do the same.",
+    "zoomOut": "Zooms the map out one step. The mouse wheel down or the - key do the same.",
+    "fit": "Shows the whole map, edge to edge.",
+    "me": "Moves the map to where you are and zooms in on you.",
+    "places": {
+      "text": "Shows or hides service places like banks, stables and doctors. Only your view changes.",
+      "undo": "Yes, press it again"
+    },
+    "labels": {
+      "text": "Shows or hides town and area names on the map. Only your view changes.",
+      "undo": "Yes, press it again"
+    },
+    "refresh": "Fetches the latest player positions and markers from the server now. They already update by themselves every second.",
+    "clearWaypoint": "Removes the destination you set on your map. Nobody else is affected.",
+    "cursor": "The coordinates of the spot under the mouse right now. Move the mouse over the map and they change.",
+    "legend": "What the shapes mean: a circle is a player, a circle with a dot in it is you, a red diamond is a dead player and a small square is a service place.",
+    "following": "The map follows the picked player as they move. It stops when you drag the map yourself.",
+    "tabPlayers": "The players shown on the map. Press one and the map goes to them and their actions appear below.",
+    "tabPlaces": "Towns, services and saved markers. Press one and the map goes there.",
+    "tabTools": "Extra map tools: go to coordinates, and the look of the server map.",
+    "search": "Filters the list by name, citizen ID like 12, session number like #5, or place name.",
+    "filterAll": "Shows every player.",
+    "filterAlive": "Shows living players only.",
+    "filterDead": "Shows dead players only, to find fast who needs reviving.",
+    "colCitizen": "The character's fixed citizen ID, with the session number (#) that changes each join under it.",
+    "colName": "The character's name with their job under it.",
+    "colStatus": "Whether the player is alive or dead right now.",
+    "colPlace": "The place and its kind: town, service or saved marker.",
+    "selected": "The player you picked. These actions apply to them, and their position updates every second.",
+    "follow": {
+      "text": "Keeps the map on the player as they move. Stops when you drag the map yourself.",
+      "undo": "Yes, press it again"
+    },
+    "position": "Where the player is now, in numbers. Copy puts it as a vector3.",
+    "openPlayer": "Opens the player's full file on the Players page, with money, items and moderation.",
+    "deselect": "Clears the selection. Nothing happens to the player.",
+    "player": {
+      "goto": "Moves you to the player; the player does not move. The panel closes so you can see.",
+      "bring": {
+        "text": "Moves the player to you. Their old spot is saved so Send back can return them.",
+        "undo": "Yes, with Send back"
+      },
+      "bringBack": "Returns the player to where they were before you brought them. Works only after Bring.",
+      "revive": "Brings the player back to life where they lie, with full health. The player notices right away.",
+      "heal": "Fills the player's health. It does not bring back a dead player; use Revive.",
+      "refill": "Fills the player's hunger and thirst to 100. They see it on their needs bar right away.",
+      "freeze": {
+        "text": "Holds the player in place until you unfreeze them. Useful while investigating or explaining.",
+        "undo": "Yes, with the same button, Unfreeze"
+      },
+      "spectate": {
+        "text": "See the game from where the player is, to check what they are doing, while you stay hidden. Stop watching ends it and puts you back.",
+        "undo": "Yes, with Stop watching"
+      },
+      "openInventory": "Opens the player's bag on your screen to see and move their items. The menu closes to open the bag.",
+      "wardrobe": "Opens the wardrobe on the player's own screen so they can change clothes."
+    },
+    "findCoords": "Type coordinates and the map goes there and marks the spot, so you can look before you jump. You can paste a whole vector3.",
+    "locate": "Moves the map to the coordinates you typed and opens the spot's actions. It does not move you.",
+    "theme": {
+      "text": "Changes the colours of the server map for every player, not only you. It applies at once.",
+      "undo": "Yes, pick the old look"
+    },
+    "point": "The spot you clicked on the map. Choose what to do with it.",
+    "waypoint": {
+      "text": "Sets a destination on this spot on your own map, like a player does in the game map.",
+      "undo": "Yes, with Clear destination"
+    },
+    "copyPoint": {
+      "text": "Copies the spot as a vector2 to paste into a file or a message.",
+      "example": "vector2(-308.00, 775.00)"
+    },
+    "tpHere": "Moves you to this spot, right onto the ground. The panel stays open.",
+    "bringHere": "Moves the picked player to this spot. Their old spot is not saved, so be sure before you press."
+  },
+  "label": {
+    "map": {
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "fit": "Whole map",
+      "me": "My position",
+      "places": "Services",
+      "labels": "Place names",
+      "refresh": "Refresh",
+      "clearWaypoint": "Clear destination",
+      "legend": {
+        "title": "Shapes",
+        "player": "Player",
+        "self": "You",
+        "dead": "Dead",
+        "place": "Service"
+      },
+      "following": "Following: %s",
+      "tabs": {
+        "label": "Map lists",
+        "players": "Players",
+        "places": "Places",
+        "tools": "Tools"
+      },
+      "search": "Name, citizen ID or #session…",
+      "searchPlaces": "Search a place…",
+      "filter": {
+        "label": "Player state",
+        "all": "All",
+        "alive": "Alive",
+        "dead": "Dead"
+      },
+      "col": {
+        "citizen": "Citizen ID",
+        "name": "Name",
+        "status": "State",
+        "place": "Place"
+      },
+      "alive": "Alive",
+      "dead": "Dead",
+      "kind": {
+        "town": "Town or area",
+        "service": "Service",
+        "saved": "Saved marker"
+      },
+      "selected": "Picked player",
+      "follow": "Follow",
+      "stopFollow": "Stop following",
+      "position": "Position",
+      "openPlayer": "Open their file",
+      "deselect": "Clear selection",
+      "selfTag": "This is you",
+      "player": {
+        "goto": "Go to",
+        "bring": "Bring",
+        "bringBack": "Send back",
+        "revive": "Revive",
+        "heal": "Heal",
+        "refill": "Fill needs",
+        "freeze": "Freeze",
+        "unfreeze": "Unfreeze"
+      },
+      "findCoords": "Go to coordinates",
+      "locate": "Show on the map",
+      "theme": "Server map look",
+      "themeNames": {
+        "light": "Paper",
+        "dark": "Night",
+        "ember": "Ember",
+        "blueprint": "Blueprint",
+        "bone": "Bone"
+      },
+      "point": "Picked spot",
+      "waypoint": "Set destination here",
+      "destination": "Destination",
+      "copyPoint": "Copy the spot",
+      "tpHere": "Take me here",
+      "bringHere": "Move %s here",
+      "done": "Done",
+      "count": "%s of %s",
+      "noPlayers": "No player matches the search",
+      "noPlaces": "No place matches the search",
+      "noCfg": "The map has not arrived yet. Make sure the map script w_map is running, then press Refresh.",
+      "pickHint": "Pick a player in the list or press them on the map to see their actions here."
+    }
+  }
+}

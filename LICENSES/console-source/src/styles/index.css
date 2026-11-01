@@ -1,0 +1,6 @@
+/* w_admin · the design layer. Imported FIRST by main.tsx: the pages' own CSS follows it in the bundle. */
+@import './tokens.css';
+@import './base.css';
+@import './kit.css';
+@import './help.css';
+@import './shell.css';

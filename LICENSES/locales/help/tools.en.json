@@ -1,0 +1,254 @@
+{
+  "tools": {
+    "section": {
+      "status": "Your state right now: the modes that are on, where you stand and how many things you spawned. It updates by itself every 2 seconds.",
+      "me": "Modes for you only, like flying, invisibility and protection. Each one stays on until you turn it off yourself.",
+      "health": "Heals, revives or cleans you. To treat another player, open their file on the Players page or pick them on the map.",
+      "travel": {
+        "text": "Moves you somewhere else fast; the panel closes so you can see your new spot. Your spot is saved before every jump.",
+        "undo": "Yes, with Go back"
+      },
+      "spawn": "Spawns a temporary horse, wagon, animal or person next to you. They belong to nobody and one button removes them all.",
+      "vehicle": "Repairs or fixes the wagon or horse you are using now. You must be on it or close to it.",
+      "dev": "Tools for developers: show and copy coordinates and object IDs, and clear the area around you. The numbers show for you only."
+    },
+    "active": "The modes that are on for you now. Each stays on until you turn it off here or in the quick menu.",
+    "position": {
+      "text": "Where you are now as X, Y and Z. Copy gives you a ready vector3 to paste into a file or a message.",
+      "example": "vector3(-175.30, 626.80, 113.20)"
+    },
+    "spawned": "How many temporary things you have spawned now, out of 25 allowed. At the limit, remove them first, then spawn again.",
+    "noclip": {
+      "text": "Fly through walls while hidden and protected. Q goes up, E goes down, Shift is faster. The panel closes so you can move.",
+      "undo": "Yes, turn it off here or in the quick menu (F10)"
+    },
+    "invisible": {
+      "text": "Hides your character from every player, so nobody sees you. Useful while watching or investigating.",
+      "undo": "Yes, turn it off any time"
+    },
+    "godmode": {
+      "text": "Stops all damage to you, so falls and bullets cannot hurt or kill you. Turn it off when you are done.",
+      "undo": "Yes, turn it off any time"
+    },
+    "names": {
+      "text": "Shows the name and session number (#) above every nearby player. Only you see them; players do not know.",
+      "undo": "Yes, turn it off any time"
+    },
+    "boost": {
+      "text": "Makes you run faster on foot. It does not affect your horse, and only you notice it.",
+      "undo": "Yes, turn it off any time"
+    },
+    "stamina": {
+      "text": "Keeps your stamina full so you never tire from running or swimming.",
+      "undo": "Yes, turn it off any time"
+    },
+    "heal": "Fills your health, stamina and needs. It does not bring you back from death; use Revive for that.",
+    "revive": "Brings you back to life where you lie, with full health.",
+    "cleanPed": "Wipes blood and wetness off your character. Looks only; your health does not change.",
+    "refill": "Fills your hunger and thirst to 100. Only you are affected.",
+    "noclipSpeed": {
+      "text": "How fast Noclip flies. 1x is normal, 0.25x is slow for careful moves and 10x is fast for long trips.",
+      "undo": "Yes, pick another speed"
+    },
+    "tpWaypoint": "Moves you to the waypoint you set on the map, right onto the ground. Set the waypoint first, in the game map or on the Map page here.",
+    "tpBack": "Takes you back to where you were before your last jump. It stays greyed out until you have jumped once.",
+    "tpForward": "Moves you onto the nearest surface in front of the camera, like a roof or a rock you are looking at. Handy to get past something.",
+    "tpCoords": {
+      "text": "Moves you to a spot by its X, Y and Z numbers. Leave Z empty and we find the ground. You can paste a whole vector3 into any box.",
+      "example": "X -175.3 · Y 626.8 · Z empty"
+    },
+    "spawnKind": "What to spawn: horses, wagons, animals or people. The model list below changes with your choice.",
+    "spawnModel": {
+      "text": "Pick the model by name. You can type to search by name or by model name.",
+      "example": "Arabian or A_C_Horse_Arabian_White"
+    },
+    "mount": "On: you get on the horse or wagon as soon as it appears. Off: it waits next to you and you get on yourself.",
+    "behavior": "What the animal or person does after it appears: Stand stays put and does not attack; Wander walks around freely.",
+    "spawn": "Spawns the chosen model next to you now; nearby players see it. The limit is 25 temporary things; remove them all with Remove all my spawns.",
+    "cleanupSpawned": {
+      "text": "Removes every temporary thing you spawned. Anything a player is riding stays, and players' own horses are never touched.",
+      "undo": "No, but you can spawn them again"
+    },
+    "repairVehicle": "Repairs the wagon you are in, or the nearest empty one, as good as new.",
+    "flipVehicle": "Puts an overturned wagon back on its wheels where it is.",
+    "vehicleBoost": "Gives the wagon you drive a short burst of speed. You must be the driver.",
+    "healMount": "Restores the health and stamina of the horse you ride now. It cannot bring back a dead horse; the stable does that.",
+    "deleteVehicle": "Deletes the empty wagon near you (within 6 metres) from the world. Get off it first. Cannot be undone.",
+    "laser": {
+      "text": "Shows a laser from the middle of the screen: aim at anything to see its ID, press J to delete it or 7 to copy its details. Players and owned horses are protected.",
+      "undo": "You can turn the laser off any time, but what it deleted does not come back"
+    },
+    "showCoords": {
+      "text": "Shows your coordinates and heading on screen, updating as you move. Only you see them.",
+      "undo": "Yes, turn it off any time"
+    },
+    "hashes": {
+      "text": "Shows the IDs (hashes) of the objects near you on screen. For developers building maps and scripts.",
+      "undo": "Yes, turn it off any time"
+    },
+    "copyCoords3": {
+      "text": "Copies where you stand as a vector3 to paste into a config file or a message. Nothing changes in the game.",
+      "example": "vector3(-175.30, 626.80, 113.20)"
+    },
+    "copyCoords4": {
+      "text": "Copies your position and heading as a vector4. Handy for spawn points that face a direction.",
+      "example": "vector4(-175.30, 626.80, 113.20, 92.40)"
+    },
+    "copyHeading": {
+      "text": "Copies only your character's heading, a number from 0 to 360 degrees.",
+      "example": "92.40"
+    },
+    "clearArea": "Deletes every unprotected thing around you within the chosen distance: people, animals, wagons and objects, up to 50 at a time. Players, what they ride and stable horses are never touched. Cannot be undone.",
+    "radius": {
+      "text": "How many metres around you to clear, from 5 to 100. Example: 30 metres is about a street with its houses.",
+      "example": "30"
+    },
+    "stopSpectate": "Stops watching the player and puts you back where you were before you started watching.",
+    "openQuick": "Opens the small quick menu at the side of the screen with these same tools, so you can use them while watching the game. Shortcut F10."
+  },
+  "label": {
+    "tools": {
+      "section": {
+        "status": "Your status",
+        "me": "Movement and protection",
+        "health": "My health",
+        "travel": "Travel",
+        "spawn": "Temporary spawns",
+        "vehicle": "Wagon and horse",
+        "dev": "Developer tools"
+      },
+      "lead": {
+        "me": "For you only; they stay on until you turn them off.",
+        "travel": "The panel closes after a jump so you can see your new spot.",
+        "spawn": "Temporary staff things that belong to nobody.",
+        "dev": "The numbers show for you only."
+      },
+      "tool": {
+        "noclip": "Noclip (fly)",
+        "invisible": "Invisible",
+        "godmode": "God mode",
+        "names": "Names over players",
+        "boost": "Run faster",
+        "stamina": "Endless stamina",
+        "heal": "Full heal",
+        "revive": "Revive",
+        "cleanPed": "Clean up",
+        "refill": "Fill hunger and thirst",
+        "noclipSpeed": "Noclip speed",
+        "tpWaypoint": "Go to map waypoint",
+        "tpBack": "Go back",
+        "tpForward": "Jump ahead",
+        "tpCoords": "Go to coordinates",
+        "spawn": "Spawn",
+        "cleanupSpawned": "Remove all my spawns",
+        "repairVehicle": "Repair wagon",
+        "flipVehicle": "Flip wagon upright",
+        "vehicleBoost": "Wagon speed burst",
+        "healMount": "Heal my horse",
+        "deleteVehicle": "Delete nearby wagon",
+        "laser": "Object laser",
+        "showCoords": "Show my coordinates",
+        "hashes": "Show object IDs",
+        "copyCoords3": "Copy position (vector3)",
+        "copyCoords4": "Copy position and heading (vector4)",
+        "copyHeading": "Copy heading",
+        "clearArea": "Clear the area around me",
+        "stopSpectate": "Stop watching"
+      },
+      "hint": {
+        "noclip": "Free movement · Q up, E down",
+        "invisible": "Players cannot see you",
+        "godmode": "No damage, no death",
+        "names": "Name and session number over nearby players",
+        "boost": "On foot only",
+        "stamina": "Never tire from running",
+        "heal": "Health, stamina and needs",
+        "revive": "Back to life where you lie",
+        "cleanPed": "Wipes blood and wetness",
+        "refill": "Hunger and thirst to 100",
+        "noclipSpeed": "1x is the normal speed",
+        "tpWaypoint": "Onto the ground at the map waypoint",
+        "tpBack": "To your spot before the last jump",
+        "tpForward": "Onto the nearest surface in view",
+        "tpCoords": "Leave Z empty and we find the ground",
+        "cleanupSpawned": "Ridden things and player horses stay",
+        "repairVehicle": "Your wagon or the nearest empty one",
+        "flipVehicle": "Back on its wheels",
+        "vehicleBoost": "While you drive only",
+        "healMount": "The horse you ride now",
+        "deleteVehicle": "An empty wagon within 6 metres",
+        "laser": "J deletes · 7 copies",
+        "showCoords": "On screen, updating as you move",
+        "hashes": "IDs of nearby objects",
+        "copyCoords3": "Position without heading",
+        "copyCoords4": "Position with your heading",
+        "copyHeading": "A number from 0 to 360",
+        "clearArea": "Up to 50 things at a time"
+      },
+      "do": {
+        "heal": "Heal me",
+        "revive": "Revive me",
+        "cleanPed": "Clean me",
+        "refill": "Fill up",
+        "tpWaypoint": "Go",
+        "tpBack": "Go back",
+        "tpForward": "Jump",
+        "tpCoords": "Go",
+        "spawn": "Spawn",
+        "cleanupSpawned": "Remove them",
+        "repairVehicle": "Repair",
+        "flipVehicle": "Flip",
+        "vehicleBoost": "Boost",
+        "healMount": "Heal",
+        "deleteVehicle": "Delete",
+        "copyCoords3": "Copy",
+        "copyCoords4": "Copy",
+        "copyHeading": "Copy",
+        "clearArea": "Clear",
+        "stopSpectate": "Stop watching"
+      },
+      "kind": {
+        "label": "Type",
+        "horses": "Horses",
+        "wagons": "Wagons",
+        "animals": "Animals",
+        "peds": "People"
+      },
+      "behavior": {
+        "label": "After it appears",
+        "stand": "Stand, calm",
+        "wander": "Wander"
+      },
+      "model": "Model",
+      "pickModel": "Pick a model…",
+      "searchModel": "Search by name or model…",
+      "modelCount": "%s models",
+      "mount": "Get on it when it appears",
+      "radius": "Distance around you",
+      "metres": "m",
+      "coords": "Coordinates",
+      "active": "On now",
+      "activeNone": "Nothing is on right now",
+      "position": "Your position",
+      "spawned": "Spawned now",
+      "spawnedOf": "%s of %s",
+      "watching": "You are watching player %s",
+      "openQuick": "Quick menu",
+      "done": "Done",
+      "copied": "Copied",
+      "unavailableBack": "You have not jumped yet",
+      "speed": "%sx",
+      "paletteOn": "On now · press to turn off",
+      "paletteOff": "Off · press to turn on",
+      "paletteForm": "Opens My tools to fill in the details",
+      "confirm": {
+        "cleanup": "We will remove every temporary thing you spawned. Anything a player is riding stays, and players' horses are never touched.",
+        "deleteVehicle": "We will delete the empty wagon near you from the world. Get off it first.",
+        "clearArea": "We will delete every unprotected thing within %s metres around you, up to 50 at a time. Players, what they ride and stable horses are never touched.",
+        "clearYes": "Clear the area",
+        "deleteYes": "Delete the wagon",
+        "cleanupYes": "Remove my spawns"
+      }
+    }
+  }
+}

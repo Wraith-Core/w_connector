@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '2.0.3'
+version '2.1.0'
 description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith control panel.'
 
 -- The website bridge, join queue and /wadmin menu share this resource.
@@ -25,12 +25,12 @@ description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith 
 
 dependencies { 'oxmysql' }
 
--- The in-game Wraith menu (/wadmin; F10 on FiveM) and the spectate streamer share the one ui_page:
+-- The original full console (Page Up) and quick menu (F10) share NUI with the spectate streamer.
 -- nui/index.html loads both (docs/admin-platform/08-ingame-menu.md). capture.html stays as the streamer alone.
-ui_page 'nui/index.html'
-files { 'nui/index.html', 'nui/menu.css', 'nui/menu.js', 'nui/capture.html', 'nui/spectate.js' }
+ui_page 'web/build/index.html'
+files { 'web/build/**/*', 'nui/capture.html', 'nui/spectate.js', 'core/console_contract.json', 'core/console_models.json', 'locales/ar.json', 'locales/en.json' }
 
-client_scripts { 'client/cl_actions.lua', 'client/cl_death.lua', 'client/cl_spectate.lua', 'client/cl_map.lua', 'client/cl_menu.lua', 'client/cl_menu_self.lua' }
+client_scripts { 'client/cl_actions.lua', 'client/cl_death.lua', 'client/cl_spectate.lua', 'client/cl_map.lua', 'client/cl_console.lua', 'client/cl_menu_self.lua', 'client/cl_console_tools.lua' }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
@@ -64,6 +64,9 @@ server_scripts {
     'ops/wraith_admin.lua',
     'ops/live.lua',
     'ops/ingame.lua',
+    'ops/console.lua',
+    'ops/console_actions.lua',
+    'ops/console_entities.lua',
     'core/script_permission_registry.lua',
     'core/script_catalog.lua',
     'core/script_permissions.lua',

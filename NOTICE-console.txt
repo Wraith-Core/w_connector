@@ -1,0 +1,5 @@
+The Wraith admin console UI is derived from w_admin (GPL-3.0).
+Its corresponding source, build inputs, package lock, provenance and licence are supplied
+in LICENSES/console-source; adjacent LICENSES/locales, LICENSES/core and LICENSES/nui are
+the relative inputs used by that project. From console-source run npm ci and npm run build.
+The UI never grants or stores server permissions.

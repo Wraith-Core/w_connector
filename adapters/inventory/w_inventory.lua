@@ -57,4 +57,9 @@ function WInv.clear(src)
     return true
 end
 
+function WInv.openPlayer(actor, target)
+    local result = inv():forceOpenInventory(actor, 'player', target)
+    return result ~= nil and result ~= false
+end
+
 WC.Adapters.register('inventory', 'w_inventory', WInv)

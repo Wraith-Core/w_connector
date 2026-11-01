@@ -57,4 +57,9 @@ function Ox.clear(src)
     return true
 end
 
+function Ox.openPlayer(actor, target)
+    local result = inv():forceOpenInventory(actor, 'player', target)
+    return result ~= nil and result ~= false
+end
+
 WC.Adapters.register('inventory', 'ox_inventory', Ox)

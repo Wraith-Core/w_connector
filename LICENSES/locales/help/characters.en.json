@@ -1,0 +1,213 @@
+{
+  "characters": {
+    "search": {
+      "text": "Searches every saved character, online or not, by citizen ID, character name, account name or license. Shows the first 60 matches.",
+      "example": "Type 14 or Fahad"
+    },
+    "filterAll": "Shows every character the search found. Changes nothing on the server.",
+    "filterOnline": "Shows only characters whose player is in the server now, each with its session number (#).",
+    "filterOffline": "Shows characters that are not online. You can still change their money and job; it waits in their data until the player joins.",
+    "filterBlocked": "Shows suspended characters that their players cannot play until you lift the suspension.",
+    "clearSearch": "Clears the search and shows the most recently played characters again.",
+    "colId": "The character's fixed citizen ID, with its session number (#) beside it when online now.",
+    "colName": "The character's in-game name, with the account name of the player who owns it under it.",
+    "colJob": "The character's current job. Change it in the Money & job tab.",
+    "colState": "Online now or offline, and Suspended when it may not be played.",
+    "colLast": "The last time the character's data was saved, roughly when its player last played it. Server time.",
+    "colLicense": "The player's Rockstar license, the same for all their characters. It tells you which characters belong to one player.",
+    "colSlot": {
+      "text": "The character's slot on the player's character selection screen.",
+      "example": "2 means their second character"
+    },
+    "reportDelete": "Summary of the last deletion: what each script removed, how much money went back to the reserve, and whether the number is free. It stays until you hide it.",
+    "reportTransfer": "Result of the last number transfer: who took the number and where its holder went. If it stopped half way it tells you what to do. It stays until you hide it.",
+    "openReported": "Opens this character's file in the side panel so you can see how it is now. Changes nothing.",
+    "drawer": "The selected character's file. The tabs hold its details, where its data lives, money and job, suspension, its citizen ID and deletion.",
+    "tabOverview": "The character's details: IDs, account, job, balances and the account's other characters. Read only.",
+    "tabLinks": "Where the server keeps the character's data, grouped by what a deletion would do to it. Read only.",
+    "tabEconomy": "Gives the character money or an item, or changes its job and gang, whether it is online or not.",
+    "tabAccess": "Suspends the character so its player cannot play it, or lifts the suspension.",
+    "tabIdentity": "Changes the character's citizen ID, or hands its number to another character.",
+    "tabDanger": "Deletes the character and its data for good. It cannot be undone.",
+    "kvCitizenId": "This character's fixed citizen ID. It only changes if you change it in the Identity tab. Copy it to paste into a command or a message.",
+    "kvState": "Online now with its session number (#), or offline. Changes to an offline character are saved to its data.",
+    "kvAccount": "The name of the player account that owns the character, like their RedM name.",
+    "kvGang": "The gang the character belongs to now. Change it in the Money & job tab.",
+    "balances": "The character's balances in the central bank now: cash, bank and gold. Change cash and gold in the Money & job tab.",
+    "siblings": "Other characters on the same account, so the same player. Press one to open its file.",
+    "offline": "The character is offline: changes are saved to its data and its player finds them on joining.",
+    "links": "Where the server keeps the character's data, grouped by what a deletion does to it. The number is how many records.",
+    "kindCore": "The character itself and its bank accounts. A deletion removes them and every balance goes back to the reserve.",
+    "kindData": "Things only this character uses, like its looks, bag and horses. A deletion removes them for good.",
+    "kindAsset": "Property such as a house or a store. A deletion returns it to the game: the house goes back on sale, the store back to the government.",
+    "kindHistory": "Old records like bank movements. They stay after a deletion, filed as deleted instead of under the character's number.",
+    "kindOther": "Data its own script handles in its own way when the character is deleted.",
+    "techDetails": "Shows the database table and column names for each group. Only useful to a developer; it changes nothing.",
+    "moneySafe": "Where the character's money goes on deletion: it is not lost, it all returns to the reserve through the central bank.",
+    "money": {
+      "text": "Adds cash or gold to the character or takes it away. Online, they see it at once; offline, it is saved to their data.",
+      "undo": "Yes, with the opposite operation for the same amount"
+    },
+    "moneyType": "Cash is the money in the character's pocket and gold is gold bars. The bank balance is changed from the central bank itself.",
+    "moneyOp": "Add raises the balance; Take away lowers it by the same amount.",
+    "amount": {
+      "text": "How much to add or take away, from 0.01 to 1000000000. Up to two decimals are fine.",
+      "example": "250 with cash means $250; 2.5 with gold means two and a half gold"
+    },
+    "moneyReason": "Why you add the money. It is kept in the admin log; only adding needs it, because the money comes out of the central bank reserve.",
+    "moneyApply": {
+      "text": "Carries out the operation now and writes it to the admin log.",
+      "undo": "Yes, with the opposite operation"
+    },
+    "item": "Gives the character an item in its bag. If it is offline, the item is added to its saved bag.",
+    "itemPick": "The item to give. Search by name; the small name under it is what scripts call it.",
+    "itemCount": {
+      "text": "How many to give, from 1 to 1000.",
+      "example": "5 means five of it"
+    },
+    "itemGive": {
+      "text": "Gives the item now. If it does not arrive, a message tells you why.",
+      "undo": "No, there is no take-back here"
+    },
+    "job": {
+      "text": "Changes the character's job and rank in it. Online, it changes at once; offline, on its next join.",
+      "undo": "Yes, pick the old job and apply it"
+    },
+    "jobPick": "The new job. Search by its name.",
+    "grade": {
+      "text": "The rank inside the job or gang. 0 is the lowest; a higher number usually means more rights.",
+      "example": "0 trainee, 3 boss"
+    },
+    "jobApply": "Saves the chosen job and rank now.",
+    "gang": {
+      "text": "Changes the character's gang and rank in it. Online, it changes at once; offline, on its next join.",
+      "undo": "Yes, pick the old gang and apply it"
+    },
+    "gangPick": "The new gang. Search by its name.",
+    "gangApply": "Saves the chosen gang and rank now.",
+    "access": {
+      "text": "Stops this one character from being played: its player sees 'contact the administration', and their other characters stay available.",
+      "undo": "Yes, by lifting the suspension"
+    },
+    "blockReason": {
+      "text": "The player sees the reason when trying to join with the character, and it is kept in the log.",
+      "example": "Cheating investigation"
+    },
+    "block": {
+      "text": "Suspends the character now. If it is playing, it is kicked at once and sees the reason.",
+      "undo": "Yes, by lifting the suspension"
+    },
+    "unblock": "Lifts the suspension so the player can join with this character again right away.",
+    "blocked": "This character is suspended now: the reason, who suspended it and when.",
+    "reassign": {
+      "text": "Gives the character a new citizen ID you choose. All its data moves with it and its old number becomes free. It must be offline.",
+      "example": "A special number like 777"
+    },
+    "newId": {
+      "text": "The new number: digits only, 1 to 9 of them, and not held by another character.",
+      "example": "777"
+    },
+    "newIdTaken": "Another character holds the number you typed now, so it cannot go to this one. Pick another number.",
+    "openHolder": "Opens the file of the character that holds the number; from its Identity tab you can hand its number to this character.",
+    "reassignApply": {
+      "text": "Changes the number now. Its player sees the new number on the next join.",
+      "undo": "Yes, change it back to its old number while that is still free"
+    },
+    "transfer": "Gives this character's number to another character. The holder moves to a fresh number with everything it has; nothing passes between them. Both are kicked if online.",
+    "transferTarget": {
+      "text": "The citizen ID of the character that takes the number, or # and the session number if it is online. Its name shows under the field so you can check.",
+      "example": "12 or #5"
+    },
+    "transferSides": "Who the transfer affects: the holder moves to a fresh number, and the other character takes this one.",
+    "transferApply": {
+      "text": "Opens the confirm window: type the number there and the whole transfer runs in one go.",
+      "undo": "Not with one press; move it back with another transfer"
+    },
+    "transferNumeric": "Only sequential numbers like 14 can be handed on. This character has an old ID like OMG95204, so give it a new number first with Change citizen ID.",
+    "delete": "Deletes the character for good; its property returns to the game and its money to the reserve. Cannot be undone; type the citizen ID to confirm.",
+    "deleteSummary": "What would happen to this character's data if you delete it, from what we found now.",
+    "deleteStart": "Opens the confirm window. Type the citizen ID there and the deletion starts. If the character is online it is kicked first and its logout saved.",
+    "refusal": "A script refused the deletion, so everything stopped. Fix the reason shown, then try again; deleting again is safe and repeats nothing.",
+    "openPlayer": "Opens this player on the Players page so you can go to them, bring them or heal them. Works only while the character is online.",
+    "reload": "Fetches the character's data from the server again."
+  },
+  "label": {
+    "characters": {
+      "filter": {
+        "label": "Show",
+        "all": "All",
+        "online": "Online",
+        "offline": "Offline",
+        "blocked": "Suspended"
+      },
+      "tab": {
+        "overview": "Profile",
+        "links": "Links",
+        "economy": "Money & job",
+        "access": "Suspension",
+        "identity": "Citizen ID",
+        "danger": "Delete"
+      },
+      "tabs": "Character file sections",
+      "table": "Characters",
+      "serverId": "Session number",
+      "acc": {
+        "cash": "Cash",
+        "bank": "Bank",
+        "gold": "Gold"
+      },
+      "noBalances": "No balances",
+      "techShow": "Technical details",
+      "techHide": "Hide technical details",
+      "records": "%s records in %s places",
+      "noLinks": "Nothing is linked to this character",
+      "moneyType": "Money type",
+      "moneyOp": "Operation",
+      "moneyReason": "Reason for adding",
+      "moneyAdd": "%s will be added to %s",
+      "moneyRemove": "%s will be taken from %s",
+      "toSaved": "to its saved data",
+      "give": "Give",
+      "pickItem": "Pick an item…",
+      "pickJob": "Pick a job…",
+      "pickGang": "Pick a gang…",
+      "pickGrade": "Pick the rank…",
+      "blockedBy": "Suspended by %s",
+      "noReason": "No reason given",
+      "blockAsk": "Suspend %s?",
+      "blockAskText": "Its player cannot play it until you lift the suspension. If it is online now it is kicked and sees the reason.",
+      "reasonLine": "Reason: %s",
+      "reassignAsk": "Change the number of %s?",
+      "reassignAskText": "From %s to %s. All its data moves to the new number and number %s becomes free.",
+      "newIdTaken": "Number %s is held by %s now.",
+      "openHolder": "Open its file",
+      "transferStart": "Hand the number over…",
+      "transferSides": "Who is affected",
+      "transferKick": "Whichever of them is online is kicked from the game first.",
+      "deleteStart": "Delete the character…",
+      "deleteSummary": "If you delete it",
+      "sumCore": "The character and its bank accounts are deleted",
+      "sumData": "%s records deleted for good",
+      "sumAsset": "%s properties returned to the game",
+      "sumHistory": "%s records kept as deleted",
+      "sumOther": "%s records handled by their script",
+      "sumMoney": "Back to the reserve: %s",
+      "openPlayer": "Open in Players",
+      "reload": "Reload the file",
+      "clearSearch": "Clear the search",
+      "open": "Open",
+      "sidesHolder": "Holds the number",
+      "sidesTaker": "Takes the number",
+      "newJob": "New job",
+      "newGang": "New gang",
+      "moneySafe": "Money is never lost",
+      "transferOldTitle": "An old ID cannot be handed on",
+      "transferOldText": "Give it a new number first with Change citizen ID above; then you can hand its number on.",
+      "reasons": {
+        "cheat": "Cheating investigation",
+        "request": "At the owner's request",
+        "rules": "Breaking the server rules"
+      }
+    }
+  }
+}

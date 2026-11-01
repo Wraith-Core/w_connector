@@ -1,0 +1,325 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   w_admin · map/map.css
+   The map tab, scoped under .wa-map. The paper is w_map's; the chrome around it is the pause
+   screen's vocabulary (ink #0a0a0a and paper #f2f2f2, neutral greys with no cream tint; the red band, thin rules, no rounded
+   widgets, no shadows the game does not draw). 1rem = 0.64vh as everywhere else.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.wa-map {
+  --wam-ink: #0a0a0a;
+  --wam-white: #f2f2f2;
+  --wam-dim: rgba(10, 10, 10, 0.42);
+  --wam-locked: #7a7a7a;
+  --wam-red: #cb0101;
+  --wam-red-d: #cb0101;
+  --wam-paper: #0a0a0a;
+  --wam-plate: rgba(10, 10, 10, 0.92);
+  --wam-rule: rgba(242, 242, 242, 0.22);
+  --wam-f-title: 'RDR Lino', 'Tajawal', 'Noto Sans Arabic', Georgia, serif;
+  --wam-f-body: 'Hapna Slab', 'Tajawal', 'Noto Sans Arabic', Georgia, serif;
+  --wam-f-num: 'RDR Catalogue', 'Tajawal', 'Noto Sans Arabic', Georgia, serif;
+  --wam-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --wam-mk: 2.9rem;                  /* the marker disc - 20px at 1080p */
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 20rem;
+  overflow: hidden;
+  background: var(--wam-paper);
+  touch-action: none;
+  cursor: crosshair;
+  outline: none;
+  user-select: none;
+  color: var(--wam-white);
+  font-family: var(--wam-f-body);
+}
+.wa-map.is-dragging { cursor: grabbing; }
+.wa-map:focus-visible { box-shadow: inset 0 0 0 0.28rem rgba(242, 242, 242, 0.35); }
+
+/* Before 'mapCfg' arrives: bare parchment with a faint grain, nothing else */
+.wa-map.is-empty::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, rgba(10, 10, 10, 0.035) 0 0.3rem, rgba(0, 0, 0, 0) 0.3rem 1.1rem),
+    repeating-linear-gradient(90deg, rgba(10, 10, 10, 0.03) 0 0.4rem, rgba(0, 0, 0, 0) 0.4rem 1.3rem);
+}
+
+/* ══════════════════ The paper ══════════════════ */
+.wa-map-tiles { position: absolute; inset: 0; display: block; }
+.wa-map-layer { position: absolute; inset: 0; pointer-events: none; }
+
+/* The paper's edge: the game's map is a sheet with dark margins - same gradient as w_map's, so both read as one paper.
+   z-index 38: above the markers (8..30), below the in-map UI (40+). */
+.wa-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 38;
+  background:
+    radial-gradient(120% 95% at 50% 50%,
+      rgba(10, 10, 10, 0) 58%,
+      rgba(10, 10, 10, 0.16) 82%,
+      rgba(10, 10, 10, 0.42) 100%),
+    linear-gradient(to bottom,
+      rgba(10, 10, 10, 0.30) 0%,
+      rgba(10, 10, 10, 0) 9%,
+      rgba(10, 10, 10, 0) 91%,
+      rgba(10, 10, 10, 0.30) 100%),
+    linear-gradient(to right,
+      rgba(10, 10, 10, 0.26) 0%,
+      rgba(10, 10, 10, 0) 7%,
+      rgba(10, 10, 10, 0) 93%,
+      rgba(10, 10, 10, 0.26) 100%);
+}
+.wa-map.is-empty::after { opacity: 0.6; }
+
+/* ══════════════════ The markers ══════════════════
+   ! No will-change: every marker is a translate3d already, and a crowded server means many of them. */
+.wa-map .wa-mk {
+  position: absolute;
+  left: 0; top: 0;
+  width: 0; height: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+.wa-map .wa-mk-inner {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: var(--wam-mk);
+  height: var(--wam-mk);
+  margin: calc(var(--wam-mk) * -0.5) 0 0 calc(var(--wam-mk) * -0.5);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 90ms var(--wam-ease);
+}
+/* A player: the engine's own blip - a parchment disc with an ink edge and a thin light ring */
+.wa-map .wa-mk-dot {
+  display: block;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: var(--wam-white);
+  border: 0.32rem solid var(--wam-ink);
+  box-shadow: 0 0 0 0.16rem rgba(255, 255, 255, 0.55);
+  position: relative;
+}
+/* The admin himself: the same disc with the band's red at its heart */
+.wa-map .wa-mk.is-self .wa-mk-dot::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 42%; height: 42%;
+  margin: -21% 0 0 -21%;
+  border-radius: 50%;
+  background: var(--wam-red);
+}
+.wa-map .wa-mk.is-self { z-index: 25; }
+/* Dead: grey, dimmed, under the living */
+.wa-map .wa-mk.is-dead .wa-mk-dot {
+  background: var(--wam-locked);
+  border-color: rgba(10, 10, 10, 0.7);
+  box-shadow: 0 0 0 0.16rem rgba(255, 255, 255, 0.25);
+  opacity: 0.85;
+}
+.wa-map .wa-mk.is-dead { z-index: 8; }
+/* Selected: a red ring around the disc, and the label stays up */
+.wa-map .wa-mk.is-selected { z-index: 30; }
+.wa-map .wa-mk.is-selected .wa-mk-inner::before {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 190%; height: 190%;
+  margin: -95% 0 0 -95%;
+  border-radius: 50%;
+  border: 0.32rem solid var(--wam-red);
+  box-shadow: 0 0 0 0.16rem rgba(242, 242, 242, 0.6), inset 0 0 0 0.16rem rgba(242, 242, 242, 0.6);
+  animation: wa-mk-ring 240ms var(--wam-ease) both;
+}
+@keyframes wa-mk-ring { from { transform: scale(1.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.wa-map .wa-mk.is-hover { z-index: 32; }
+.wa-map .wa-mk.is-hover .wa-mk-inner { transform: scale(1.3); }
+
+/* The name label: a small ink plate beside the marker - as the game's own blip tooltip */
+.wa-map .wa-mk-tip {
+  position: absolute;
+  left: 2.4rem; top: -4.2rem;
+  display: none;
+  white-space: nowrap;
+  padding: 0.45rem 1.2rem 0.55rem;
+  background: var(--wam-plate);
+  border: 0.14rem solid var(--wam-rule);
+  color: var(--wam-white);
+  font: 400 2.6rem/1.15 var(--wam-f-body);
+  unicode-bidi: plaintext;
+  pointer-events: none;
+  z-index: 1;
+}
+.wa-map .wa-mk.is-hover .wa-mk-tip,
+.wa-map .wa-mk.is-selected .wa-mk-tip { display: block; }
+.wa-map .wa-mk.is-dead .wa-mk-tip { color: rgba(242, 242, 242, 0.6); }
+
+/* ══════════════════ The in-map UI ══════════════════
+   Everything with .wa-map-ui is the page's, not the paper's: the engine ignores pointer-downs on it. */
+.wa-map-ui { z-index: 40; }
+.wa-map-ui, .wa-map-ui * { cursor: default; }
+
+/* The RDR button: a thin parchment rule with parchment text; hover / focus = the parchment plate with ink text */
+.wa-map .wa-map-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.6rem;
+  height: 5.6rem;
+  padding: 0 1.6rem;
+  border: 0.28rem solid var(--wam-white);
+  background: var(--wam-plate);
+  color: var(--wam-white);
+  font: 400 3.4rem/1 var(--wam-f-title);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 80ms var(--wam-ease), color 80ms var(--wam-ease);
+}
+.wa-map .wa-map-btn:hover,
+.wa-map .wa-map-btn:focus-visible { background: var(--wam-white); color: var(--wam-ink); outline: none; }
+.wa-map .wa-map-btn:active { background: var(--wam-red); border-color: var(--wam-red); color: var(--wam-white); }
+.wa-map .wa-map-btn--text { font-size: 2.3rem; padding: 0 1.4rem; }
+.wa-map .wa-map-btn--row { width: 100%; height: 5.2rem; font-size: 2.4rem; justify-content: flex-start; border-width: 0 0 0.14rem 0; border-color: var(--wam-rule); background: none; }
+.wa-map .wa-map-btn--row:last-child { border-bottom: 0; }
+.wa-map .wa-map-btn--quiet { color: rgba(242, 242, 242, 0.62); }
+.wa-map.is-rtl .wa-map-btn { font-family: 'Tajawal', 'Noto Sans Arabic', sans-serif; font-weight: 700; letter-spacing: 0; text-transform: none; }
+.wa-map.is-rtl .wa-map-btn--text { font-size: 2.5rem; }
+
+/* Keep navigation above the map; location actions occupy the bottom edge. */
+.wa-map .wa-map-ctl {
+  position: absolute;
+  top: 2.4rem;
+  inset-inline-end: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* Cursor coordinates remain LTR; their position follows the page direction. */
+.wa-map .wa-map-coords {
+  position: absolute;
+  top: 2.4rem;
+  left: 2.4rem;
+  padding: 0.5rem 1.2rem;
+  background: var(--wam-plate);
+  border: 0.14rem solid var(--wam-rule);
+  font: 700 2.3rem/1.2 var(--wam-f-num);
+  letter-spacing: 0.06em;
+  color: var(--wam-white);
+  direction: ltr;
+  white-space: pre;
+  pointer-events: none;
+  min-height: 3.6rem;
+  min-width: 18rem;
+}
+.wa-map .wa-map-coords:empty { opacity: 0.35; }
+.wa-map.is-rtl .wa-map-coords { left: auto; right: 2.4rem; }
+
+/* The selected player's strip: top, inline start - his name, then what can be done with him */
+.wa-map .wa-map-sel {
+  position: absolute;
+  top: 2.4rem;
+  inset-inline-start: 2.4rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 0.6rem 0.6rem 0.6rem 1.6rem;
+  background: var(--wam-plate);
+  border: 0.14rem solid var(--wam-rule);
+  border-inline-start: 0.6rem solid var(--wam-red);
+  max-width: calc(100% - 4.8rem);
+}
+.wa-map.is-rtl .wa-map-sel { padding: 0.6rem 1.6rem 0.6rem 0.6rem; }
+.wa-map .wa-map-sel-name {
+  font: 400 3.2rem/1.1 var(--wam-f-title);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  unicode-bidi: plaintext;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 34rem;
+}
+.wa-map.is-rtl .wa-map-sel-name { font-family: 'Tajawal', 'Noto Sans Arabic', sans-serif; font-weight: 700; text-transform: none; letter-spacing: 0; }
+.wa-map .wa-map-sel-id { font: 700 2.4rem/1 var(--wam-f-num); color: rgba(242, 242, 242, 0.7); direction: ltr; }
+.wa-map .wa-map-sel-tag { font: 400 2.2rem/1 var(--wam-f-body); color: var(--wam-red); padding: 0.4rem 0.8rem; border: 0.14rem solid var(--wam-red); }
+.wa-map .wa-map-sel .wa-map-btn { height: 4.6rem; }
+
+/* ══════════════════ The click card ══════════════════
+   Anchored to the clicked game point by the engine; the red pin is at the point, the card beside it. */
+.wa-map .wa-map-card {
+  position: absolute;
+  left: 0; top: 0;
+  width: 0; height: 0;
+}
+.wa-map .wa-map-pin {
+  position: absolute;
+  left: 0; top: 0;
+  width: 0; height: 0;
+  pointer-events: none;
+}
+/* The game map's red crosshair: four arms around a gap */
+.wa-map .wa-map-pin::before,
+.wa-map .wa-map-pin::after {
+  content: "";
+  position: absolute;
+  background: var(--wam-red);
+  box-shadow: 0 0 0.25rem rgba(0, 0, 0, 0.45);
+}
+.wa-map .wa-map-pin::before { left: -0.16rem; top: -3.9rem; width: 0.32rem; height: 7.8rem;
+  -webkit-mask: linear-gradient(#000 0 30%, transparent 30% 70%, #000 70%); mask: linear-gradient(#000 0 30%, transparent 30% 70%, #000 70%); }
+.wa-map .wa-map-pin::after  { left: -3.9rem; top: -0.16rem; width: 7.8rem; height: 0.32rem;
+  -webkit-mask: linear-gradient(90deg, #000 0 30%, transparent 30% 70%, #000 70%); mask: linear-gradient(90deg, #000 0 30%, transparent 30% 70%, #000 70%); }
+
+.wa-map .wa-map-card-box {
+  position: absolute;
+  left: 3.2rem;
+  top: -2.4rem;
+  min-width: 34rem;
+  max-width: 52rem;
+  background: var(--wam-plate);
+  border: 0.14rem solid var(--wam-rule);
+  border-top: 0.6rem solid var(--wam-red);
+  animation: wa-card-in 120ms var(--wam-ease) both;
+}
+.wa-map.is-rtl .wa-map-card-box { left: auto; right: 3.2rem; }
+@keyframes wa-card-in { from { opacity: 0; transform: translateY(0.6rem); } to { opacity: 1; transform: none; } }
+.wa-map .wa-map-card-head {
+  display: flex;
+  gap: 2rem;
+  padding: 0.9rem 1.6rem 0.8rem;
+  border-bottom: 0.14rem solid var(--wam-rule);
+  font: 700 2.4rem/1.2 var(--wam-f-num);
+  letter-spacing: 0.06em;
+  color: rgba(242, 242, 242, 0.82);
+  direction: ltr;
+}
+.wa-map .wa-map-card-box .wa-map-btn--row { padding: 0 1.6rem; }
+
+/* Locations and labels from w_map share this projection with the live players. */
+.wa-map .wa-mk.is-place .wa-mk-dot { border-radius: 0; transform: rotate(45deg) scale(.65); background: #b4b4b4; }
+.wa-map .wa-mk.is-waypoint .wa-mk-dot { border-radius: 0; transform: rotate(45deg); background: var(--wam-red); }
+.wa-map .wa-mk.is-label .wa-mk-dot { display: none; }
+.wa-map .wa-mk.is-label .wa-mk-tip { display: block; left: 0; top: 0; transform: translate(-50%, -50%); color: #111111; background: none; border: 0; font: 2.3rem var(--wam-f-body); text-shadow: 0 1px 2px #f2f2f2; max-width: 26rem; text-align: center; }
+.wa-map.theme-dark .wa-mk.is-label .wa-mk-tip, .wa-map.theme-ember .wa-mk.is-label .wa-mk-tip, .wa-map.theme-blueprint .wa-mk.is-label .wa-mk-tip { color: #f2f2f2; text-shadow: 0 1px 2px #0a0a0a; }
+.wa-map.is-rtl .wa-mk.is-label .wa-mk-tip { font-family: 'Tajawal', sans-serif; font-weight: 700; }
+.wa-map .wa-map-card--docked { left: auto; top: auto; bottom: 8rem; inset-inline-end: 2rem; width: min(42rem, calc(100% - 4rem)); height: auto; }
+.wa-map .wa-map-card--docked .wa-map-card-box { position: relative; left: auto; right: auto; top: auto; min-width: 0; max-width: 100%; transform: none; }
+.wa-map-card-title { display: flex; justify-content: space-between; align-items: center; gap: 2rem; padding: 1rem 1.5rem; }
+.wa-map-card-title button { font: 4rem/1 sans-serif; }
+.wa-map-legend { position: absolute; inset-inline-start: 2rem; bottom: 2rem; display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 1rem 1.5rem; background: var(--wam-plate); font-size: 1.8rem; }
+.wa-map-legend span::before { content: ''; display: inline-block; width: 1.2rem; height: 1.2rem; margin-inline-end: .6rem; background: #f2f2f2; border-radius: 50%; }
+.wa-map-legend .legend-place::before { border-radius: 0; background: #b4b4b4; }
+.wa-map-legend .legend-dead::before { background: #cb0101; }
+.wa-map-tracking { position: absolute; inset-inline-start: 2.4rem; top: 8rem; padding: 1rem 1.5rem; background: var(--wam-plate); border-inline-start: .4rem solid var(--wam-red); }
+.wa-map-clear { position: absolute; inset-inline-end: 2rem; bottom: 2rem; }
+.wa-map .wa-map-btn:disabled { opacity: .5; cursor: wait; }
