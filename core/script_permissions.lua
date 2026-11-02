@@ -57,6 +57,16 @@ local function aceAllowed(principal, node)
     return nil
 end
 local function probe(s) return s.principal .. '.bound' end
+-- 2.2.5: every principal inherits builtin.everyone, so a node the server opens to everyone (or a manual
+-- wildcard on the player) stays "allowed" after our own ACE is gone, and the cleanup retried forever
+-- (Red River, every 15 s). A principal nobody ever grants anything answers what everyone gets: when it
+-- is allowed the node too, our removal is what we can prove, and the node is cleared.
+local CONTROL = 'wcsite.control'
+local function gone(principal, node)
+    local allowed = aceAllowed(principal, node)
+    if allowed == false then return true end
+    return allowed == true and aceAllowed(CONTROL, node) == true
+end
 local function persist()
     if journalBlocked or type(SetResourceKvp) ~= 'function' or type(GetResourceKvpString) ~= 'function'
         or type(json) ~= 'table' or type(json.encode) ~= 'function' then
@@ -94,17 +104,17 @@ local function clear(s)
     -- Remove only our own parent. A manual rank or an ACE on another principal is never touched.
     if s.bound then
         unbound = execute(('remove_principal player.%d %s'):format(s.source, s.principal))
-        if unbound and aceAllowed('player.' .. s.source, probe(s)) == false then s.bound = false; changed = true end
+        if unbound and gone('player.' .. s.source, probe(s)) then s.bound = false; changed = true end
     end
     for node in pairs(s.nodes) do
         local ok = execute(('remove_ace %s %s allow'):format(s.principal, node))
-        if ok and aceAllowed(s.principal, node) == false then s.nodes[node] = nil; changed = true end
+        if ok and gone(s.principal, node) then s.nodes[node] = nil; changed = true end
     end
     -- Once every real owned ACE is gone, remove the probe too. A pre-existing manual wildcard can
     -- independently grant this probe to the player; it must not prevent retiring an empty principal.
     if not next(s.nodes) and s.probe then
         local ok = execute(('remove_ace %s %s allow'):format(s.principal, probe(s)))
-        if ok and aceAllowed(s.principal, probe(s)) == false then s.probe = false end
+        if ok and gone(s.principal, probe(s)) then s.probe = false end
     end
     if unbound and not next(s.nodes) and not s.probe then
         if s.bound then changed = true end
@@ -114,7 +124,14 @@ local function clear(s)
     if complete then
         P.pending[s.principal], P.owned[s.principal] = nil, nil
         s.cleanup, s.deadline, s.grantedAt = false, nil, nil
-    else warning('native permission cleanup is pending; owned authority remains tracked for retry') end
+    else
+        -- 2.2.5: say what is stuck, so a repeat can be traced (principal and node names only, no identifiers)
+        local left = {}
+        for node in pairs(s.nodes) do left[#left + 1] = node end
+        table.sort(left)
+        warning(('native permission cleanup is pending for %s (parent %s, probe %s, nodes: %s); owned authority remains tracked for retry')
+            :format(s.principal, s.bound and 'kept' or 'gone', s.probe and 'kept' or 'gone', #left > 0 and table.concat(left, ', ', 1, math.min(#left, 6)) or 'none'))
+    end
     persist()
     if changed then notify(s) end
     return complete

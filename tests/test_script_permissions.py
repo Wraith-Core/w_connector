@@ -27,6 +27,7 @@ function IsPrincipalAceAllowed(principal,node)
   if seen[p] then return false end;seen[p]=true
   for ace in pairs(NATIVE_ACES[p] or {}) do if ace=='*' or ace==node or node:sub(1,#ace+1)==ace..'.' then return true end end
   for parent in pairs(NATIVE_PARENTS[p] or {}) do if visit(parent) then return true end end
+  if p ~= 'builtin.everyone' then return visit('builtin.everyone') end
   return false
  end
  return visit(principal)
@@ -245,6 +246,15 @@ class ScriptPermissionsTests(unittest.TestCase):
         self.assertFalse(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
         self.assertFalse(self.val("IsPrincipalAceAllowed('player.1','w_farming.admin.view')"))
         self.assertTrue(all(c.startswith('remove_') for c in self.lua.globals().COMMANDS.values()))
+
+    def test_a_node_open_to_everyone_does_not_keep_cleanup_pending(self):
+        # 2.2.5: every principal inherits builtin.everyone; a public node stays "allowed" after our ACE goes
+        self.run_lua("ExecuteCommand('add_ace builtin.everyone w_farming.admin.view allow')")
+        self.refresh()
+        self.run_lua("MODE='empty';WC.ScriptPermissions.refresh()")
+        self.assertFalse(self.bound())
+        self.assertFalse(self.val('next(WC.ScriptPermissions.pending) ~= nil'))
+        self.assertTrue(self.val("IsPrincipalAceAllowed('builtin.everyone','w_farming.admin.view')"))
 
     def test_manual_wildcard_and_other_manual_principals_survive_cleanup(self):
         self.run_lua("ExecuteCommand('add_ace manual * allow');ExecuteCommand('add_principal player.1 manual')")
