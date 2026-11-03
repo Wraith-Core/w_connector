@@ -1,0 +1,1103 @@
+{
+  "catalog": [
+    {
+      "id": "overview.view",
+      "label": {
+        "ar": "عرض ملخص السيرفر",
+        "en": "View server overview"
+      },
+      "description": {
+        "ar": "عرض حالة الاتصال وعدد اللاعبين ومعلومات السيرفر.",
+        "en": "View connection status, player count and server information."
+      }
+    },
+    {
+      "id": "players.view",
+      "label": {
+        "ar": "عرض اللاعبين",
+        "en": "View players"
+      },
+      "description": {
+        "ar": "عرض قائمة اللاعبين وبياناتهم وشخصياتهم وحقائبهم.",
+        "en": "View players, their details, characters and inventories."
+      }
+    },
+    {
+      "id": "players.kick",
+      "label": {
+        "ar": "طرد اللاعبين",
+        "en": "Kick players"
+      },
+      "description": {
+        "ar": "إخراج لاعب من السيرفر مع تحديد السبب.",
+        "en": "Remove a player from the server with a reason."
+      }
+    },
+    {
+      "id": "players.warn",
+      "label": {
+        "ar": "إدارة تحذيرات اللاعبين",
+        "en": "Manage player warnings"
+      },
+      "description": {
+        "ar": "إضافة التحذيرات وإزالتها من سجل اللاعب.",
+        "en": "Add and remove warnings in a player’s record."
+      }
+    },
+    {
+      "id": "players.manage",
+      "label": {
+        "ar": "تنفيذ إجراءات على اللاعبين",
+        "en": "Manage players"
+      },
+      "description": {
+        "ar": "تنفيذ إجراءات الإدارة على اللاعبين، مثل الإحياء والتجميد وتغيير الوظيفة.",
+        "en": "Use player actions such as revive, freeze and job changes."
+      }
+    },
+    {
+      "id": "players.inventory",
+      "label": {
+        "ar": "تعديل حقائب اللاعبين",
+        "en": "Edit player inventories"
+      },
+      "description": {
+        "ar": "إضافة الأغراض وسحبها وتفريغ حقيبة اللاعب.",
+        "en": "Add or remove items and clear a player’s inventory."
+      }
+    },
+    {
+      "id": "players.money",
+      "label": {
+        "ar": "تعديل أموال اللاعبين",
+        "en": "Adjust player money"
+      },
+      "description": {
+        "ar": "إضافة الأموال إلى حسابات اللاعبين أو سحبها.",
+        "en": "Add money to or remove money from player accounts."
+      }
+    },
+    {
+      "id": "players.troll",
+      "label": {
+        "ar": "استخدام مؤثرات المقالب",
+        "en": "Use player effects"
+      },
+      "description": {
+        "ar": "تشغيل مؤثرات المقالب على اللاعب وإيقافها.",
+        "en": "Start and stop prank effects on a player."
+      }
+    },
+    {
+      "id": "players.spectate",
+      "label": {
+        "ar": "مراقبة اللاعبين",
+        "en": "Spectate players"
+      },
+      "description": {
+        "ar": "مشاهدة بث لاعب متصل لأغراض الإشراف.",
+        "en": "Watch a connected player’s stream for moderation."
+      }
+    },
+    {
+      "id": "characters.manage",
+      "label": {
+        "ar": "إدارة الشخصيات",
+        "en": "Manage characters"
+      },
+      "description": {
+        "ar": "تعديل بيانات الشخصية وحالتها وتنفيذ إجراءات إدارتها.",
+        "en": "Edit character details and status and use character administration actions."
+      }
+    },
+    {
+      "id": "notes.manage",
+      "label": {
+        "ar": "إدارة ملاحظات اللاعبين",
+        "en": "Manage player notes"
+      },
+      "description": {
+        "ar": "إضافة الملاحظات والعلامات الإدارية وإزالتها.",
+        "en": "Add and remove staff notes and flags."
+      }
+    },
+    {
+      "id": "server.control",
+      "label": {
+        "ar": "التحكم بدخول السيرفر",
+        "en": "Control server access"
+      },
+      "description": {
+        "ar": "إغلاق دخول اللاعبين أو فتحه وتنفيذ إجراءات السيرفر العامة.",
+        "en": "Open or close player access and use server-wide actions."
+      }
+    },
+    {
+      "id": "bans.view",
+      "label": {
+        "ar": "عرض المحظورين",
+        "en": "View bans"
+      },
+      "description": {
+        "ar": "عرض قائمة الحظر وأسباب الحظر ومدده.",
+        "en": "View banned players, ban reasons and durations."
+      }
+    },
+    {
+      "id": "bans.manage",
+      "label": {
+        "ar": "إدارة الحظر",
+        "en": "Manage bans"
+      },
+      "description": {
+        "ar": "حظر اللاعبين وإلغاء الحظر عنهم.",
+        "en": "Ban players and revoke bans."
+      }
+    },
+    {
+      "id": "reports.view",
+      "label": {
+        "ar": "عرض البلاغات",
+        "en": "View reports"
+      },
+      "description": {
+        "ar": "قراءة بلاغات اللاعبين وتفاصيلها.",
+        "en": "Read player reports and their details."
+      }
+    },
+    {
+      "id": "reports.manage",
+      "label": {
+        "ar": "معالجة البلاغات",
+        "en": "Handle reports"
+      },
+      "description": {
+        "ar": "استلام البلاغات والرد عليها وتغيير حالتها.",
+        "en": "Claim reports, reply to them and change their status."
+      }
+    },
+    {
+      "id": "whitelist.manage",
+      "label": {
+        "ar": "إدارة السماح بالدخول",
+        "en": "Manage whitelist"
+      },
+      "description": {
+        "ar": "إدارة القائمة البيضاء ومراجعة طلبات الانضمام.",
+        "en": "Manage allowed players and review joining applications."
+      }
+    },
+    {
+      "id": "queue.manage",
+      "label": {
+        "ar": "إدارة طابور الدخول",
+        "en": "Manage join queue"
+      },
+      "description": {
+        "ar": "إدارة أولوية دخول اللاعبين والطابور.",
+        "en": "Manage player queue access and joining priority."
+      }
+    },
+    {
+      "id": "staffchat.use",
+      "label": {
+        "ar": "استخدام محادثة الإدارة",
+        "en": "Use staff chat"
+      },
+      "description": {
+        "ar": "قراءة رسائل الطاقم وإرسال رسائل فيها.",
+        "en": "Read and send messages in staff chat."
+      }
+    },
+    {
+      "id": "logs.view",
+      "label": {
+        "ar": "عرض سجلات السيرفر",
+        "en": "View server logs"
+      },
+      "description": {
+        "ar": "قراءة الأحداث والسجلات المسجلة في اللوحة.",
+        "en": "Read events and logs recorded in the panel."
+      }
+    },
+    {
+      "id": "stats.view",
+      "label": {
+        "ar": "عرض الإحصائيات",
+        "en": "View statistics"
+      },
+      "description": {
+        "ar": "عرض نشاط اللاعبين وأوقات الذروة وإحصائيات السيرفر.",
+        "en": "View player activity, peak times and server statistics."
+      }
+    },
+    {
+      "id": "world.control",
+      "label": {
+        "ar": "التحكم بالطقس والوقت",
+        "en": "Control weather and time"
+      },
+      "description": {
+        "ar": "تغيير طقس السيرفر ووقته وإعدادات العالم المتاحة.",
+        "en": "Change server weather, time and supported world settings."
+      }
+    },
+    {
+      "id": "resources.view",
+      "label": {
+        "ar": "عرض السكربتات",
+        "en": "View resources"
+      },
+      "description": {
+        "ar": "عرض سكربتات السيرفر وحالة تشغيل كل سكربت.",
+        "en": "View server resources and their running status."
+      }
+    },
+    {
+      "id": "resources.control",
+      "label": {
+        "ar": "التحكم بالسكربتات",
+        "en": "Control resources"
+      },
+      "description": {
+        "ar": "تشغيل السكربتات وإيقافها وإعادة تشغيلها.",
+        "en": "Start, stop and restart server resources."
+      }
+    },
+    {
+      "id": "host.view",
+      "label": {
+        "ar": "عرض حالة الاستضافة",
+        "en": "View host status"
+      },
+      "description": {
+        "ar": "عرض حالة السيرفر ومعلومات وكيل الاستضافة.",
+        "en": "View server status and host-agent information."
+      }
+    },
+    {
+      "id": "host.control",
+      "label": {
+        "ar": "تشغيل السيرفر وإيقافه",
+        "en": "Start and stop the server"
+      },
+      "description": {
+        "ar": "تشغيل السيرفر أو إيقافه أو إعادة تشغيله عبر الاستضافة.",
+        "en": "Start, stop or restart the server through its host."
+      }
+    },
+    {
+      "id": "schedule.manage",
+      "label": {
+        "ar": "إدارة مواعيد إعادة التشغيل",
+        "en": "Manage scheduled restarts"
+      },
+      "description": {
+        "ar": "تخطي موعد إعادة التشغيل القادم أو تأجيله أو تغيير المواعيد.",
+        "en": "Skip or delay the next scheduled restart, or change the times."
+      }
+    },
+    {
+      "id": "modules.use",
+      "label": {
+        "ar": "استخدام أنظمة السيرفر",
+        "en": "Use server modules"
+      },
+      "description": {
+        "ar": "فتح أدوات الأنظمة الإضافية وتنفيذ إجراءاتها المتاحة.",
+        "en": "Open additional server-system tools and use their available actions."
+      }
+    },
+    {
+      "id": "console.view",
+      "label": {
+        "ar": "عرض الكونسول",
+        "en": "View console"
+      },
+      "description": {
+        "ar": "قراءة رسائل كونسول السيرفر دون تنفيذ أوامر.",
+        "en": "Read server console output without running commands."
+      }
+    },
+    {
+      "id": "console.command",
+      "label": {
+        "ar": "تنفيذ أوامر الكونسول",
+        "en": "Run console commands"
+      },
+      "description": {
+        "ar": "تنفيذ أوامر مباشرة على السيرفر. هذه الصلاحية للمالك فقط.",
+        "en": "Run commands directly on the server. Only the owner has this permission."
+      },
+      "ownerOnly": true
+    },
+    {
+      "id": "server.announce",
+      "label": {
+        "ar": "إرسال إعلانات السيرفر",
+        "en": "Send server announcements"
+      },
+      "description": {
+        "ar": "نشر إعلان لجميع اللاعبين المتصلين.",
+        "en": "Send an announcement to all connected players."
+      }
+    },
+    {
+      "id": "settings.manage",
+      "label": {
+        "ar": "تعديل إعدادات اللوحة",
+        "en": "Edit panel settings"
+      },
+      "description": {
+        "ar": "تعديل إعدادات الدخول والتحذيرات والسجن ومواعيد إعادة التشغيل.",
+        "en": "Change join, warning, jail and scheduled-restart settings."
+      }
+    },
+    {
+      "id": "audit.view",
+      "label": {
+        "ar": "عرض سجل إجراءات الإدارة",
+        "en": "View staff audit log"
+      },
+      "description": {
+        "ar": "معرفة الإجراءات التي نفذها الإداريون ونتائجها.",
+        "en": "See actions taken by staff and their results."
+      }
+    },
+    {
+      "id": "roles.manage",
+      "label": {
+        "ar": "إدارة الرتب والصلاحيات",
+        "en": "Manage roles and permissions"
+      },
+      "description": {
+        "ar": "إنشاء الرتب وتعديلها وإسنادها ضمن الصلاحيات المسموح لك بتفويضها.",
+        "en": "Create, edit and assign roles within the permissions you may delegate."
+      }
+    },
+    {
+      "id": "connector.manage",
+      "label": {
+        "ar": "إدارة ربط السيرفر",
+        "en": "Manage server connection"
+      },
+      "description": {
+        "ar": "إنشاء رمز الربط أو إلغاؤه وتغيير اتصال السيرفر. هذه الصلاحية للمالك فقط.",
+        "en": "Create or revoke the connector token and change the server link. Owner only."
+      },
+      "ownerOnly": true
+    },
+    {
+      "id": "self.playermode",
+      "label": {
+        "ar": "استخدام أدوات المشرف لنفسه",
+        "en": "Use personal admin tools"
+      },
+      "description": {
+        "ar": "استخدام وضع المشرف وأدوات اللاعب المتاحة لنفسك داخل اللعبة.",
+        "en": "Use admin mode and available player tools on yourself in game."
+      }
+    },
+    {
+      "id": "self.teleport",
+      "label": {
+        "ar": "التنقل الإداري",
+        "en": "Use admin teleport"
+      },
+      "description": {
+        "ar": "استخدام أدوات التنقل المتاحة لك داخل اللعبة.",
+        "en": "Use your available in-game teleport tools."
+      }
+    },
+    {
+      "id": "self.viewids",
+      "label": {
+        "ar": "إظهار أرقام اللاعبين",
+        "en": "Show player IDs"
+      },
+      "description": {
+        "ar": "إظهار معرّفات اللاعبين داخل اللعبة لأغراض الإشراف.",
+        "en": "Show in-game player identifiers for moderation."
+      }
+    },
+    {
+      "id": "self.spawn",
+      "label": {
+        "ar": "إنشاء مركبات وشخصيات تجريبية",
+        "en": "Create test vehicles and peds"
+      },
+      "description": {
+        "ar": "إنشاء الخيول والعربات والمركبات والشخصيات المدعومة وتنظيف ما أنشأته.",
+        "en": "Spawn supported mounts, vehicles and peds, and clean up your spawns."
+      }
+    },
+    {
+      "id": "self.vehicle",
+      "label": {
+        "ar": "أدوات المركبة والحصان",
+        "en": "Vehicle and mount tools"
+      },
+      "description": {
+        "ar": "إصلاح المركبة وقلبها وعلاج الحصان المتاح لك.",
+        "en": "Repair or flip a vehicle and heal your mount."
+      }
+    },
+    {
+      "id": "self.entities",
+      "label": {
+        "ar": "حذف عناصر من العالم",
+        "en": "Delete world entities"
+      },
+      "description": {
+        "ar": "استخدام أداة الحذف والتنظيف مع حماية اللاعبين وممتلكاتهم.",
+        "en": "Use entity deletion and cleanup with player and ownership protection."
+      }
+    },
+    {
+      "id": "self.developer",
+      "label": {
+        "ar": "أدوات الإحداثيات والموديلات",
+        "en": "Coordinate and model tools"
+      },
+      "description": {
+        "ar": "عرض الإحداثيات ونسخها وفحص الموديلات القريبة.",
+        "en": "View and copy coordinates and inspect nearby models."
+      }
+    },
+    {
+      "id": "news.manage",
+      "label": {
+        "ar": "إدارة أخبار السيرفر",
+        "en": "Manage server news"
+      },
+      "description": {
+        "ar": "تعديل الأخبار عند توفر إضافة الأخبار المتوافقة.",
+        "en": "Edit server news when a compatible news integration is available."
+      }
+    }
+  ],
+  "roleSets": {
+    "owner": [
+      "overview.view",
+      "players.view",
+      "players.kick",
+      "players.warn",
+      "players.manage",
+      "players.inventory",
+      "players.money",
+      "players.troll",
+      "players.spectate",
+      "characters.manage",
+      "notes.manage",
+      "server.control",
+      "bans.view",
+      "bans.manage",
+      "reports.view",
+      "reports.manage",
+      "whitelist.manage",
+      "queue.manage",
+      "staffchat.use",
+      "logs.view",
+      "stats.view",
+      "world.control",
+      "resources.view",
+      "resources.control",
+      "host.view",
+      "host.control",
+      "schedule.manage",
+      "modules.use",
+      "console.view",
+      "console.command",
+      "server.announce",
+      "settings.manage",
+      "audit.view",
+      "roles.manage",
+      "connector.manage",
+      "self.playermode",
+      "self.teleport",
+      "self.viewids",
+      "self.spawn",
+      "self.vehicle",
+      "self.entities",
+      "self.developer",
+      "news.manage"
+    ],
+    "admin": [
+      "overview.view",
+      "players.view",
+      "bans.view",
+      "resources.view",
+      "stats.view",
+      "staffchat.use",
+      "players.kick",
+      "players.warn",
+      "bans.manage",
+      "server.announce",
+      "reports.view",
+      "reports.manage",
+      "whitelist.manage",
+      "logs.view",
+      "notes.manage",
+      "self.viewids",
+      "players.manage",
+      "players.inventory",
+      "players.money",
+      "resources.control",
+      "console.view",
+      "audit.view",
+      "queue.manage",
+      "world.control",
+      "settings.manage",
+      "host.view",
+      "host.control",
+      "schedule.manage",
+      "modules.use",
+      "players.troll",
+      "players.spectate",
+      "characters.manage",
+      "server.control",
+      "self.playermode",
+      "self.teleport",
+      "self.spawn",
+      "self.vehicle",
+      "news.manage"
+    ],
+    "moderator": [
+      "overview.view",
+      "players.view",
+      "bans.view",
+      "resources.view",
+      "stats.view",
+      "staffchat.use",
+      "players.kick",
+      "players.warn",
+      "bans.manage",
+      "server.announce",
+      "reports.view",
+      "reports.manage",
+      "whitelist.manage",
+      "logs.view",
+      "notes.manage",
+      "self.viewids"
+    ]
+  },
+  "groups": [
+    {
+      "id": "w_farming",
+      "label": {
+        "ar": "المزرعة والمواشي",
+        "en": "Farming and livestock"
+      },
+      "permissions": [
+        {
+          "id": "w_farming:w_farming.admin",
+          "node": "w_farming.admin",
+          "label": {
+            "ar": "الزراعة: كاملة",
+            "en": "Farming: full"
+          },
+          "description": {
+            "ar": "كل صلاحيات لوحة الزراعة (/farmadmin). يشمل كل ما تحتها.",
+            "en": "Every farming board power (/farmadmin). Includes everything below."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_farming.admin.view",
+          "node": "w_farming.admin.view",
+          "label": {
+            "ar": "الزراعة: مشاهدة",
+            "en": "Farming: view"
+          },
+          "description": {
+            "ar": "يفتح لوحة الزراعة للمشاهدة فقط.",
+            "en": "Opens the farming board, read only."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_farming:w_farming.admin.fields",
+          "node": "w_farming.admin.fields",
+          "label": {
+            "ar": "الزراعة: الأراضي والنقاط",
+            "en": "Farming: fields and points"
+          },
+          "description": {
+            "ar": "يرسم الأراضي ويعدّلها، ويضع الورش والتجار ونقاط الماء.",
+            "en": "Draws and edits fields, places workshops, buyers and water points."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_farming:w_farming.admin.economy",
+          "node": "w_farming.admin.economy",
+          "label": {
+            "ar": "الزراعة: الأسعار",
+            "en": "Farming: prices"
+          },
+          "description": {
+            "ar": "يغيّر أسعار المحاصيل وميزانيتها اليومية.",
+            "en": "Changes crop prices and their daily budgets."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_farming.admin.compensate",
+          "node": "w_farming.admin.compensate",
+          "label": {
+            "ar": "الزراعة: الطرد والتعويض",
+            "en": "Farming: evictions and refunds"
+          },
+          "description": {
+            "ar": "يطرد المستأجرين مع إرجاع المال أو دونه، ويحل العمليات المعلّقة.",
+            "en": "Evicts tenants with or without a refund, and settles held operations."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_farming.admin.cleanup",
+          "node": "w_farming.admin.cleanup",
+          "label": {
+            "ar": "الزراعة: التنظيف",
+            "en": "Farming: cleanup"
+          },
+          "description": {
+            "ar": "يمسح السجلات والعمليات القديمة حسب مدة الحفظ.",
+            "en": "Clears old records and operations past their retention."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_farming:w_livestock.admin",
+          "node": "w_livestock.admin",
+          "label": {
+            "ar": "المواشي: كاملة",
+            "en": "Livestock: full"
+          },
+          "description": {
+            "ar": "كل صلاحيات لوحة المواشي (/livestockadmin). يشمل كل ما تحتها.",
+            "en": "Every livestock board power (/livestockadmin). Includes everything below."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_livestock.admin.view",
+          "node": "w_livestock.admin.view",
+          "label": {
+            "ar": "المواشي: مشاهدة",
+            "en": "Livestock: view"
+          },
+          "description": {
+            "ar": "يفتح لوحة المواشي للمشاهدة فقط.",
+            "en": "Opens the livestock board, read only."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_farming:w_livestock.admin.barns",
+          "node": "w_livestock.admin.barns",
+          "label": {
+            "ar": "المواشي: الحظائر",
+            "en": "Livestock: barns"
+          },
+          "description": {
+            "ar": "يرسم الحظائر ويعدّلها ويطرد ملاكها.",
+            "en": "Draws and edits barns, evicts their owners."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_livestock.admin.dealers",
+          "node": "w_livestock.admin.dealers",
+          "label": {
+            "ar": "المواشي: التجار",
+            "en": "Livestock: dealers"
+          },
+          "description": {
+            "ar": "يضع تجار المواشي ويعدّلهم.",
+            "en": "Places and edits the livestock dealers."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_farming:w_livestock.admin.animals",
+          "node": "w_livestock.admin.animals",
+          "label": {
+            "ar": "المواشي: السجل",
+            "en": "Livestock: registry"
+          },
+          "description": {
+            "ar": "يعالج ويحذف ويعطي حيوانات.",
+            "en": "Heals, removes and gives animals."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_livestock.admin.settings",
+          "node": "w_livestock.admin.settings",
+          "label": {
+            "ar": "المواشي: الأسعار والأوقات",
+            "en": "Livestock: prices and times"
+          },
+          "description": {
+            "ar": "يغيّر الأسعار والأوقات ويحل الدفعات المعلقة.",
+            "en": "Changes prices and times, settles held payments."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_livestock.admin.configure",
+          "node": "w_livestock.admin.configure",
+          "label": {
+            "ar": "تعديل إعدادات المزرعة",
+            "en": "Configure the ranch"
+          },
+          "description": {
+            "ar": "تنفيذ هذه الإجراءات ضمن صلاحيات السكربت فقط.",
+            "en": "Perform these actions within this resource only."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_livestock.admin.evict",
+          "node": "w_livestock.admin.evict",
+          "label": {
+            "ar": "إخلاء ملكية المزرعة",
+            "en": "Evict ranch owners"
+          },
+          "description": {
+            "ar": "تنفيذ هذه الإجراءات ضمن صلاحيات السكربت فقط.",
+            "en": "Perform these actions within this resource only."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_farming:w_livestock.admin.delete",
+          "node": "w_livestock.admin.delete",
+          "label": {
+            "ar": "أرشفة المزرعة",
+            "en": "Archive the ranch"
+          },
+          "description": {
+            "ar": "تنفيذ هذه الإجراءات ضمن صلاحيات السكربت فقط.",
+            "en": "Perform these actions within this resource only."
+          },
+          "danger": true
+        }
+      ]
+    },
+    {
+      "id": "w_medic",
+      "label": {
+        "ar": "الطبيب",
+        "en": "Medic"
+      },
+      "permissions": [
+        {
+          "id": "w_medic:command.medrevive",
+          "node": "command.medrevive",
+          "label": {
+            "ar": "/medrevive — إنعاش",
+            "en": "/medrevive — revive"
+          },
+          "description": {
+            "ar": "ينعش لاعبًا ميتًا (w_medic، إذا كان Config.AdminRevive مفعّلًا).",
+            "en": "Revives a dead player (w_medic, when Config.AdminRevive is on)."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_medic:command.aheal",
+          "node": "command.aheal",
+          "label": {
+            "ar": "/aheal — علاج",
+            "en": "/aheal — heal"
+          },
+          "description": {
+            "ar": "يعالج لاعبًا بالكامل.",
+            "en": "Fully heals a player."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_medic:command.kill",
+          "node": "command.kill",
+          "label": {
+            "ar": "/kill — قتل",
+            "en": "/kill — kill"
+          },
+          "description": {
+            "ar": "يقتل لاعبًا.",
+            "en": "Kills a player."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_medic:command.setpain",
+          "node": "command.setpain",
+          "label": {
+            "ar": "/setpain — الألم",
+            "en": "/setpain — set pain"
+          },
+          "description": {
+            "ar": "يغيّر ألم لاعب.",
+            "en": "Changes a player's pain."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_medic:w_medic.admin",
+          "node": "w_medic.admin",
+          "label": {
+            "ar": "إدارة الأطباء والإجراءات الطبية الداخلية",
+            "en": "Manage doctors and internal medical actions"
+          },
+          "description": {
+            "ar": "يتيح إدارة الأطباء والإجراءات الطبية الداخلية. أوامر الشات الطبية لها صلاحيات منفصلة؛ اخترها أيضًا إذا احتجتها أو اختر جميع صلاحيات الطبيب.",
+            "en": "Allows doctor management and internal medical actions. Medical chat commands have separate permissions; select the commands you need or select all Medic permissions."
+          },
+          "danger": true
+        }
+      ]
+    },
+    {
+      "id": "w_stables",
+      "label": {
+        "ar": "الإسطبلات والخيول",
+        "en": "Stables and horses"
+      },
+      "permissions": [
+        {
+          "id": "w_stables:w_stables.admin",
+          "node": "w_stables.admin",
+          "label": {
+            "ar": "إدارة الإسطبلات كاملة",
+            "en": "Full stables admin"
+          },
+          "description": {
+            "ar": "كل لوحة /stables بكل أقسامها.",
+            "en": "The whole /stables board, every area."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_stables:w_stables.admin.stables",
+          "node": "w_stables.admin.stables",
+          "label": {
+            "ar": "الأسواق ومحطات التلقيح",
+            "en": "Markets and studs"
+          },
+          "description": {
+            "ar": "إدارة الأسواق ومحطات التلقيح وأعمالها.",
+            "en": "Markets, studs and their business."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_stables:w_stables.admin.catalogue",
+          "node": "w_stables.admin.catalogue",
+          "label": {
+            "ar": "الكتالوج",
+            "en": "Catalogue"
+          },
+          "description": {
+            "ar": "أنواع العربات وأرقامها.",
+            "en": "Wagon types and their numbers."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_stables:w_stables.admin.balancing",
+          "node": "w_stables.admin.balancing",
+          "label": {
+            "ar": "الموازنة",
+            "en": "Balancing"
+          },
+          "description": {
+            "ar": "إعدادات الإسطبلات.",
+            "en": "Stables settings."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_stables:w_stables.admin.records",
+          "node": "w_stables.admin.records",
+          "label": {
+            "ar": "السجلات",
+            "en": "Records"
+          },
+          "description": {
+            "ar": "قراءة كل السجلات.",
+            "en": "Reads every registry."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_stables:w_stables.admin.ownership",
+          "node": "w_stables.admin.ownership",
+          "label": {
+            "ar": "الملكية",
+            "en": "Ownership"
+          },
+          "description": {
+            "ar": "إعطاء ونقل وعلاج وحذف الخيل والعربات.",
+            "en": "Give, move, heal, delete horses and wagons."
+          },
+          "danger": true
+        },
+        {
+          "id": "w_stables:w_stables.admin.breeding",
+          "node": "w_stables.admin.breeding",
+          "label": {
+            "ar": "التربية",
+            "en": "Breeding"
+          },
+          "description": {
+            "ar": "الحمل وفحوص الجينات وتعديلها.",
+            "en": "Pregnancies and gene tests and edits."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_stables:w_stables.admin.migration",
+          "node": "w_stables.admin.migration",
+          "label": {
+            "ar": "الترحيل",
+            "en": "Migration"
+          },
+          "description": {
+            "ar": "سجل ترحيل الخيل القديمة.",
+            "en": "The old horses' migration record."
+          },
+          "danger": false
+        }
+      ]
+    },
+    {
+      "id": "w_weathersync",
+      "label": {
+        "ar": "الطقس والوقت",
+        "en": "Weather and time"
+      },
+      "permissions": [
+        {
+          "id": "w_weathersync:command.weather",
+          "node": "command.weather",
+          "label": {
+            "ar": "/weather — الطقس",
+            "en": "/weather — weather"
+          },
+          "description": {
+            "ar": "يغيّر الطقس.",
+            "en": "Changes the weather."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.time",
+          "node": "command.time",
+          "label": {
+            "ar": "/time — الوقت",
+            "en": "/time — time"
+          },
+          "description": {
+            "ar": "يغيّر الساعة.",
+            "en": "Changes the clock."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.morning",
+          "node": "command.morning",
+          "label": {
+            "ar": "/morning — الصباح",
+            "en": "/morning — morning"
+          },
+          "description": {
+            "ar": "يجعل الوقت صباحًا.",
+            "en": "Sets the time to morning."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.noon",
+          "node": "command.noon",
+          "label": {
+            "ar": "/noon — الظهر",
+            "en": "/noon — noon"
+          },
+          "description": {
+            "ar": "يجعل الوقت ظهرًا.",
+            "en": "Sets the time to noon."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.evening",
+          "node": "command.evening",
+          "label": {
+            "ar": "/evening — المساء",
+            "en": "/evening — evening"
+          },
+          "description": {
+            "ar": "يجعل الوقت مساءً.",
+            "en": "Sets the time to evening."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.night",
+          "node": "command.night",
+          "label": {
+            "ar": "/night — الليل",
+            "en": "/night — night"
+          },
+          "description": {
+            "ar": "يجعل الوقت ليلًا.",
+            "en": "Sets the time to night."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.freezetime",
+          "node": "command.freezetime",
+          "label": {
+            "ar": "/freezetime — تجميد الوقت",
+            "en": "/freezetime — freeze time"
+          },
+          "description": {
+            "ar": "يوقّف الساعة.",
+            "en": "Stops the clock."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.freezeweather",
+          "node": "command.freezeweather",
+          "label": {
+            "ar": "/freezeweather — تجميد الطقس",
+            "en": "/freezeweather — freeze weather"
+          },
+          "description": {
+            "ar": "يثبّت الطقس.",
+            "en": "Locks the weather."
+          },
+          "danger": false
+        },
+        {
+          "id": "w_weathersync:command.blackout",
+          "node": "command.blackout",
+          "label": {
+            "ar": "/blackout — انقطاع الكهرباء",
+            "en": "/blackout — blackout"
+          },
+          "description": {
+            "ar": "يطفئ الأنوار.",
+            "en": "Turns the lights off."
+          },
+          "danger": false
+        }
+      ]
+    }
+  ]
+}

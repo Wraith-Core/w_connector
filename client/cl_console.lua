@@ -64,8 +64,17 @@ local function pushSelf() if WConsoleTools then send('self', WConsoleTools.state
 local PUSH = { players = { 'query.players', 'players', 'list' }, server = { 'query.server', 'serverInfo' },
     bans = { 'query.bans', 'bans', 'list' }, catalog = { 'query.catalog', 'catalog' },
     modules = { 'scripts.list', 'modules', 'list' }, blocks = { 'characters.blocks', 'blocks', 'list' }, map = { 'query.map', 'mapCfg' } }
+-- 2.3.1: the permissions page's data (ops/console.lua C.access): asked when the page opens, then again only
+-- when the session's accessRev changes while the console stays open
+local accessWanted, accessRev = false, nil
+local function askAccess()
+    if not C.live() then return end
+    accessWanted = true
+    TriggerServerEvent('w_connector:console:access', C.session.nonce)
+end
 local function refresh(what)
     if what == 'self' then pushSelf(); return end
+    if what == 'access' then askAccess(); return end
     local def = PUSH[what]
     if not def or not C.live() or not C.session.actions[def[1]] then return end
     local generation = openGeneration
@@ -80,6 +89,7 @@ local function open()
     if not C.ready or not C.live() then return end
     C.wantOpen = false
     WMenu.open = true; openGeneration = openGeneration + 1
+    accessWanted, accessRev = false, nil
     local s = C.session
     local roleLabels = lang == 'ar' and { owner = 'مالك اللوحة', admin = 'إداري', moderator = 'مشرف', viewer = 'مشاهد', custom = 'رتبة مخصصة' }
         or { owner = 'Panel owner', admin = 'Administrator', moderator = 'Moderator', viewer = 'Viewer', custom = 'Custom role' }
@@ -130,6 +140,12 @@ RegisterNetEvent('w_connector:console:permissions', function(s)
     if C.session and s.nonce ~= C.session.nonce then return end
     setSession(s)
     if WMenu.open then send('permissions', { perms = s.perms, actions = s.actionAreas }); send('connectorCapabilities', { actions = s.list, unavailable = s.unavailable, game = s.game }); pushSelf() end
+    if WMenu.open and accessWanted and s.accessRev ~= accessRev then askAccess() end
+end)
+RegisterNetEvent('w_connector:console:access', function(block, nonce)
+    if foreign() or not WMenu.open or not C.session or nonce ~= C.session.nonce or type(block) ~= 'table' then return end
+    accessRev = block.rev
+    send('access', block)
 end)
 RegisterNetEvent('w_connector:console:result', function(id, r, nonce)
     if foreign() then return end

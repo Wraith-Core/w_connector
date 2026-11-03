@@ -69,7 +69,7 @@ local function package(s)
     end
     table.sort(actions)
     return { ok = true, nonce = s.nonce, role = s.role, customRoles = s.customRoles, actions = actions, unavailable = unavailable, perms = areas,
-        actionAreas = actionAreas, permissions = s.permissions, self = s.source, game = WC.gameName(),
+        actionAreas = actionAreas, permissions = s.permissions, accessRev = s.accessRev, self = s.source, game = WC.gameName(),
         serverName = GetConvar('sv_projectName', GetConvar('sv_hostname', 'Wraith')), lease = math.max(0, LEASE - (now() - s.at)) }
 end
 local function retire(s, reason)
@@ -89,12 +89,81 @@ local function retire(s, reason)
     TriggerClientEvent('w_connector:console:revoked', s.source, reason or 'no_session')
 end
 C.retire = retire
+-- 2.3.1: the permissions page (web/src/pages/perms) shows the admin's access the way the website models it.
+-- Everything below is display data, checked for shape and size; authority stays in s.allowed and the website.
+local function stringList(list, max, len)
+    local out = {}
+    if type(list) ~= 'table' then return out end
+    for _, v in ipairs(list) do
+        if type(v) == 'string' and #v <= len and #out < max then out[#out + 1] = v end
+    end
+    return out
+end
+local function texts(v, len)
+    if type(v) ~= 'table' or type(v.ar) ~= 'string' or type(v.en) ~= 'string' or #v.ar > len or #v.en > len then return nil end
+    return { ar = v.ar, en = v.en }
+end
+-- The website's permission names { tag, list }: one copy for the resource, sent again only when its tag changes.
+C.webCatalog = nil
+local function keepWebCatalog(body)
+    local tag = body.permissionCatalogTag
+    if type(tag) ~= 'string' or #tag > 64 or not tag:match('^[%w_%-]+$') or type(body.permissionCatalog) ~= 'table' then return end
+    local list = {}
+    for _, p in ipairs(body.permissionCatalog) do
+        if type(p) == 'table' and type(p.id) == 'string' and p.id:match('^[a-z]+%.[a-z]+$') and #list < 128 then
+            local label, description = texts(p.label, 300), texts(p.description, 900)
+            if label and description then list[#list + 1] = { id = p.id, label = label, description = description, ownerOnly = p.ownerOnly == true or nil } end
+        end
+    end
+    C.webCatalog = { tag = tag, list = list }
+end
+local function keepAccess(s, body)
+    s.roleSources = {}
+    for _, r in ipairs(type(body.customRoleSources) == 'table' and body.customRoleSources or {}) do
+        if type(r) == 'table' and type(r.name) == 'string' and #r.name <= 120 and #s.roleSources < 16 then
+            s.roleSources[#s.roleSources + 1] = { name = r.name, direct = r.direct == true, discord = r.discord == true }
+        end
+    end
+    -- nil from an older website: C.access then reads what core/script_permissions.lua applies
+    s.scriptPermissions = type(body.scriptPermissions) == 'table' and stringList(body.scriptPermissions, 1024, 146) or nil
+    local m = body.manage
+    s.manage = type(m) == 'table' and type(m.url) == 'string' and #m.url <= 200 and m.url:match('^https?://[%w%.%-:%[%]]+/[%w/_%-]*$')
+        and { url = m.url, where = texts(m.where, 300) } or nil
+    keepWebCatalog(body)
+    local roles = {}
+    for _, r in ipairs(s.roleSources) do roles[#roles + 1] = r.name .. (r.direct and '+' or '') .. (r.discord and '@' or '') end
+    local key = table.concat({ tostring(s.role), table.concat(s.customRoles, ','), table.concat(roles, ','), table.concat(stringList(s.permissions, 128, 64), ','),
+        s.scriptPermissions and table.concat(s.scriptPermissions, ',') or '-', C.webCatalog and C.webCatalog.tag or '', s.manage and s.manage.url or '' }, '|')
+    if key ~= s.accessKey then s.accessKey, s.accessRev = key, (s.accessRev or 0) + 1 end
+end
+--- The permissions page's data: this session's own role, custom roles and website permissions (with the
+--- website's names), and its script permissions with this server's catalogue names. Read only.
+function C.access(s)
+    local held, from = s.scriptPermissions, 'website'
+    if not held then
+        held, from = {}, 'server'
+        local p = WC.ScriptPermissions and WC.ScriptPermissions.sessions[s.source]
+        for id in pairs(p and p.grants or {}) do held[#held + 1] = id end
+        table.sort(held)
+    end
+    local roles = s.roleSources or {}
+    if #roles == 0 and #s.customRoles > 0 then -- an older website sends the names only
+        roles = {}; for _, name in ipairs(s.customRoles) do roles[#roles + 1] = { name = name } end
+    end
+    local built, catalog = pcall(WC.ScriptCatalog.build)
+    return { rev = s.accessRev or 0, role = type(s.role) == 'string' and s.role or nil, roles = roles,
+        web = { held = stringList(s.permissions, 128, 64), catalog = C.webCatalog and C.webCatalog.list or nil },
+        scripts = { held = held, from = from, groups = built and type(catalog) == 'table' and catalog.groups or {} },
+        manage = s.manage }
+end
 local function refresh(src, old)
     if opening[src] then return nil, 'busy' end
     local bound, at = identity(src), now()
     if not bound or not WC.linked() then return nil, 'offline' end
     local lock = {}; opening[src] = lock
-    local status, body = WC.request('POST', '/ingame/console/session', who(src), 10000)
+    local ask = who(src)
+    ask.catalogTag = C.webCatalog and C.webCatalog.tag or nil -- 2.3.1: the website omits names we already hold
+    local status, body = WC.request('POST', '/ingame/console/session', ask, 10000)
     if opening[src] ~= lock then return nil, 'no_session' end
     opening[src] = nil
     if identity(src) ~= bound or now() - at >= LEASE or (old and C.sessions[src] ~= old) then return nil, 'no_session' end
@@ -111,6 +180,7 @@ local function refresh(src, old)
         if type(name) == 'string' and #s.customRoles < 16 then s.customRoles[#s.customRoles + 1] = name:sub(1, 120) end
     end
     for _, name in ipairs(body.actions) do if contract[name] then s.allowed[name] = true end end
+    keepAccess(s, body) -- 2.3.1
     C.sessions[src] = s
     -- Modes use their exact action, not a broad area; a revoked mode stops on the next watchdog tick.
     for name in pairs(modes[src] or {}) do if not s.allowed[name] then modes[src][name] = nil end end
@@ -331,6 +401,14 @@ end)
 RegisterNetEvent('w_connector:console:closed', function()
     local s = C.sessions[source]
     if s then s.uiOpen = false end
+end)
+-- 2.3.1: the permissions page asks when it opens, and again when accessRev changes (client/cl_console.lua)
+RegisterNetEvent('w_connector:console:access', function(sessionNonce)
+    local src = source
+    if not WC.onlineSource(src) or limited(src) then return end
+    local s = C.sessions[src]
+    if not C.valid(s) or sessionNonce ~= s.nonce then return end
+    TriggerClientEvent('w_connector:console:access', src, C.access(s), s.nonce)
 end)
 function C.watchdog()
         for src, s in pairs(C.sessions) do

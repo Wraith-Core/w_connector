@@ -93,6 +93,30 @@ export interface LocaleData { locale: Lang; dir: Dir; strings: Strings }
 /** 'permissions' push: today a bare Perms map; L1 sends the object form (the page accepts both) */
 export type PermissionsPush = Perms | { perms: Perms; levels?: LevelsMap; rank?: Rank };
 
+/* ── 2.3.1 · 'access' push: the admin's own access as the website models it (pages/perms) ───── */
+
+export interface LangText { ar: string; en: string }
+/** One website permission with the website's own names (the session's permissionCatalog) */
+export interface WebPermission { id: string; label: LangText; description: LangText; ownerOnly?: boolean }
+/** One script permission from this server's catalogue (core/script_catalog.lua) */
+export interface ScriptPermission { id: string; node: string; label: LangText; description: LangText; danger?: boolean }
+export interface ScriptGroup { id: string; label: LangText; permissions: ScriptPermission[] }
+/** A custom role and how it is held (direct / discord are missing when an older website sends names only) */
+export interface AccessRole { name: string; direct?: boolean; discord?: boolean }
+export interface AccessData {
+  /** changes whenever any of it changes */
+  rev: number;
+  /** the website base role: owner · admin · moderator · viewer · custom */
+  role: string | null;
+  roles: AccessRole[];
+  /** held: the website permissions he has · catalog: every website permission (null from an older website) */
+  web: { held: string[]; catalog: WebPermission[] | null };
+  /** held: the script permissions he has · from 'server' when the website did not send them */
+  scripts: { held: string[]; from: 'website' | 'server'; groups: ScriptGroup[] };
+  /** where roles are managed on the website */
+  manage: { url: string; where: LangText | null } | null;
+}
+
 /* ── Players ─────────────────────────────────────────────────────────────── */
 
 export interface JobInfo { name: string; label: string; grade: number; gradeName: string; onDuty: boolean }
@@ -562,7 +586,9 @@ export type LuaMessage =
   /* L1 */
   | { action: 'modules'; data: { list: ModuleDescriptor[] } }
   | { action: 'logEntry'; data: LogEntry }
-  | { action: 'blocks'; data: { list: BlockEntry[] } };
+  | { action: 'blocks'; data: { list: BlockEntry[] } }
+  /* 2.3.1 */
+  | { action: 'access'; data: AccessData };
 
 /** What refresh(what) may ask for (post('refresh', { what })) */
-export type RefreshWhat = 'players' | 'server' | 'bans' | 'hud' | 'catalog' | 'map' | 'self' | 'modules' | 'blocks' | 'logs';
+export type RefreshWhat = 'players' | 'server' | 'bans' | 'hud' | 'catalog' | 'map' | 'self' | 'modules' | 'blocks' | 'logs' | 'access';

@@ -13,7 +13,7 @@
 import { createContext, useContext } from 'react';
 import type { ConfirmSpec } from './kit/dialog';
 import type {
-  ActionAreas, AdminPlayer, AdminSelf, Area, BanEntry, BlockEntry, Catalog, HudCfg, Level, LevelsMap, LogEntry, MapCfg, MapData,
+  AccessData, ActionAreas, AdminPlayer, AdminSelf, Area, BanEntry, BlockEntry, Catalog, HudCfg, Level, LevelsMap, LogEntry, MapCfg, MapData,
   MapPlayerRow, ModuleDescriptor, Perms, Rank, RefreshWhat, Result, SelfState, ServerInfo, ToastType,
 } from './types';
 
@@ -74,6 +74,8 @@ export interface AppCtx {
   recentLogs: LogEntry[];
   /** character blocks (the 'blocks' push; null until asked) */
   blocks: BlockEntry[] | null;
+  /** 2.3.1 · the admin's own access as the website models it (the 'access' push; null until asked) */
+  access: AccessData | null;
 
   act<T = unknown>(name: string, data: unknown, opts?: ActOptions): Promise<Result<T>>;
   confirm<V = unknown>(spec: ConfirmSpec<V>): void;
@@ -105,7 +107,7 @@ export const Ctx = createContext<AppCtx>({
   levels: {}, rank: null, actions: {}, commands: {}, protectedResources: [], banDurations: [], levelOf: () => null,
   players: [], playersSeen: false, serverInfo: null, hudCfg: null, bans: null, catalog: null, mapCfg: null,
   mapPlayers: [], mapPlayersSeen: false, mapData: { places: [], labels: [], markers: [] }, self: null,
-  modules: null, recentLogs: [], blocks: null,
+  modules: null, recentLogs: [], blocks: null, access: null,
   act: noopAsync as AppCtx['act'], confirm: () => {}, toast: () => {}, refresh: () => {},
   selectedId: null, select: () => {},
   route: { page: 'dashboard', params: {} }, navigate: () => {}, openPalette: () => {},

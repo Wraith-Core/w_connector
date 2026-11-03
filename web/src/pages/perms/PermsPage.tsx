@@ -1,206 +1,93 @@
 /* ════════════════════════════════════════════════════════════════════════════
- * w_admin · pages/perms/PermsPage.tsx  (read only)
- * Who can do what, in plain words:
- *   your level + the level ladder (mod → admin → god, and the server owner)
- *   one table per group of areas: area · what it allows · which levels have it (a lit track) · you
- *   the chat commands with their lowest level
- * Data: levels (Config.PagePerms), actions (Config.ActionPerms), commands (Config.CommandPerms),
- * rank and the perms booleans (the server's own answer for "you"). Nothing here posts anything.
- * An area the server marks 'master' (ranks) sits above god: only the panel's master has it.
+ * w_admin · pages/perms/PermsPage.tsx  (read only; 2.3.1: the website's model)
+ * Your access exactly as the website's roles page models it:
+ *   your base role on the website + your custom roles (and which come through a Discord role)
+ *   where permissions are managed (the website panel's Roles & Permissions, and the Ranks page here)
+ *   the website permissions in the website's order with its own names (ar + en), allowed or locked
+ *   the in-game script permissions one script at a time, with this server's catalogue names
+ * Data: the 'access' push (ops/console.lua C.access), asked when the page opens. Nothing here posts a change.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 import { useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
-import type { TFn } from '../../i18n';
 import {
-  Button, DataTable, EmptyState, FilterChips, Glyph, HelpTip, InlineAlert, Section, Switch, Tag, TextInput, Toolbar, cls, fmtNum,
+  Button, CopyButton, DataTable, EmptyState, FilterChips, Glyph, HelpTip, InlineAlert, Loading, Section, Switch, Tag, TextInput, Toolbar, fmtNum,
 } from '../../kit';
-import type { ChipItem, Column, HelpKey } from '../../kit';
-import { LEVELS } from '../../types';
-import type { Area, Level, Rank } from '../../types';
-import { actionLabel } from '../log/labels';
-
-type GroupId = 'people' | 'player' | 'tools' | 'world' | 'scripts' | 'system' | 'other';
-type Filter = 'all' | 'mine' | 'locked';
-/** A level as the server may send it: mod · admin · god, or 'master' (above every level: the ranks page) */
-type MinLevel = Level | 'master';
-
-/** Every area the panel knows, in reading order, by group */
-const GROUPS: { id: Exclude<GroupId, 'other'>; areas: Area[] }[] = [
-  { id: 'people', areas: ['players', 'kick', 'ban', 'bans', 'characters', 'citizenId', 'charDelete'] },
-  { id: 'player', areas: ['teleport', 'revive', 'needs', 'job', 'money', 'items'] },
-  { id: 'tools', areas: ['spawn', 'vehicle', 'entities', 'dev'] },
-  { id: 'world', areas: ['server', 'map', 'news'] },
-  { id: 'scripts', areas: ['scripts', 'scriptsRun', 'scriptsConsole', 'settings', 'settingsImport', 'hud'] },
-  { id: 'system', areas: ['resources', 'logs', 'perms', 'ranks'] },
-];
-const KNOWN = new Set<string>(GROUPS.flatMap((g) => g.areas));
-
-/** Chat commands that exist for everyone (not in Config.CommandPerms) */
-const PUBLIC_COMMANDS = ['report'];
-
-interface Row { area: Area; group: GroupId; min: MinLevel | null; mine: boolean; actions: string[] }
-interface CmdRow { key: string; min: Level | null; mine: boolean }
-
-/* the server may call its top rank 'master' (the ranks system): read it as the owner, the top of the ladder */
-const isTop = (r: string | null | undefined): boolean => r === 'owner' || r === 'master';
-const rankIndex = (r: Rank | null): number => (isTop(r) ? LEVELS.length : r ? LEVELS.indexOf(r as Level) : -1);
-
-/** The levels map value of an area: a known level, 'master', or null */
-function minOf(v: string | undefined): MinLevel | null {
-  if (v === 'master' || v === 'owner') return 'master';
-  return (LEVELS as readonly string[]).includes(v ?? '') ? (v as Level) : null;
-}
-
-function known(t: TFn, key: string, fallback: string) {
-  const v = t(key);
-  return v === key ? fallback : v;
-}
+import type { ChipItem, Column } from '../../kit';
+import { buildView, matches } from './model';
+import type { Filter, PermRow, PermsView } from './model';
 
 export default function PermsPage() {
   const app = useApp();
-  const { t } = useI18n();
+  const { t, lt, lang } = useI18n();
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [details, setDetails] = useState(false);
 
-  const rank: Rank | null = app.rank ?? (LEVELS.includes(app.admin?.group as Level) ? (app.admin?.group as Level) : null);
-  const hasLevels = Object.keys(app.levels).length > 0;
+  const view = useMemo<PermsView | null>(() => (app.access ? buildView(app.access) : null), [app.access]);
+  if (!view) return <div className="pm-page"><Loading text={t('label.perms.loading')} /></div>;
 
-  const areaName = (a: string) => known(t, `label.perms.area.${a}`, a);
-  const areaAllows = (a: string) => known(t, `label.perms.allows.${a}`, '');
-  const levelName = (lv: Level) => t(`label.perms.levelShort.${lv}`);
+  const keep = (r: PermRow) => matches(r, filter, q, lang);
+  const web = view.web.filter(keep);
+  const scripts = view.scripts.map((g) => ({ ...g, shown: g.rows.filter(keep) })).filter((g) => g.shown.length > 0);
+  const every = [...view.web, ...view.scripts.flatMap((g) => g.rows)];
+  const mine = every.filter((r) => r.mine).length;
+  const nothing = web.length === 0 && scripts.length === 0 && (q.trim() !== '' || filter !== 'all');
 
-  /* area → the "kind.action" ids that need it (Config.ActionPerms) */
-  const actionsByArea = useMemo(() => {
-    const m = new Map<string, string[]>();
-    for (const [kind, map] of Object.entries(app.actions)) {
-      for (const [action, area] of Object.entries(map ?? {})) {
-        const l = m.get(area) ?? [];
-        l.push(`${kind}.${action}`);
-        m.set(area, l);
-      }
-    }
-    return m;
-  }, [app.actions]);
-
-  const rows = useMemo<Row[]>(() => {
-    const out: Row[] = [];
-    const push = (area: Area, group: GroupId) => out.push({
-      area, group, min: minOf((app.levels as Record<string, string | undefined>)[area]), mine: app.can(area), actions: actionsByArea.get(area) ?? [],
-    });
-    for (const g of GROUPS) for (const a of g.areas) if (!hasLevels || a in app.levels || a in app.perms) push(a, g.id);
-    /* areas a newer server sends that this page does not know yet */
-    for (const a of Object.keys({ ...app.levels, ...app.perms })) if (!KNOWN.has(a)) push(a as Area, 'other');
-    return out;
-  }, [app.levels, app.perms, app.can, actionsByArea, hasLevels]);
-
-  const needle = q.trim().toLowerCase();
-  const match = (r: Row) => {
-    if (filter === 'mine' && !r.mine) return false;
-    if (filter === 'locked' && r.mine) return false;
-    if (!needle) return true;
-    return [areaName(r.area), areaAllows(r.area), r.area, ...r.actions.map((x) => actionLabel(t, x.split('.')[1] ?? x))]
-      .some((v) => v.toLowerCase().includes(needle));
-  };
-  const visible = rows.filter(match);
-  const mineCount = rows.filter((r) => r.mine).length;
-
-  const commands = useMemo<CmdRow[]>(() => {
-    const ri = rankIndex(rank);
-    const list: CmdRow[] = Object.entries(app.commands).map(([key, min]) => ({ key, min, mine: ri >= LEVELS.indexOf(min) }));
-    list.sort((a, b) => LEVELS.indexOf(a.min as Level) - LEVELS.indexOf(b.min as Level) || a.key.localeCompare(b.key));
-    for (const k of PUBLIC_COMMANDS) if (!(k in app.commands)) list.push({ key: k, min: null, mine: true });
-    return list;
-  }, [app.commands, rank]);
-
-  const plainActions = (r: Row): ReactNode => {
-    if (r.actions.length === 0) return null;
-    const names = Array.from(new Set(r.actions.map((x) => actionLabel(t, x.split('.')[1] ?? x))));
-    const shown = names.slice(0, 8);
-    return (
-      <span className="pm-actions">
-        <span className="pm-actions-k">{t('label.perms.buttons')}</span>
-        <span>{shown.join(' · ')}{names.length > shown.length ? ` ${t('label.perms.more', fmtNum(names.length - shown.length))}` : ''}</span>
-      </span>
-    );
-  };
-
-  const columns: Column<Row>[] = [
+  const columns: Column<PermRow>[] = [
     {
-      key: 'area', label: t('label.perms.col.area'), help: 'help.perms.col.area', width: '15rem', className: 'pm-areacol',
+      key: 'perm', label: t('label.perms.col.perm'), help: 'help.perms.col.perm', width: '19rem', className: 'pm-wrap',
       render: (r) => (
-        <span className="pm-area">
-          <span className="k-cell-main">{areaName(r.area)}</span>
-          <HelpTip help={`help.perms.area.${r.area}` as HelpKey} label={areaName(r.area)} facts={{ area: r.area }} size="sm" />
-          {details && <span className="k-cell-sub pm-key">{r.area}</span>}
+        <span className="pm-perm">
+          <span className="k-cell-main">{r.label ? lt(r.label) : t('label.perms.unnamed')}</span>
+          {r.ownerOnly && <Tag tone="faint">{t('label.perms.ownerOnly')}</Tag>}
+          {r.danger && <Tag tone="faint">{t('label.perms.danger')}</Tag>}
+          {(details || !r.label) && <span className="k-cell-sub pm-key">{r.id}</span>}
         </span>
       ),
     },
     {
-      key: 'allows', label: t('label.perms.col.allows'), help: 'help.perms.col.allows', className: 'pm-wrap',
-      render: (r) => (
-        <>
-          <span className="pm-allows">{areaAllows(r.area) || '—'}</span>
-          {details && plainActions(r)}
-          {details && r.actions.length > 0 && <span className="pm-rawkeys">{r.actions.join('  ')}</span>}
-        </>
-      ),
+      key: 'desc', label: t('label.perms.col.desc'), help: 'help.perms.col.desc', className: 'pm-wrap',
+      render: (r) => <span className="pm-allows">{r.description ? lt(r.description) : '—'}</span>,
     },
     {
-      key: 'levels', label: t('label.perms.col.levels'), help: 'help.perms.col.levels', width: '17rem',
-      render: (r) => <LevelTrack min={r.min} />,
-    },
-    {
-      key: 'you', label: t('label.perms.col.you'), help: 'help.perms.col.you', width: '10rem',
-      render: (r) => <You mine={r.mine} min={r.min} />,
-    },
-  ];
-
-  const cmdColumns: Column<CmdRow>[] = [
-    {
-      key: 'command', label: t('label.perms.cmd.command'), help: 'help.perms.cmd.command', width: '11rem',
-      render: (c) => <span className="pm-cmd">/{c.key === 'menu' ? 'admin' : c.key}</span>,
-    },
-    {
-      key: 'does', label: t('label.perms.cmd.does'), help: 'help.perms.cmd.does', className: 'pm-wrap',
-      render: (c) => known(t, `label.perms.cmd.${c.key}`, '—'),
-    },
-    {
-      key: 'level', label: t('label.perms.cmd.level'), help: 'help.perms.cmd.level', width: '17rem',
-      render: (c) => (c.min ? <LevelTrack min={c.min} /> : <Tag>{t('label.perms.cmd.everyone')}</Tag>),
-    },
-    {
-      key: 'you', label: t('label.perms.cmd.you'), help: 'help.perms.cmd.you', width: '10rem',
-      render: (c) => <You mine={c.mine} min={c.min} />,
+      key: 'you', label: t('label.perms.col.you'), help: 'help.perms.col.you', width: '9rem',
+      render: (r) => <You mine={r.mine} />,
     },
   ];
 
   const chips: ChipItem<Filter>[] = [
-    { id: 'all', label: t('label.perms.filter.all'), count: rows.length, help: 'help.perms.filter.all' },
-    { id: 'mine', label: t('label.perms.filter.mine'), count: mineCount, help: 'help.perms.filter.mine' },
-    { id: 'locked', label: t('label.perms.filter.locked'), count: rows.length - mineCount, help: 'help.perms.filter.locked' },
+    { id: 'all', label: t('label.perms.filter.all'), count: every.length, help: 'help.perms.filter.all' },
+    { id: 'mine', label: t('label.perms.filter.mine'), count: mine, help: 'help.perms.filter.mine' },
+    { id: 'locked', label: t('label.perms.filter.locked'), count: every.length - mine, help: 'help.perms.filter.locked' },
   ];
-
-  const sections = [...GROUPS.map((g) => g.id), 'other' as const]
-    .map((id) => ({ id, rows: visible.filter((r) => r.group === id) }))
-    .filter((s) => s.rows.length > 0);
-
-  const groupHelp = (id: GroupId): HelpKey => (id === 'other' ? 'help.perms.col.area' : (`help.perms.group.${id}` as HelpKey));
+  const lockClass = (r: PermRow) => (r.mine ? undefined : 'pm-row-locked');
 
   return (
     <div className="pm-page">
       <div className="pm-top">
-        <YouCard rank={rank} label={!hasLevels ? app.admin?.group : undefined} mine={mineCount} total={rows.length} />
-        {hasLevels && <Ladder rank={rank} />}
+        <YouCard view={view} />
+        <RolesCard view={view} />
       </div>
 
-      <InlineAlert tone="info" title={t('label.perms.readOnlyTitle')} help="help.perms.readOnly">
-        {t('label.perms.readOnly')}
+      <InlineAlert
+        tone="info"
+        title={t('label.perms.manageTitle')}
+        help="help.perms.manage"
+        actions={app.can('ranks') ? <Button help="help.perms.openRanks" size="sm" kind="ghost" icon="arrow" onClick={() => app.navigate('ranks')}>{t('label.perms.openRanks')}</Button> : undefined}
+      >
+        <p>{view.manage?.where ? t('label.perms.manage', lt(view.manage.where)) : t('label.perms.manageNoWhere')}</p>
+        {view.manage && (
+          <p className="pm-link">
+            <span className="pm-link-k">{t('label.perms.link')}</span>
+            <bdi className="pm-url">{view.manage.url}</bdi>
+            <CopyButton value={view.manage.url} label={t('label.perms.link')} />
+          </p>
+        )}
+        <p className="pm-note">{t('label.perms.manageRanks')}</p>
       </InlineAlert>
-      {!hasLevels && <InlineAlert tone="info">{t('label.perms.noLevels')}</InlineAlert>}
+      {!view.webNamed && <InlineAlert tone="info">{t('label.perms.noWebNames')}</InlineAlert>}
 
       <Toolbar className="pm-toolbar">
         <TextInput
@@ -220,55 +107,49 @@ export default function PermsPage() {
         </span>
       </Toolbar>
 
-      {sections.length === 0 && (
+      {nothing && (
         <EmptyState
           text={t('label.perms.none')}
           next={<Button help="help.common.search" size="sm" onClick={() => { setQ(''); setFilter('all'); }}>{t('label.perms.clear')}</Button>}
         />
       )}
 
-      {sections.map((s) => (
-        <Section key={s.id} className="pm-group" title={t(`label.perms.group.${s.id}`)} help={groupHelp(s.id)}>
-          <DataTable label={t(`label.perms.group.${s.id}`)} columns={hasLevels ? columns : columns.filter((c) => c.key !== 'levels')} rows={s.rows} rowKey={(r) => r.area} rowClass={(r) => (r.mine ? undefined : 'pm-row-locked')} />
-        </Section>
-      ))}
-
-      {commands.length > 0 && (
-        <Section className="pm-group" title={t('label.perms.commands')} help="help.perms.commands">
-          <DataTable label={t('label.perms.commands')} columns={hasLevels ? cmdColumns : cmdColumns.filter((c) => c.key !== 'level')} rows={commands} rowKey={(c) => c.key} rowClass={(c) => (c.mine ? undefined : 'pm-row-locked')} />
+      {web.length > 0 && (
+        <Section className="pm-group" title={t('label.perms.web')} help="help.perms.web"
+          actions={<Count n={view.counts.web} of={view.counts.webTotal} />}>
+          <DataTable label={t('label.perms.web')} columns={columns} rows={web} rowKey={(r) => r.id} rowClass={lockClass} />
         </Section>
       )}
+
+      {!nothing && (
+        <Section className="pm-group pm-scripts" title={t('label.perms.scripts')} help="help.perms.scripts"
+          lead={t('label.perms.scriptsLead')}
+          actions={view.counts.scriptsTotal > 0 ? <Count n={view.counts.scripts} of={view.counts.scriptsTotal} /> : undefined}>
+          {view.scriptsFrom === 'server' && <p className="pm-note">{t('label.perms.scriptsFromServer')}</p>}
+          {view.scripts.length === 0 && <p className="pm-note">{t('label.perms.noScripts')}</p>}
+          {view.scripts.length > 0 && view.counts.scripts === 0 && <p className="pm-note">{t('label.perms.noScriptsHeld')}</p>}
+          {view.scriptsUnknown.length > 0 && <p className="pm-note">{t('label.perms.scriptsUnknown', fmtNum(view.scriptsUnknown.length))}</p>}
+        </Section>
+      )}
+      {scripts.map((g) => (
+        <Section key={g.id} className="pm-group pm-script" title={g.label ? lt(g.label) : g.id} help="help.perms.script"
+          actions={<Count n={g.rows.filter((r) => r.mine).length} of={g.rows.length} />}>
+          <DataTable label={g.label ? lt(g.label) : g.id} columns={columns} rows={g.shown} rowKey={(r) => r.id} rowClass={lockClass} />
+        </Section>
+      ))}
     </div>
   );
 }
 
 /* ── pieces ──────────────────────────────────────────────────────────────── */
 
-/** mod · admin · god, lit from the minimum level up: text + shape, never colour alone.
- *  'master' (above god) is one cell: only the panel's master. */
-function LevelTrack({ min }: { min: MinLevel | null }) {
+/** "held / all", left to right in both languages as the website's roles page draws it */
+function Count({ n, of }: { n: number; of: number }) {
   const { t } = useI18n();
-  if (min === 'master') {
-    return (
-      <span className="pm-track pm-track--top" role="img" aria-label={t('label.perms.masterOnly')}>
-        <span className="pm-seg is-on is-min">{t('label.perms.masterOnly')}</span>
-      </span>
-    );
-  }
-  const i = min ? LEVELS.indexOf(min) : -1;
-  const aria = min ? t('label.perms.minLevel', t(`label.common.level.${min}`)) : t('label.perms.unknownRank');
-  return (
-    <span className="pm-track" role="img" aria-label={aria}>
-      {LEVELS.map((lv, j) => (
-        <span key={lv} className={cls('pm-seg', i >= 0 && j >= i && 'is-on', j === i && 'is-min')}>
-          {t(`label.perms.levelShort.${lv}`)}
-        </span>
-      ))}
-    </span>
-  );
+  return <Tag><bdi dir="ltr">{t('label.perms.groupCount', fmtNum(n), fmtNum(of))}</bdi></Tag>;
 }
 
-function You({ mine, min }: { mine: boolean; min: MinLevel | null }) {
+function You({ mine }: { mine: boolean }) {
   const { t } = useI18n();
   if (mine) {
     return (
@@ -281,53 +162,50 @@ function You({ mine, min }: { mine: boolean; min: MinLevel | null }) {
   return (
     <span className="pm-you is-no">
       <Glyph name="lock" />
-      <span>{min ? t('label.perms.needs', t(`label.perms.levelShort.${min}`)) : t('label.perms.locked')}</span>
+      <span>{t('label.perms.locked')}</span>
     </span>
   );
 }
 
-function YouCard({ rank, label, mine, total }: { rank: Rank | null; label?: string; mine: number; total: number }) {
+function YouCard({ view }: { view: PermsView }) {
   const { t } = useI18n();
+  const { role, counts } = view;
+  const line = role === 'owner' ? 'owner' : role === 'custom' ? 'custom' : 'base';
   return (
     <div className="pm-you-card">
       <div className="pm-you-head">
         <span className="pm-cap">{t('label.perms.you')}</span>
         <HelpTip help="help.perms.you" label={t('label.perms.you')} size="sm" />
       </div>
-      <div className="pm-you-level">{label || (rank ? t(`label.common.level.${rank}`) : t('label.perms.unknownRank'))}</div>
-      <div className="pm-you-count">
-        {isTop(rank) ? t('label.perms.ownerAll') : t('label.perms.youCount', fmtNum(mine), fmtNum(total))}
-      </div>
-      <div className="pm-you-bar" aria-hidden="true"><span style={{ width: `${total ? Math.round((mine / total) * 100) : 0}%` }} /></div>
+      <div className="pm-you-level">{role ? t(`label.perms.role.${role}`) : t('label.perms.unknownRole')}</div>
+      <div className="pm-you-count">{t(`label.perms.roleLine.${line}`)}</div>
+      <div className="pm-you-count">{t('label.perms.webCount', fmtNum(counts.web), fmtNum(counts.webTotal))}</div>
+      <div className="pm-you-bar" aria-hidden="true"><span style={{ width: `${counts.webTotal ? Math.round((counts.web / counts.webTotal) * 100) : 0}%` }} /></div>
+      {counts.scriptsTotal > 0 && <div className="pm-you-count">{t('label.perms.scriptCount', fmtNum(counts.scripts), fmtNum(counts.scriptsTotal))}</div>}
     </div>
   );
 }
 
-function Ladder({ rank }: { rank: Rank | null }) {
+function RolesCard({ view }: { view: PermsView }) {
   const { t } = useI18n();
-  const steps: Rank[] = [...LEVELS, 'owner'];
   return (
-    <div className="pm-ladder">
+    <div className="pm-roles">
       <div className="pm-you-head">
-        <span className="pm-cap">{t('label.perms.ladder')}</span>
-        <HelpTip help="help.common.level" label={t('label.perms.ladder')} size="sm" />
+        <span className="pm-cap">{t('label.perms.roles')}</span>
+        <HelpTip help="help.perms.roles" label={t('label.perms.roles')} size="sm" />
       </div>
-      <ol className="pm-steps">
-        {steps.map((lv, i) => {
-          const here = rank === lv || (lv === 'owner' && isTop(rank));
-          const reached = rankIndex(rank) >= i;
-          return (
-            <li key={lv} className={cls('pm-step', here && 'is-here', reached && 'is-reached', lv === 'owner' && 'is-owner')}>
-              <span className="pm-step-top">
-                <span className="pm-step-name">{t(`label.common.level.${lv}`)}</span>
-                <HelpTip help={`help.perms.level.${lv}` as HelpKey} label={t(`label.common.level.${lv}`)} size="sm" />
-              </span>
-              <span className="pm-step-line">{lv === 'owner' ? t('label.perms.ownerAll') : t(`label.perms.levelLine.${lv}`)}</span>
-              {here && <span className="pm-here">{t('label.perms.youHere')}</span>}
-            </li>
-          );
-        })}
-      </ol>
+      {view.roles.length === 0
+        ? <p className="pm-roles-none">{t('label.perms.noRoles')}</p>
+        : (
+          <ul className="pm-role-list">
+            {view.roles.map((r) => (
+              <li key={r.name} className="pm-role">
+                <bdi className="pm-role-name">{r.name}</bdi>
+                {r.discord && <Tag tone="faint">{t('label.perms.viaDiscord')}</Tag>}
+              </li>
+            ))}
+          </ul>
+        )}
     </div>
   );
 }

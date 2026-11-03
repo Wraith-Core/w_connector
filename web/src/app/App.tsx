@@ -5,7 +5,7 @@
  * or the quick menu (quick mode).
  *
  * Lua → page:  open · close · mode · permissions · locale · players · serverInfo · hudCfg · bans · catalog
- *              · mapCfg · mapPlayers · mapData · self · toast · modules · logEntry · blocks
+ *              · mapCfg · mapPlayers · mapData · self · toast · modules · logEntry · blocks · access (2.3.1)
  * page → Lua:  ready · close · mode · refresh · player · self · server · hud · bans · map · catalog
  *              · characters · citizen · logs · scripts · settings
  * ════════════════════════════════════════════════════════════════════════════ */
@@ -28,6 +28,8 @@ import AppShell from './AppShell';
 import QuickSlot from './quick';
 import { copyText } from '../kit/format';
 import { allowed, pageById, visiblePages } from './registry';
+import { toAccess } from '../pages/perms/model';
+import type { AccessData } from '../types';
 
 const TOAST_MS = 4200;
 /* the old console's tab ids (?tab= links in the browser mock) → the page ids */
@@ -84,6 +86,7 @@ export default function App() {
   const [modules, setModules] = useState<ModuleDescriptor[] | null>(null);
   const [recentLogs, setRecentLogs] = useState<LogEntry[]>([]);
   const [blocks, setBlocks] = useState<BlockEntry[] | null>(null);
+  const [access, setAccess] = useState<AccessData | null>(null);
 
   const [route, setRoute] = useState<Route>({ page: 'dashboard', params: {} });
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -138,7 +141,7 @@ export default function App() {
           setSelfId(typeof o.selfId === 'number' ? o.selfId : 0);
           setSelectedId(null);
           setPlayers([]); setPlayersSeen(false); setServerInfo(null); setHudCfg(null); setBans(null); setCatalog(null);
-          setModules(null); setRecentLogs([]); setBlocks(null); setMapCfg(null); setMapData(EMPTY_MAP); setSelf(null);
+          setModules(null); setRecentLogs([]); setBlocks(null); setMapCfg(null); setMapData(EMPTY_MAP); setSelf(null); setAccess(null);
           setRoute({ page: o.initialPage && pageById(o.initialPage) ? o.initialPage : 'dashboard', params: {} });
           setModeState(o.mode === 'quick' ? 'quick' : 'full');
           setMapPlayers([]); setMapPlayersSeen(false);
@@ -203,6 +206,7 @@ export default function App() {
         case 'modules': setModules(arr<ModuleDescriptor>(d.list)); return;
         case 'logEntry': if (typeof d.id === 'number') setRecentLogs((l) => [d as unknown as LogEntry, ...l.filter((x) => x.id !== d.id)].slice(0, 50)); return;
         case 'blocks': setBlocks(arr<BlockEntry>(d.list)); return;
+        case 'access': setAccess(toAccess(d)); return;
         case 'toast': {
           const type = d.type === 'success' || d.type === 'error' ? d.type : 'inform';
           const text = typeof d.text === 'string' ? d.text : '';
@@ -310,7 +314,7 @@ export default function App() {
     admin, serverName, selfId, perms, can, canAction,
     levels, rank, actions, commands, protectedResources, banDurations, levelOf,
     players, playersSeen, serverInfo, hudCfg, bans, catalog, mapCfg, mapPlayers, mapPlayersSeen, mapData, self,
-    modules, recentLogs, blocks,
+    modules, recentLogs, blocks, access,
     act, confirm, toast, refresh,
     selectedId, select: setSelectedId,
     route, navigate, openPalette,
@@ -318,7 +322,7 @@ export default function App() {
     prefs, setPrefs,
   }), [admin, serverName, selfId, perms, can, canAction, levels, rank, actions, commands, protectedResources, banDurations, levelOf,
     players, playersSeen, serverInfo, hudCfg, bans, catalog, mapCfg, mapPlayers, mapPlayersSeen, mapData, self,
-    modules, recentLogs, blocks, act, confirm, toast, refresh, selectedId, route, navigate, openPalette, mode, setMode, close, prefs, setPrefs]);
+    modules, recentLogs, blocks, access, act, confirm, toast, refresh, selectedId, route, navigate, openPalette, mode, setMode, close, prefs, setPrefs]);
   ctxRef.current = ctx;
 
   /* a page that is not allowed (or vanished with a permission change) falls back to the first allowed one */

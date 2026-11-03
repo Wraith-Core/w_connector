@@ -5,7 +5,7 @@
  * including the L1 contracts (levels, citizen, characters incl. blocks, logs, scripts, settings).
  *
  *   ?lang=en            English (default Arabic)
- *   ?perms=mod|admin    a lower rank (default god: everything)
+ *   ?perms=mod|admin    a lower rank (default god: everything); the permissions page shows moderator / admin + custom roles / owner
  *   ?open=0             stay closed (press O)
  *   ?mode=quick         open the quick menu
  *   ?page=<id>          land on a page (?tab=<old id> still works); ?sel=<server id>; ?cid=<citizen id>; any other param reaches route.params
@@ -25,6 +25,7 @@ import connectorContract from '../../../core/console_contract.json';
 import hubModules from './modules/hub.json';
 import wHud from './modules/w_hud.json';
 import wStore from './modules/w_store.json';
+import accessFixture from './access.json';
 import type {
   AdminPlayer, Area, BanEntry, BlockEntry, CharacterDetail, CharacterRow, CitizenPreview, Level, LevelsMap, LogEntry,
   LogQuery, ModuleDescriptor, SettingsApplyResult, SettingsChange, SettingsField, SettingsRow, SettingsSchema,
@@ -548,6 +549,23 @@ const openMsg = () => ({
   ...connectorFixture(),
 });
 
+/* 2.3.1 · the 'access' push of the permissions page (ops/console.lua C.access): the website's real names
+   and role sets, and four real script groups (dev/access.json, made from the website and the registry) */
+function accessMock() {
+  const sets = accessFixture.roleSets as Record<string, string[]>;
+  const role = RANK === 'god' ? 'owner' : RANK === 'admin' ? 'admin' : 'moderator';
+  const extra = role === 'admin' ? ['players.troll', 'roles.manage'] : [];
+  const scripts = accessFixture.groups.flatMap((g) => g.permissions.map((p) => p.id));
+  const held = role === 'owner' ? scripts : role === 'admin' ? scripts.filter((id) => id.startsWith('w_farming:') || id.startsWith('w_weathersync:')) : [];
+  return {
+    rev: 1, role,
+    roles: role === 'admin' ? [{ name: L('مشرف المزارع', 'Farm warden'), direct: true, discord: false }, { name: L('الشريف', 'Sheriff'), direct: false, discord: true }] : [],
+    web: { held: [...new Set([...sets[role], ...extra])], catalog: accessFixture.catalog },
+    scripts: { held, from: 'website', groups: accessFixture.groups },
+    manage: { url: 'https://wraith7.com/redm/dashboard', where: { ar: 'لوحة الموقع ← الإعدادات ← الرتب والصلاحيات', en: 'Website panel → Settings → Roles & Permissions' } },
+  };
+}
+
 let isOpen = false;
 function doOpen() {
   isOpen = true;
@@ -605,6 +623,7 @@ async function callback(name: string, data: Record<string, unknown>): Promise<un
       if (data.what === 'catalog') send('catalog', catalog());
       if (data.what === 'modules') send('modules', { list: modules() });
       if (data.what === 'blocks') send('blocks', { list: blocks });
+      if (data.what === 'access') send('access', accessMock());
       return { ok: true };
     case 'catalog': send('catalog', catalog()); return { ok: true };
     case 'citizen': return resolveCitizen(String(data.input ?? ''));
