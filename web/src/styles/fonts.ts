@@ -33,3 +33,22 @@ export function injectFonts(): void {
     /* the fallback font is enough: never drop the console for a font */
   }
 }
+
+/**
+ * 2.3.0 The textures of the board look (the torn edge, the paper grain, the brushed bands), as ABSOLUTE urls on
+ * <html>. The theme's tokens.css writes them as './tex/…' inside custom properties, and Chromium resolves such a
+ * url against the page that uses it (web/build/tex/…, which does not exist), so the bands and the torn edges
+ * never drew. The w_housing / w_pets boards set them the same way from main.tsx.
+ */
+export function injectTextures(): void {
+  try {
+    const tex = `${new URL('./', window.location.href).href}theme/tex/`;
+    const root = document.documentElement.style;
+    root.setProperty('--tex-tear', `url("${tex}tear.png")`);
+    root.setProperty('--tex-grain', `url("${tex}grain.png")`);
+    root.setProperty('--tex-band', `url("${tex}selection_box_bg_1a.png")`);
+    root.setProperty('--tex-band-sm', `url("${tex}selection_box_bg_1c.png")`);
+  } catch {
+    /* without them the bands are plain paper bars and the cards square: still usable */
+  }
+}

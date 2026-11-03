@@ -7,7 +7,8 @@
 
 /* the page draws its own header (header: false); it covers the body's top rule so only one line shows */
 .hub-root { display: flex; flex-direction: column; height: 100%; min-height: 0; }
-.hub-root > .hub-head { position: relative; background: var(--ink); border-bottom: 1px solid var(--rule); }
+/* 2.3.0: the head sits on the page card like every other page head (no band of its own) */
+.hub-root > .hub-head { position: relative; background: transparent; }
 .hub-pad { padding: 1.25rem 1.5rem; }
 .hub-split { flex: 1; min-height: 0; height: auto; }
 html[dir='ltr'] .hub-back .k-glyph { transform: scaleX(-1); }
@@ -28,15 +29,21 @@ html[dir='ltr'] .hub-back .k-glyph { transform: scaleX(-1); }
 .hub-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(23rem, 1fr)); gap: .75rem; }
 .k-split.has-drawer .hub-cards { grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr)); }
 
+/* 2.3.0 a script is a torn plate (the board look); the pointer lights it, the selected one keeps the light and
+   the red ribbon (the card the cursor is in) */
 .hub-card {
   position: relative; display: flex; flex-direction: column; gap: .375rem; min-width: 0;
-  padding: .875rem 1rem .75rem; background: var(--ink-2); border: 1px solid var(--rule); cursor: pointer;
-  transition: border-color var(--t-fast) var(--ease), background var(--t-fast) var(--ease);
+  padding: 1.125rem 1.375rem 1rem; cursor: pointer;
+  background-color: var(--ink);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .03), rgba(242, 242, 242, 0) 55%);
+  box-shadow: inset 0 0 1rem rgba(242, 242, 242, .07), inset 0 0 .35rem rgba(242, 242, 242, .06);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
+  transition: background-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
-.hub-card:hover { border-color: var(--rule-2); }
-.hub-card.is-selected { background: var(--ink-3); border-color: var(--rule-3); }
+.hub-card:hover { background-color: var(--ink-3); box-shadow: var(--card-glow); }
+.hub-card.is-selected { background-color: var(--ink-3); box-shadow: var(--card-glow-hi); }
 .hub-card.is-selected::before {
-  content: ''; position: absolute; inset-inline-start: -1px; top: -1px; bottom: -1px; width: 3px; background: var(--red);
+  content: ''; position: absolute; inset-inline-start: .3rem; top: 1rem; width: .3rem; height: 2.4rem; background: var(--red);
 }
 .hub-card-head { display: flex; align-items: flex-start; gap: .75rem; }
 .hub-card-title {
@@ -151,7 +158,7 @@ html[dir='ltr'] .hub-back .k-glyph { transform: scaleX(-1); }
 .hub-needs-grid { display: flex; flex-direction: column; gap: .875rem; }
 .hub-needs-now {
   display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.5rem;
-  padding: .625rem .875rem; background: var(--ink-2); border: 1px solid var(--rule);
+  padding: .625rem .875rem; background: var(--ink); box-shadow: inset 0 0 .8rem rgba(242, 242, 242, .05), inset 0 -1px 0 var(--rule);
 }
 .hub-needs-nowtitle { display: inline-flex; align-items: center; gap: .375rem; font-weight: 700; color: var(--paper); }
 .hub-needs-meter { display: inline-flex; align-items: center; gap: .5rem; font-size: var(--fs-14); color: var(--paper-dim); }

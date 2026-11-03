@@ -4,10 +4,11 @@ import { createRoot } from 'react-dom/client';
    pages are imported through App), so a page rule of the same specificity wins over the kit's. */
 import './styles/index.css';
 import App from './app/App';
-import { injectFonts } from './styles/fonts';
+import { injectFonts, injectTextures } from './styles/fonts';
 
 /* fonts from JS: their URLs must be relative to nui://w_admin/web/build/ (see styles/fonts.ts) */
 injectFonts();
+injectTextures();
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

@@ -57,6 +57,16 @@
 .sh-cmdwrap:hover > .k-help--quiet,
 .sh-who:hover .k-help--quiet { visibility: visible; }
 
+/* 2.3.0 the board look (fast use): outside help mode every "؟" waits until the pointer is on the thing it
+   explains (its own row, button, label or column head), or the keyboard reaches it. F1 shows them all. */
+html:not(.k-help-mode) .k-help { visibility: hidden; }
+html:not(.k-help-mode) :hover > .k-help,
+html:not(.k-help-mode) .k-help:focus-visible,
+html:not(.k-help-mode) .k-help.is-open,
+html:not(.k-help-mode) .k-help.is-pinned { visibility: visible; }
+/* on paper (a dialog) the "؟" stay: there are few and the note is read slowly */
+html:not(.k-help-mode) .k-onpaper .k-help { visibility: visible; }
+
 /* help mode: every "؟" stands out, the quiet ones appear */
 html.k-help-mode .k-help { visibility: visible; border-color: var(--paper); color: var(--paper); box-shadow: 0 0 0 3px rgba(242, 242, 242, .16); }
 html.k-help-mode .k-help:hover, html.k-help-mode .k-help.is-open { color: var(--ink); }

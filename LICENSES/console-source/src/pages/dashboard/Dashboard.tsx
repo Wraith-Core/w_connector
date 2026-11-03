@@ -1,18 +1,20 @@
 /* ════════════════════════════════════════════════════════════════════════════
  * w_admin · pages/dashboard/Dashboard.tsx
- * The landing page: the server right now.
+ * The landing page: the server right now. 2.3.0 an action desk for fast use (the board look):
  *   KPIs            online / room · uptime (written out) · active bans · blocked characters · scripts running
+ *   Players now     every online player, the selected one's actions one key away (Desk.tsx)
  *   Needs attention dead · badly hurt · hunger or thirst under 20 · frozen · weak connection, each with its
- *                   one-press fix (revive / heal / refill / unfreeze) and a way into the player's file
+ *                   one-press fix (revive / heal / refill / unfreeze); a row selects the player in the desk,
+ *                   "open file" goes to the Players page
  *   World now       the shared world controls (weather, time, announcement), never collapsed
  *   Recent actions  the admin log, live
- *   Shortcuts       the pages this admin may open
+ * The shortcuts card left (2.3.0): the menu's number keys (1-9) and Ctrl+K reach every page faster.
  * Every player action targets the CITIZEN ID (the server resolves it to the live session).
  * ════════════════════════════════════════════════════════════════════════════ */
 
 import { useEffect, useMemo, useState } from 'react';
 import type { PageProps } from '../../app/pages';
-import { allowed, descKeyOf, helpKeyOf, labelKeyOf, pageById } from '../../app/registry';
+import { allowed, pageById } from '../../app/registry';
 import { useApp } from '../../ctx';
 import type { AppCtx } from '../../ctx';
 import { useI18n } from '../../i18n';
@@ -23,6 +25,7 @@ import type { ChipItem, Column, HelpKey, Status } from '../../kit';
 import type { AdminPlayer, Area } from '../../types';
 import { useUptime } from '../world/state';
 import { WorldControls } from '../world/WorldControls';
+import Desk from './Desk';
 import LogTable from './LogTable';
 import { useRecentLogs } from './recent';
 import './dashboard.css';
@@ -221,7 +224,8 @@ function Attention() {
           rows={shown}
           rowKey={(r) => r.p.id}
           label={t('label.dashboard.attention')}
-          onSelect={(r) => app.navigate('players', { sel: String(r.p.id) })}
+          selectedKey={app.selectedId}
+          onSelect={(r) => app.select(r.p.id)}
           loading={!app.playersSeen && app.can('players')}
           empty={(
             <EmptyState
@@ -262,7 +266,7 @@ function WorldCard() {
 
 function RecentBody() {
   const { t } = useI18n();
-  const { rows, error } = useRecentLogs({ limit: 8 });
+  const { rows, error } = useRecentLogs({ limit: 6 });
   return <LogTable rows={rows} error={error} label={t('label.dashboard.recent')} empty={t('label.dashboard.recentEmpty')} className="dsh-recent-table" />;
 }
 
@@ -280,35 +284,6 @@ function Recent() {
       ) : undefined}
     >
       <Gate area="logs">{app.can('logs') && <RecentBody />}</Gate>
-    </Section>
-  );
-}
-
-/* ── shortcuts ───────────────────────────────────────────────────────────── */
-
-const SHORTCUTS = ['players', 'characters', 'map', 'tools', 'hub', 'bans', 'log', 'perms', 'resources'];
-
-function Shortcuts() {
-  const app = useApp();
-  const { t } = useI18n();
-  const defs = SHORTCUTS.map((id) => pageById(id)).filter((d): d is NonNullable<typeof d> => !!d && allowed(d, app));
-  return (
-    <Section title={t('label.dashboard.shortcuts')} help="help.dashboard.shortcuts" className="dsh-shortcuts">
-      <div className="dsh-shorts">
-        {defs.map((d) => {
-          const label = t(labelKeyOf(d));
-          return (
-            <Button key={d.id} help={helpKeyOf(d)} helpLabel={label} className="dsh-short" onClick={() => app.navigate(d.id)}>
-              <span className="dsh-short-title">{label}</span>
-              <span className="dsh-short-desc">{t(descKeyOf(d))}</span>
-            </Button>
-          );
-        })}
-        <Button help="help.shell.palette" helpLabel={t('label.dashboard.palette')} className="dsh-short" kbd="Ctrl K" onClick={() => app.openPalette()}>
-          <span className="dsh-short-title">{t('label.dashboard.palette')}</span>
-          <span className="dsh-short-desc">{t('label.shell.palette.placeholder')}</span>
-        </Button>
-      </div>
     </Section>
   );
 }
@@ -331,13 +306,15 @@ export default function DashboardPage(_: PageProps) {
       </PageActions>
       <Kpis />
       <div className="dsh-grid">
+        <div className="dsh-col dsh-col--desk">
+          {app.can('players') ? <Desk /> : <Attention />}
+        </div>
         <div className="dsh-col">
-          <Attention />
+          {app.can('players') && <Attention />}
           <Recent />
         </div>
         <div className="dsh-col">
           <WorldCard />
-          <Shortcuts />
         </div>
       </div>
     </div>

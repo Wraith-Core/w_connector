@@ -1,45 +1,121 @@
 /* ════════════════════════════════════════════════════════════════════════════
  * w_admin · styles/shell.css
- * AppShell: 20 px inset, 248 px sidebar (64 px rail), 56 px top bar, page header, body.
- * The wordmark "WRAITH" in RDR Lino with "لوحة الإدارة" in Lalezar is the only brand: no emblem.
+ * AppShell, 2.3.0 the board look (w_housing / w_pets boards: w_stables kit.css): a dark scrim over the game,
+ * a masthead line (the name, the breadcrumb, a rule, the search, the online count, the keys), and under it two
+ * torn ink cards: the menu (with the pinned paper strip at the screen's edge) and the page. The card the
+ * cursor is in lights up and carries the red ribbon (the one red, a mark). Grid areas follow the language:
+ * in Arabic the menu is at the right, the page at the left.
+ * The wordmark "WRAITH" in RDR Lino beside "لوحة الإدارة" in Lalezar is the only brand: no emblem.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 .sh-root {
   position: absolute;
-  inset: var(--shell-inset);
+  inset: 1.25rem 1.75rem 1.5rem;
   display: grid;
   grid-template-columns: var(--side) minmax(0, 1fr);
-  background: rgba(10, 10, 10, .97);
-  border: 1px solid var(--rule-2);
-  box-shadow: 0 0 0 1px #000, 0 30px 80px rgba(0, 0, 0, .6);
-  overflow: hidden;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas: 'mast mast' 'side main';
+  gap: .875rem 1.25rem;
 }
 .sh-root.is-rail { grid-template-columns: var(--rail) minmax(0, 1fr); }
 
-/* ── sidebar ────────────────────────────────────────────────────────────── */
-.sh-side {
-  min-width: 0; min-height: 0; display: flex; flex-direction: column;
-  background: var(--ink-2); border-inline-end: 1px solid var(--rule);
-  padding: 1.25rem 0 0;
+/* the scrim: the game stays faintly visible at the far side, the reading side is near black */
+.sh-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(10, 10, 10, .9) 0%, rgba(10, 10, 10, .86) 45%, rgba(10, 10, 10, .78) 100%);
+  animation: sh-fade 220ms var(--ease) both;
 }
-.sh-brand { padding: 0 1.25rem 1.125rem; border-bottom: 1px solid var(--rule); }
-.sh-mark { font: 400 1.375rem/1 var(--f-mark); letter-spacing: .08em; color: var(--paper); direction: ltr; text-align: start; }
-[dir='rtl'] .sh-mark { text-align: right; }
-.sh-brand-ar { margin-top: .375rem; font: 400 1.25rem/1.2 var(--f-title-ar); color: var(--paper-dim); }
-html[lang='en'] .sh-brand-ar { font: 700 var(--fs-13)/1.3 var(--f-ui); letter-spacing: .12em; text-transform: uppercase; }
-.sh-server { margin-top: .125rem; font-size: var(--fs-12); color: var(--paper-faint); }
-.sh-nav { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: .25rem .75rem 1rem; position: relative; }
+[dir='rtl'] .sh-scrim { transform: scaleX(-1); }
+@keyframes sh-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sh-rise { from { opacity: 0; transform: translate3d(0, .6rem, 0); } to { opacity: 1; transform: none; } }
+
+/* ── the cards ──────────────────────────────────────────────────────────────
+ * A wrapper holds the ribbon (the mask would cut it), the card inside is torn by the mask; the lighter band
+ * inside the tear is an inset shadow the mask cuts along the tear (the board's .ws-wrap / .ws-card). */
+.sh-wrap { position: relative; min-width: 0; min-height: 0; display: flex; animation: sh-rise 260ms var(--ease) backwards; }
+.sh-sidewrap { grid-area: side; }
+.sh-mainwrap { grid-area: main; animation-delay: 40ms; }
+.sh-card {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  background-color: var(--ink-2);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .035), rgba(242, 242, 242, 0) 55%);
+  box-shadow: var(--card-glow);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-card) round;
+  transition: background-color var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease);
+}
+/* the paper grain over the ink */
+.sh-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: var(--tex-grain);
+  background-size: 256px 256px;
+  opacity: .1;
+  mix-blend-mode: screen;
+  filter: invert(1);
+  z-index: 0;
+}
+.sh-card > * { position: relative; z-index: 1; }
+/* the card the cursor is in: more light inside the tear (its ink stays, so sticky table heads keep matching it) */
+.sh-wrap:hover > .sh-card, .sh-wrap:focus-within > .sh-card { box-shadow: var(--card-glow-hi); }
+
+/* the red ribbon on the card the cursor is in */
+.sh-tick {
+  position: absolute;
+  inset-inline-start: .15rem;
+  top: 1.5rem;
+  z-index: 3;
+  width: .32rem;
+  height: 2.6rem;
+  background: var(--red);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / .22rem round;
+  opacity: 0;
+  transform: scaleY(.4);
+  transform-origin: top;
+  transition: opacity 140ms var(--ease), transform 180ms var(--ease);
+  pointer-events: none;
+}
+.sh-wrap:hover > .sh-tick, .sh-wrap:focus-within > .sh-tick { opacity: 1; transform: none; }
+
+/* the thin paper strip pinned at the menu's outer edge (a sheet pinned to a board) */
+.sh-strip {
+  position: absolute;
+  inset-inline-start: -1.15rem;
+  top: 2.5rem;
+  height: 55%;
+  width: .55rem;
+  background: var(--w-strip, #CFCFCF) var(--tex-grain);
+  background-blend-mode: multiply;
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / .22rem round;
+  pointer-events: none;
+  animation: sh-fade 400ms var(--ease) 120ms both;
+}
+
+/* ── the menu ───────────────────────────────────────────────────────────── */
+.sh-side { display: flex; flex-direction: column; padding: .875rem 0 0; }
+.sh-nav { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: .25rem 1rem 1rem; position: relative; }
 .sh-nav-helprow { display: flex; justify-content: flex-end; height: 0; position: relative; top: .5rem; }
-.sh-navsec { padding-top: .875rem; }
-/* Arabic is never letter-spaced; the English section names are tracked caps */
-.sh-navsec-title { font: 700 var(--fs-12)/1.3 var(--f-ui); color: var(--paper-faint); padding: 0 .625rem .375rem; }
-html[lang='en'] .sh-navsec-title { text-transform: uppercase; letter-spacing: .1em; font-size: var(--fs-11); }
+.sh-navsec { padding-top: .75rem; }
+/* the section's name: the board's kicker, its number key before it */
+.sh-navsec-title { display: flex; align-items: center; gap: .5rem; font: 700 var(--fs-13)/1.3 var(--f-ui); color: var(--paper-faint); padding: 0 .625rem .375rem; }
+html[lang='en'] .sh-navsec-title { font-variant-caps: all-small-caps; letter-spacing: .1em; font-size: var(--fs-15); font-weight: 500; }
+.sh-navsec.is-here .sh-navsec-title { color: var(--paper-dim); }
+.k-app kbd.sh-navsec-key { min-width: 1.125rem; padding: 0 .25rem; text-align: center; font-size: var(--fs-11); border-color: var(--rule-2); color: var(--paper-faint); }
+.sh-navsec.is-here .sh-navsec-key { border-color: var(--paper-dim); color: var(--paper); }
 .sh-nav-item { position: relative; display: flex; align-items: center; gap: .25rem; }
 .sh-nav-btn {
   flex: 1; min-width: 0; display: flex; align-items: center; gap: .625rem;
-  height: 2.375rem; padding: 0 .625rem; color: var(--paper-dim); font-size: var(--fs-15); font-weight: 400;
-  transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
+  height: 2.375rem; padding: 0 .75rem; color: var(--paper-dim); font-size: var(--fs-15); font-weight: 400;
+  transition: color var(--t-fast) var(--ease);
 }
+.sh-nav-btn:hover { color: var(--paper); }
 /* the open page and the page under the cursor are the paper band (kit.css "the paper band") */
 .sh-nav-item.is-active > .sh-nav-btn { font-weight: 700; }
 .sh-nav-sub .sh-nav-btn { height: 2.125rem; padding-inline-start: 1.5rem; font-size: var(--fs-14); }
@@ -49,54 +125,65 @@ html[lang='en'] .sh-navsec-title { text-transform: uppercase; letter-spacing: .1
 .sh-nav-label { flex: 1 1 auto; text-align: start; }
 .sh-nav-help { margin-inline-end: .125rem; }
 .sh-nav-empty { padding: 1rem .625rem; color: var(--paper-faint); font-size: var(--fs-13); }
-.sh-who { margin-top: auto; padding: .875rem 1.25rem 1rem; border-top: 1px solid var(--rule); font-size: var(--fs-13); color: var(--paper-dim); }
+.sh-who { flex: none; padding: .75rem 1.5rem 1.125rem; border-top: 1px solid var(--rule); font-size: var(--fs-13); color: var(--paper-dim); }
 .sh-who-name { display: flex; align-items: center; gap: .375rem; color: var(--paper); font-size: var(--fs-15); font-weight: 700; }
 .sh-who-meta { margin-top: .125rem; line-height: 1.5; }
 .sh-who-meta b { color: var(--paper); }
 
 /* rail */
-.sh-root.is-rail .sh-brand { padding: 0 0 1rem; text-align: center; }
-.sh-root.is-rail .sh-mark { text-align: center; }
 .sh-root.is-rail .sh-nav { padding: .25rem .5rem 1rem; }
 .sh-root.is-rail .sh-navsec { padding-top: .5rem; border-top: 1px solid var(--rule); margin-top: .5rem; }
 .sh-root.is-rail .sh-navsec:first-of-type { border-top: 0; margin-top: 0; }
-.sh-root.is-rail .sh-navsec-title,
+.sh-root.is-rail .sh-navsec-title > span,
 .sh-root.is-rail .sh-nav-label,
 .sh-root.is-rail .k-nav-badge,
 .sh-root.is-rail .sh-nav-help,
 .sh-root.is-rail .sh-nav-helprow { display: none; }
+.sh-root.is-rail .sh-navsec-title { justify-content: center; padding: 0 0 .25rem; }
 .sh-root.is-rail .sh-nav-glyph { display: block; }
 .sh-root.is-rail .sh-nav-btn { justify-content: center; padding: 0; height: 2.75rem; }
-/* the rail keeps no wordmark letter and no name: no emblem-like marks */
-.sh-root.is-rail .sh-brand { min-height: 1.75rem; }
-.sh-root.is-rail .sh-mark, .sh-root.is-rail .sh-who { display: none; }
+.sh-root.is-rail .sh-who { display: none; }
+.sh-root.is-rail .sh-strip { display: none; }
 
-/* ── main column ────────────────────────────────────────────────────────── */
-.sh-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+/* ── the masthead ───────────────────────────────────────────────────────── */
 .sh-top {
-  flex: none; height: var(--topbar); display: flex; align-items: center; gap: .75rem;
-  padding: 0 1.25rem; border-bottom: 1px solid var(--rule);
+  grid-area: mast;
+  flex: none; height: 2.75rem; display: flex; align-items: center; gap: .875rem;
+  padding: 0 .25rem; color: var(--paper-dim);
+  text-shadow: 0 1px .4rem rgba(0, 0, 0, .6);
+  animation: sh-fade 220ms var(--ease) both;
 }
-.sh-crumb { display: flex; align-items: center; gap: .375rem; min-width: 0; font-size: var(--fs-13); color: var(--paper-faint); }
+.sh-brand { flex: none; display: flex; align-items: baseline; gap: .75rem; min-width: 0; }
+.sh-brand-ar { font: 400 1.75rem/1 var(--f-title-ar); color: var(--paper); white-space: nowrap; }
+html[lang='en'] .sh-brand-ar { font: 600 1.6rem/1 var(--f-title); }
+.sh-mark { font: 400 1rem/1 var(--f-mark); letter-spacing: .1em; color: var(--paper-dim); direction: ltr; unicode-bidi: isolate; }
+.sh-server { max-width: 12rem; font-size: var(--fs-13); color: var(--paper-faint); }
+.sh-mast-rule { flex: 1 1 2rem; min-width: 1rem; height: 1px; background: var(--rule); }
+.sh-crumb { display: flex; align-items: center; gap: .375rem; min-width: 0; flex: 0 1 auto; font-size: var(--fs-13); color: var(--paper-faint); }
 .sh-crumb-sep { opacity: .7; }
 .sh-crumb-here { color: var(--paper-dim); }
 .sh-cmdwrap, .sh-pillwrap { display: inline-flex; align-items: center; gap: .25rem; flex: none; }
-.sh-cmdwrap { margin-inline-start: auto; flex: 0 1 26rem; min-width: 12rem; }
+.sh-cmdwrap { flex: 0 1 22rem; min-width: 12rem; }
+/* the search: the board's search field (a dark well, a rule under it) */
 .sh-cmd {
   flex: 1; min-width: 0; display: flex; align-items: center; gap: .5rem; height: 2.125rem; padding: 0 .75rem;
-  background: var(--ink-2); border: 1px solid var(--rule); color: var(--paper-faint); font-size: var(--fs-14);
+  background: var(--ink-2); box-shadow: inset 0 -1px 0 var(--rule-2); color: var(--paper-faint); font-size: var(--fs-14);
+  text-shadow: none; transition: background-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
-.sh-cmd:hover { border-color: var(--rule-2); color: var(--paper-dim); }
+.sh-cmd:hover, .sh-cmd:focus-visible { background: var(--ink-3); box-shadow: inset 0 -2px 0 var(--paper); color: var(--paper-dim); outline: none; }
 .sh-cmd .k-glyph { width: 1rem; height: 1rem; flex: none; }
 .sh-cmd kbd { margin-inline-start: auto; }
+/* the masthead's items: words on the scrim, the short band under the cursor (the board's .ws-mast-item) */
 .sh-pill, .k-btn.sh-pill {
   display: inline-flex; align-items: center; gap: .5rem; height: 2.125rem; padding: 0 .75rem;
-  border: 1px solid var(--rule); background: transparent; color: var(--paper-dim);
+  border: 0; background: transparent; color: var(--paper-dim);
   font: 400 var(--fs-14)/1 var(--f-ui); white-space: nowrap;
 }
+.k-btn.sh-pill::before { opacity: 0; }
+.k-btn.sh-pill:hover:not(:disabled)::before, .k-btn.sh-pill:focus-visible::before { opacity: 1; }
 .sh-pill b { color: var(--paper); font-weight: 700; }
 /* the pills that are buttons take the kit's band under the cursor; help mode, while on, is the band */
-.sh-helpbtn { border-color: var(--rule-2); color: var(--paper); }
+.sh-helpbtn { color: var(--paper-dim); }
 .sh-helpbtn:hover, .sh-helpbtn:focus-visible, .sh-helpbtn.is-on { background: transparent; border-color: transparent; }
 .sh-helpbtn.is-on { font-weight: 700; }
 .sh-helpbtn kbd { color: inherit; border-color: currentColor; opacity: .75; }
@@ -105,51 +192,76 @@ html[lang='en'] .sh-navsec-title { text-transform: uppercase; letter-spacing: .1
   border-radius: 50%; font: 700 .72rem/1 var(--f-ui);
 }
 
+/* the help-mode banner: a paper strip across the top of the page card */
 .sh-banner {
-  flex: none; display: flex; align-items: center; gap: .625rem; padding: .5rem 1.5rem;
+  flex: none; display: flex; align-items: center; gap: .625rem; padding: .5rem 2rem;
   background: var(--note); color: var(--note-ink); font-size: var(--fs-145); font-weight: 700;
-  border-bottom: 1px solid rgba(0, 0, 0, .4);
 }
 .sh-banner .k-btnwrap { margin-inline-start: auto; }
 .sh-banner .k-btn--link { color: var(--note-ink); }
 .sh-banner .k-help { border-color: var(--note-dim); color: var(--note-dim); box-shadow: none; }
 
+/* ── the page card ──────────────────────────────────────────────────────── */
+.sh-main { display: flex; flex-direction: column; }
 .sh-page { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-.sh-body { flex: 1; min-height: 0; border-top: 1px solid var(--rule); position: relative; }
-.sh-body.is-scroll { overflow: auto; padding: 1.25rem 1.5rem 2rem; }
-.sh-body.is-fill { overflow: hidden; display: flex; flex-direction: column; }
+.sh-body { flex: 1; min-height: 0; position: relative; }
+.sh-body.is-scroll { overflow: auto; padding: .375rem 2rem 2rem; }
+.sh-body.is-fill { overflow: hidden; display: flex; flex-direction: column; padding: 0 .75rem .75rem; }
 .sh-body.is-fill > * { flex: 1; min-height: 0; }
-.sh-body.is-noheader { border-top: 0; }
+.sh-body.is-noheader { padding-top: 1rem; }
 .sh-crash { padding: 1.5rem; }
 
-/* ── command palette ────────────────────────────────────────────────────── */
+/* ── command palette: a torn card over a soft scrim ─────────────────────── */
 .sh-pal-veil {
-  position: fixed; inset: 0; z-index: var(--z-palette); background: rgba(5, 5, 5, .55);
+  position: fixed; inset: 0; z-index: var(--z-palette);
+  background: radial-gradient(60% 55% at 50% 35%, rgba(10, 10, 10, .7), rgba(10, 10, 10, .35) 100%);
   display: flex; justify-content: center; align-items: flex-start; padding-top: 12vh;
+  animation: sh-fade 160ms var(--ease) both;
 }
 .sh-pal {
-  width: min(40rem, calc(100vw - 2rem)); max-height: 70vh; display: flex; flex-direction: column;
-  background: var(--ink-2); border: 1px solid var(--rule-3); box-shadow: 0 30px 80px rgba(0, 0, 0, .7);
+  position: relative;
+  width: min(42rem, calc(100vw - 2rem)); max-height: 70vh; display: flex; flex-direction: column;
+  padding: 1rem .875rem .75rem;
+  background-color: var(--ink-3);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .04), rgba(242, 242, 242, 0) 55%);
+  box-shadow: var(--card-glow-hi);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-card) round;
+  animation: sh-rise 200ms var(--ease) both;
 }
-.sh-pal-input { display: flex; align-items: center; gap: .625rem; height: 3.25rem; padding: 0 1rem; border-bottom: 1px solid var(--rule-2); }
+.sh-pal-input {
+  display: flex; align-items: center; gap: .625rem; height: 3rem; margin: 0 .5rem; padding: 0 1rem;
+  background: var(--ink); box-shadow: inset 0 -2px 0 var(--paper);
+}
 .sh-pal-input .k-glyph { width: 1.125rem; height: 1.125rem; color: var(--paper-faint); flex: none; }
 .sh-pal-input input { flex: 1; min-width: 0; height: 100%; background: transparent; border: 0; outline: 0; color: var(--paper); font-size: var(--fs-16); }
 .sh-pal-input input::placeholder { color: var(--paper-faint); }
 .sh-pal-input input:focus-visible { outline: none; }
-.sh-pal-list { flex: 1; min-height: 0; overflow-y: auto; padding: .375rem 0; }
-.sh-pal-group { padding: .625rem 1rem .25rem; font: 700 var(--fs-12)/1 var(--f-ui); color: var(--paper-faint); }
-.sh-pal-item { display: flex; align-items: center; gap: .75rem; min-height: 2.75rem; padding: .25rem 1rem; cursor: pointer; position: relative; }
+.sh-pal-list { flex: 1; min-height: 0; overflow-y: auto; padding: .5rem .5rem .25rem; }
+.sh-pal-group { padding: .75rem .75rem .375rem; margin-bottom: .125rem; border-bottom: 1px solid var(--rule); font: 700 var(--fs-13)/1 var(--f-ui); color: var(--paper-dim); }
+html[lang='en'] .sh-pal-group { font-variant-caps: all-small-caps; letter-spacing: .1em; font-size: var(--fs-15); font-weight: 500; }
+.sh-pal-item { display: flex; align-items: center; gap: .75rem; min-height: 2.875rem; padding: .25rem .875rem; cursor: pointer; position: relative; border-bottom: 1px solid var(--rule); }
+.sh-pal-item.is-active { border-bottom-color: transparent; }
 /* the result under the cursor is the paper band (kit.css "the paper band") */
 .sh-pal-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .sh-pal-label { font-weight: 700; color: var(--paper); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sh-pal-sub { font-size: var(--fs-12); color: var(--paper-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sh-pal-right { color: var(--paper-dim); font-size: var(--fs-13); }
 .sh-pal-empty { padding: 1.25rem 1rem; color: var(--paper-faint); }
-.sh-pal-hint { flex: none; padding: .5rem 1rem; border-top: 1px solid var(--rule); font-size: var(--fs-12); color: var(--paper-faint); }
+.sh-pal-hint { flex: none; margin: 0 .5rem; padding: .625rem .5rem 0; border-top: 1px solid var(--rule); font-size: var(--fs-12); color: var(--paper-faint); }
 
-/* narrow screens (1280 x 720): the top bar drops its key hints first */
+@media (prefers-reduced-motion: reduce) {
+  .sh-scrim, .sh-wrap, .sh-strip, .sh-top, .sh-pal-veil, .sh-pal { animation: none; }
+}
+html.k-reduced-motion .sh-scrim, html.k-reduced-motion .sh-wrap, html.k-reduced-motion .sh-strip,
+html.k-reduced-motion .sh-top, html.k-reduced-motion .sh-pal-veil, html.k-reduced-motion .sh-pal { animation: none; }
+
+/* narrow screens (1280 x 720): the masthead drops its key hints and the breadcrumb first */
 @media (max-width: 1500px) {
-  .sh-top { gap: .5rem; padding: 0 .875rem; }
-  .sh-top kbd { display: none; }
-  .sh-cmdwrap { min-width: 9rem; flex-basis: 20rem; }
+  .sh-root { inset: .875rem 1.125rem 1rem; gap: .625rem .875rem; }
+  .sh-top { gap: .5rem; }
+  .sh-top kbd, .sh-crumb, .sh-server { display: none; }
+  .sh-brand-ar { font-size: 1.5rem; }
+  .sh-cmdwrap { min-width: 9rem; flex-basis: 18rem; }
+  .sh-body.is-scroll { padding: .25rem 1.25rem 1.5rem; }
+  .k-pagehead { padding: 1.125rem 1.25rem .625rem; }
 }

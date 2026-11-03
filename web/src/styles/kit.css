@@ -12,12 +12,12 @@
  * never turns over. One list of scopes, kept in step with the rules that paint the band below. */
 .sh-nav-btn:hover, .sh-nav-btn:focus-visible, .sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn,
 .k-settings-btn:hover, .k-settings-btn:focus-visible, .k-settings-item.is-active .k-settings-btn,
-.k-tab.is-active, .k-tab-wrap:hover > .k-tab:not(:disabled), .k-tab:focus-visible,
+.k-tab-wrap:hover > .k-tab:not(:disabled), .k-tab:focus-visible,
 /* a strip whose "؟" sits inside the tab's end padding: that "؟" is on the band too */
-.k-tabs--compact .k-tab.is-active + .k-tab-help, .k-tabs--compact .k-tab-wrap:hover > .k-tab:not(:disabled) + .k-tab-help,
-.pl-drawer .k-tab.is-active + .k-tab-help, .pl-drawer .k-tab-wrap:hover > .k-tab:not(:disabled) + .k-tab-help,
+.k-tabs--compact .k-tab-wrap:hover > .k-tab:not(:disabled) + .k-tab-help,
+.pl-drawer .k-tab-wrap:hover > .k-tab:not(:disabled) + .k-tab-help,
 .k-seg-btn.is-on, .k-switch.is-on .k-switch-opt.is-active, .k-chip.is-on,
-.k-table-wrap[tabindex] tbody tr:hover > td, .k-table tbody tr.is-selected > td,
+.k-table-wrap[tabindex] tbody tr:hover > td,
 .k-pop-opt.is-active, .sh-pal-item.is-active, .sh-helpbtn.is-on, .sh-helpbtn:hover, .sh-helpbtn:focus-visible {
   --paper: var(--w-ink, #0A0A0A);
   --paper-lit: var(--w-ink-3, #191919);
@@ -49,9 +49,9 @@
 }
 .sh-nav-btn:hover::before, .sh-nav-btn:focus-visible::before, .sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn::before,
 .k-settings-btn:hover::before, .k-settings-btn:focus-visible::before, .k-settings-item.is-active .k-settings-btn::before,
-.k-tab.is-active::before, .k-tab-wrap:hover > .k-tab:not(:disabled)::before, .k-tab:focus-visible::before,
+.k-tab-wrap:hover > .k-tab:not(:disabled)::before, .k-tab:focus-visible::before,
 .k-seg-btn.is-on::before, .k-switch.is-on .k-switch-opt.is-active::before, .k-chip.is-on::before,
-.k-table-wrap[tabindex] tbody tr:hover > td::before, .k-table tbody tr.is-selected > td::before,
+.k-table-wrap[tabindex] tbody tr:hover > td::before,
 .k-pop-opt.is-active::before, .sh-pal-item.is-active::before, .sh-helpbtn.is-on::before, .sh-helpbtn:hover::before,
 .sh-helpbtn:focus-visible::before { opacity: 1; }
 /* the band is the focus mark: no second ring around it */
@@ -60,11 +60,13 @@
 /* ── buttons ────────────────────────────────────────────────────────────── */
 .k-btnwrap { display: inline-flex; align-items: center; gap: .375rem; min-width: 0; vertical-align: middle; }
 .k-btnwrap.is-block { display: flex; width: 100%; }
+/* 2.3.0 the board look (w_housing / w_pets .ws-btn): no box. At rest a button is the brushed short band
+   in ink-3, under the cursor the same band in paper with ink words. */
 .k-btn {
   position: relative; isolation: isolate;
   display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
   height: var(--control); padding: 0 1rem; min-width: 0;
-  border: 1px solid var(--rule-2); background: var(--ink-3); color: var(--paper);
+  border: 1px solid transparent; background: transparent; color: var(--paper);
   font: 700 var(--fs-14)/1 var(--f-ui); white-space: nowrap;
   transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
@@ -73,10 +75,11 @@
    ink band on the paper one instead of vanishing into it. */
 .k-btn::before {
   content: ''; position: absolute; inset: -1px; z-index: -1; pointer-events: none;
-  background: var(--paper); opacity: 0;
+  background: var(--ink-4); opacity: 1;
   -webkit-mask: var(--tex-band-sm) center / 100% 100% no-repeat; mask: var(--tex-band-sm) center / 100% 100% no-repeat;
-  transition: opacity var(--t-fast) var(--ease);
+  transition: opacity var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
 }
+.k-btn:hover:not(:disabled)::before, .k-btn:focus-visible::before { background: var(--paper); }
 .k-btn.is-block { flex: 1; }
 .k-btn .k-glyph { width: 1.05em; height: 1.05em; flex: none; }
 .k-btn-label { overflow: hidden; text-overflow: ellipsis; }
@@ -98,12 +101,15 @@
 .k-btn--lg { height: 2.625rem; padding: 0 1.25rem; font-size: var(--fs-15); }
 /* primary: the band at rest, the lit band under the cursor */
 .k-btn--primary { background: transparent; border-color: transparent; color: var(--ink); }
-.k-btn--primary::before { opacity: 1; }
+.k-btn--primary::before { opacity: 1; background: var(--paper); }
 .k-btn--primary:hover:not(:disabled)::before, .k-btn--primary:focus-visible::before { background: var(--paper-lit); }
 /* a disabled or locked primary must not read as the one live action of the view: it drops to the plain look */
-.k-btn--primary:disabled:not(.is-busy) { background: var(--ink-3); border-color: var(--rule-2); color: var(--paper-dim); }
-.k-btn--primary:disabled:not(.is-busy)::before { opacity: 0; }
-.k-btn--ghost { background: transparent; border-color: var(--rule); color: var(--paper-dim); }
+.k-btn--primary:disabled:not(.is-busy) { color: var(--paper-dim); }
+.k-btn--primary:disabled:not(.is-busy)::before { background: var(--ink-4); }
+/* ghost: the board's quiet button (.ws-btn.is-quiet): no plate at rest, the band under the cursor */
+.k-btn--ghost { background: transparent; border-color: transparent; color: var(--paper-dim); }
+.k-btn--ghost::before { opacity: 0; }
+.k-btn--ghost:hover:not(:disabled)::before, .k-btn--ghost:focus-visible::before { opacity: 1; }
 /* danger: the plain button with a red underline under its label, kept on the band under the cursor
    (the pause menu's confirm note); never a red slab */
 .k-btn--danger::after {
@@ -129,14 +135,14 @@
 .k-iconbtn {
   display: inline-grid; place-items: center; flex: none;
   width: var(--control-sm); height: var(--control-sm);
-  border: 1px solid var(--rule); color: var(--paper-dim); background: transparent;
+  border: 1px solid transparent; color: var(--paper-dim); background: transparent;
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 .k-iconbtn .k-glyph { width: 1.05rem; height: 1.05rem; }
 .k-iconbtn--sm { width: 1.625rem; height: 1.625rem; border-color: transparent; }
 .k-iconbtn--sm .k-glyph { width: .9rem; height: .9rem; }
-.k-iconbtn:hover:not(:disabled) { color: var(--paper); background: var(--ink-3); border-color: var(--rule-2); }
-.k-iconbtn--secondary { background: var(--ink-3); border-color: var(--rule-2); }
+.k-iconbtn:hover:not(:disabled) { color: var(--paper); background: var(--ink-3); box-shadow: inset 0 -2px 0 var(--paper); }
+.k-iconbtn--secondary { background: var(--ink-3); }
 /* danger: the red underline, like the danger button (never a red box) */
 .k-iconbtn--danger { color: var(--paper); box-shadow: inset 0 -2px 0 var(--red); }
 .k-iconbtn[aria-pressed='true'] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
@@ -164,12 +170,13 @@
 .k-ctlwrap--block > .k-slider { flex: 1; min-width: 0; }
 
 /* ── inputs ─────────────────────────────────────────────────────────────── */
+/* 2.3.0 the board's field (.ws-input): a dark well, a rule under it, a paper rule and a lighter well under focus */
 .k-input {
   position: relative; display: flex; align-items: center; min-width: 0;
-  height: var(--control); background: var(--ink-2); border: 1px solid var(--rule-2);
-  transition: border-color var(--t-fast) var(--ease);
+  height: var(--control); background: var(--ink); border: 0; box-shadow: inset 0 -1px 0 var(--rule-2);
+  transition: background-color var(--t-fast) var(--ease), box-shadow var(--t-fast) var(--ease);
 }
-.k-input:focus-within { border-color: var(--paper-dim); }
+.k-input:focus-within { background: var(--ink-3); box-shadow: inset 0 -2px 0 var(--paper); }
 .k-input input {
   flex: 1; min-width: 0; width: 100%; height: 100%;
   background: transparent; border: 0; outline: none; padding: 0 .75rem;
@@ -187,7 +194,7 @@
 .k-input-clear:hover { color: var(--paper); }
 .k-input-clear .k-glyph { width: .85rem; height: .85rem; }
 /* invalid: a red underline, the box itself stays a hairline */
-.k-input.is-invalid, .k-textarea.is-invalid, .k-select.is-invalid { box-shadow: inset 0 -2px 0 var(--red); }
+.k-input.is-invalid, .k-textarea.is-invalid, .k-select.is-invalid, .k-input.is-invalid:focus-within { box-shadow: inset 0 -2px 0 var(--red); }
 .k-input.is-disabled, .k-textarea.is-disabled { opacity: .5; }
 .k-input--num input { text-align: end; font-variant-numeric: tabular-nums; }
 .k-numwrap { display: inline-flex; align-items: center; gap: .375rem; min-width: 0; }
@@ -199,8 +206,8 @@
 .k-numrange.is-invalid { color: var(--paper); }
 .k-numrange.is-invalid::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-end: .4em; background: var(--red); vertical-align: middle; }
 
-.k-textarea { position: relative; display: flex; background: var(--ink-2); border: 1px solid var(--rule-2); min-width: 0; }
-.k-textarea:focus-within { border-color: var(--paper-dim); }
+.k-textarea { position: relative; display: flex; background: var(--ink); border: 0; box-shadow: inset 0 -1px 0 var(--rule-2); min-width: 0; }
+.k-textarea:focus-within { background: var(--ink-3); box-shadow: inset 0 -2px 0 var(--paper); }
 .k-textarea textarea {
   flex: 1; min-width: 0; resize: vertical; min-height: 4rem;
   background: transparent; border: 0; outline: none; padding: .5rem .75rem;
@@ -209,7 +216,7 @@
 .k-textarea-count { position: absolute; inset-inline-end: .5rem; bottom: .25rem; font-size: var(--fs-11); color: var(--paper-faint); pointer-events: none; }
 
 /* switch: two words; "on" is the paper band (the band section above), "off" an ink plate */
-.k-switch { display: inline-flex; border: 1px solid var(--rule-2); background: var(--ink-2); height: var(--control); padding: 0; }
+.k-switch { display: inline-flex; border: 0; background: var(--ink); box-shadow: inset 0 -1px 0 var(--rule-2); height: var(--control); padding: 0; }
 .k-switch--sm { height: var(--control-sm); }
 .k-switch-opt { display: inline-flex; align-items: center; padding: 0 .875rem; font-size: var(--fs-14); color: var(--paper-faint); white-space: nowrap; }
 .k-switch-opt.is-active { background: var(--ink-4); color: var(--paper); font-weight: 700; }
@@ -217,7 +224,7 @@
 .k-switch:disabled { opacity: .5; }
 
 /* segmented */
-.k-seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--rule-2); background: var(--ink-2); max-width: 100%; }
+.k-seg { display: inline-flex; flex-wrap: wrap; border: 0; background: var(--ink); box-shadow: inset 0 -1px 0 var(--rule-2); max-width: 100%; }
 .k-seg-item { display: inline-flex; align-items: center; }
 .k-seg-item + .k-seg-item { border-inline-start: 1px solid var(--rule); }
 .k-seg-btn { height: calc(var(--control) - 2px); padding: 0 .875rem; font-size: var(--fs-14); color: var(--paper-dim); white-space: nowrap; }
@@ -243,21 +250,23 @@
 /* select / combobox */
 .k-select {
   display: flex; align-items: center; gap: .5rem; min-width: 8rem; width: 100%;
-  height: var(--control); padding: 0 .75rem; background: var(--ink-2); border: 1px solid var(--rule-2);
+  height: var(--control); padding: 0 .75rem; background: var(--ink); border: 0; box-shadow: inset 0 -1px 0 var(--rule-2);
   color: var(--paper); font-size: var(--fs-145); text-align: start;
 }
 .k-select--sm { height: var(--control-sm); font-size: var(--fs-14); padding: 0 .5rem; min-width: 6rem; }
-.k-select:hover:not(:disabled), .k-select.is-open { border-color: var(--paper-dim); }
+.k-select:hover:not(:disabled), .k-select.is-open { background: var(--ink-3); box-shadow: inset 0 -2px 0 var(--paper); }
 .k-select.is-empty .k-select-value { color: var(--paper-faint); }
 .k-select-value { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .k-select-sub { color: var(--paper-faint); font-size: var(--fs-12); white-space: nowrap; }
 .k-select-caret { width: .9rem; height: .9rem; color: var(--paper-faint); flex: none; }
 .k-select:disabled { opacity: .5; }
 .k-pop {
-  z-index: var(--z-popover); background: var(--ink-2); border: 1px solid var(--rule-3);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, .6); display: flex; flex-direction: column;
+  z-index: var(--z-popover); background: var(--ink-3); border: 0;
+  box-shadow: var(--card-glow-hi); display: flex; flex-direction: column;
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
+  padding: .45rem .3rem;
 }
-.k-pop-search { display: flex; align-items: center; gap: .5rem; padding: 0 .75rem; border-bottom: 1px solid var(--rule-2); height: var(--control); }
+.k-pop-search { display: flex; align-items: center; gap: .5rem; padding: 0 .75rem; box-shadow: inset 0 -1px 0 var(--rule-2); background: var(--ink); height: var(--control); }
 .k-pop-search .k-glyph { width: 1rem; height: 1rem; color: var(--paper-faint); flex: none; }
 .k-pop-search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; color: var(--paper); font-size: var(--fs-145); }
 .k-pop-list { overflow-y: auto; padding: .25rem 0; }
@@ -275,10 +284,13 @@
 .k-chip-wrap { display: inline-flex; align-items: center; gap: .25rem; }
 .k-chip {
   display: inline-flex; align-items: center; gap: .375rem; height: 1.875rem; padding: 0 .75rem;
-  border: 1px solid var(--rule); color: var(--paper-dim); font-size: var(--fs-14); white-space: nowrap;
+  border: 0; color: var(--paper-dim); font-size: var(--fs-14); white-space: nowrap;
 }
+/* 2.3.0: at rest the short band in ink (the board's .ws-btn), the chosen one the paper band */
+.k-chip:not(.is-on)::before { opacity: 1; background: var(--ink-3); }
 .k-chip i { font-style: normal; color: var(--paper-faint); font-size: var(--fs-12); }
-.k-chip:hover:not(:disabled) { color: var(--paper); border-color: var(--rule-2); }
+.k-chip:hover:not(:disabled) { color: var(--paper); }
+.k-chip:not(.is-on):hover:not(:disabled)::before { background: var(--ink-4); }
 /* the chosen filter is the band (see the band section) */
 .k-chip.is-on { border-color: transparent; font-weight: 700; }
 html:not(.k-help-mode) .k-chip-wrap:not(:hover) > .k-chip:not(.is-on) + .k-chip-help { visibility: hidden; }
@@ -319,25 +331,41 @@ html:not(.k-help-mode) .k-chip-wrap:not(:hover) > .k-chip:not(.is-on) + .k-chip-
 .k-reason-row > .k-ctlwrap { flex: 1; }
 
 /* ── page header, sections, tabs, toolbar ───────────────────────────────── */
-.k-pagehead { display: flex; align-items: flex-end; gap: 1rem; padding: 1.25rem 1.5rem .875rem; flex: none; }
+.k-pagehead { display: flex; align-items: flex-end; gap: 1rem; padding: 1.5rem 2rem .875rem; flex: none; }
 .k-pagehead-main { min-width: 0; flex: 1; }
-.k-pagehead-title { display: flex; align-items: center; gap: .625rem; font: 400 var(--fs-34)/1.25 var(--f-title-ar); color: var(--paper); }
+/* 2.3.0 the board card's head: a small kicker (the section), the title in Lalezar with the card's shade */
+.k-pagehead-kicker { margin-bottom: .125rem; font: 700 var(--fs-13)/1.3 var(--f-ui); color: var(--paper-dim); }
+html[lang='en'] .k-pagehead-kicker { font-variant-caps: all-small-caps; letter-spacing: .1em; font-size: var(--fs-15); font-weight: 500; }
+.k-pagehead-title { display: flex; align-items: center; gap: .625rem; font: 400 var(--fs-34)/1.25 var(--f-title-ar); color: var(--paper); text-shadow: 0 1px .6rem rgba(0, 0, 0, .45); }
 html[lang='en'] .k-pagehead-title { font: 600 1.9rem/1.12 var(--f-title); letter-spacing: .005em; }
 /* descriptions are reading text: Amiri in Arabic, EB Garamond in English */
 .k-pagehead-desc { margin-top: .125rem; font: 400 calc(var(--fs-text) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--paper-dim); }
 .k-pagehead-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
 .k-pagehead-actions:empty { display: none; }
 
-.k-section { border: 1px solid var(--rule); background: var(--ink); padding: .875rem 1rem; }
+/* 2.3.0 a section is a plate on the card: a darker torn sheet with the card's inner light (the board's
+   .ws-card at a smaller edge), its title over a hairline */
+.k-section {
+  position: relative; padding: 1.125rem 1.375rem 1.25rem;
+  background-color: var(--ink);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .03), rgba(242, 242, 242, 0) 55%);
+  box-shadow: inset 0 0 1rem rgba(242, 242, 242, .07), inset 0 0 .35rem rgba(242, 242, 242, .06);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
+}
 .k-section + .k-section { margin-top: .75rem; }
-.k-section-head { display: flex; align-items: center; gap: .5rem; min-width: 0; }
-.k-section-title { display: flex; align-items: center; gap: .5rem; font: 700 var(--fs-16)/1.25 var(--f-ui); color: var(--paper); min-width: 0; }
+.k-section-head { display: flex; align-items: center; gap: .5rem; min-width: 0; padding-bottom: .4rem; border-bottom: 1px solid var(--rule); }
+.k-section-title { display: flex; align-items: center; gap: .5rem; font: 400 var(--fs-18)/1.3 var(--f-title-ar); color: var(--paper); min-width: 0; }
+html[lang='en'] .k-section-title { font: 600 var(--fs-18)/1.25 var(--f-title); }
 .k-section-actions { margin-inline-start: auto; display: flex; align-items: center; gap: .5rem; }
 .k-section-lead { margin-top: .25rem; font: 400 calc(var(--fs-15) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--paper-dim); }
 .k-section-body { margin-top: .75rem; }
 .k-section-body > * + *, .k-drawer-body > * + *, .k-dialog-body > * + * { margin-top: .75rem; }
-.k-section--danger { border-color: var(--rule-2); border-inline-start: 3px solid var(--red); }
-.k-section--plain { border: 0; background: transparent; padding: 0; }
+/* danger: the board's red ribbon at the sheet's start (a border would be torn away with the edge) */
+.k-section--danger::after {
+  content: ''; position: absolute; inset-inline-start: .3rem; top: 1rem; width: .3rem; height: 2.4rem;
+  background: var(--red); pointer-events: none;
+}
+.k-section--plain { border: 0; background: transparent; padding: 0; box-shadow: none; -webkit-mask-box-image: none; }
 
 .k-tabs { display: flex; flex-wrap: wrap; align-items: stretch; gap: .125rem; }
 .k-tabs--line { border-bottom: 1px solid var(--rule-2); }
@@ -348,7 +376,13 @@ html[lang='en'] .k-pagehead-title { font: 600 1.9rem/1.12 var(--f-title); letter
 }
 .k-tab:hover:not(:disabled) { color: var(--paper); }
 /* the active tab and the tab under the cursor are the band (see the band section) */
-.k-tab.is-active { font-weight: 700; }
+.k-tab.is-active { font-weight: 700; color: var(--paper); }
+/* 2.3.0 the board's tab: the cursor is the short band, the open tab a paper rule under paper words */
+.k-tab::after {
+  content: ''; position: absolute; inset-inline: .75rem; bottom: -1px; height: 2px;
+  background: var(--paper); opacity: 0; transition: opacity var(--t-fast) var(--ease); pointer-events: none;
+}
+.k-tab.is-active::after { opacity: 1; }
 .k-tabs--box .k-tab { border: 1px solid var(--rule); }
 .k-tabs--box .k-tab.is-active, .k-tabs--box .k-tab-wrap:hover > .k-tab:not(:disabled) { border-color: transparent; }
 .k-tab:disabled { opacity: .45; }
@@ -374,8 +408,13 @@ html:not(.k-help-mode) .k-tab-wrap:not(.is-active):not(:hover) .k-tab-help { vis
 
 .k-drawer {
   position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column;
-  background: var(--ink-2); border-inline-start: 1px solid var(--rule-2);
+  background-color: var(--ink);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .035), rgba(242, 242, 242, 0) 55%);
+  box-shadow: var(--card-glow);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
 }
+/* a plate inside the drawer: a step lighter, so it reads as a sheet on the sheet */
+.k-drawer .k-section { background-color: var(--ink-2); }
 .k-drawer-head { flex: none; padding: 1.125rem 1.375rem 0; }
 .k-drawer-row { display: flex; align-items: flex-start; gap: .75rem; }
 .k-drawer-titles { flex: 1; min-width: 0; }
@@ -389,8 +428,8 @@ html[lang='en'] .k-drawer-title { font: 600 1.5rem/1.2 var(--f-title); }
 .k-drawer-tabs { margin-top: .875rem; }
 .k-drawer-body { flex: 1; min-height: 0; overflow: auto; padding: 1rem 1.375rem 1.25rem; }
 .k-drawer-foot {
-  flex: none; display: flex; align-items: center; gap: .5rem; padding: .75rem 1.375rem;
-  border-top: 1px solid var(--rule-2); background: var(--ink-2);
+  flex: none; display: flex; align-items: center; gap: .5rem; padding: .75rem 1.375rem 1rem;
+  border-top: 1px solid var(--rule); background: transparent;
 }
 .k-drawer-foot-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
 .k-drawer-foot-note { margin-inline-start: auto; font-size: var(--fs-12); color: var(--paper-faint); }
@@ -442,9 +481,12 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 .k-table-wrap { position: relative; min-height: 0; overflow: auto; flex: 1; }
 .k-table-wrap:focus-visible { outline-offset: -2px; }
 .k-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+/* 2.3.0 the sticky head takes the colour of what it sits on: the page card (ink-2), a plate (ink), a plate in the drawer */
+.k-section .k-table th, .k-drawer .k-table th { background: var(--ink); }
+.k-drawer .k-section .k-table th { background: var(--ink-2); }
 .k-table th {
-  position: sticky; top: 0; z-index: var(--z-sticky); background: var(--ink);
-  text-align: start; font: 700 var(--fs-13)/1 var(--f-ui); color: var(--paper-faint);
+  position: sticky; top: 0; z-index: var(--z-sticky); background: var(--ink-2);
+  text-align: start; font: 700 var(--fs-13)/1.1 var(--f-ui); color: var(--paper-dim);
   padding: .625rem .75rem; border-bottom: 1px solid var(--rule-2); white-space: nowrap;
 }
 .k-th { display: inline-flex; align-items: center; gap: .3rem; }
@@ -465,7 +507,14 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 /* a read-only table only shades the row under the mouse; a table you pick from (tabindex) puts the
    band on it, and the selected row keeps the band */
 .k-table tbody tr:hover td { background: var(--ink-2); }
-.k-table-wrap[tabindex] tbody tr:hover > td, .k-table tbody tr.is-selected > td { background: transparent; border-bottom-color: transparent; }
+.k-table-wrap[tabindex] tbody tr:hover > td { background: transparent; border-bottom-color: transparent; }
+/* 2.3.0 the selected row (the board's .ws-row.is-picked): a darker plate between two paper hairlines and a
+   paper tick at its end - never a second band; a hover never moves it, a click or Enter does */
+.k-table tbody tr.is-selected > td { background: var(--ink-3); box-shadow: inset 0 1px 0 var(--paper-dim), inset 0 -1px 0 var(--paper-dim); }
+.k-table tbody tr.is-selected > td:last-child::after {
+  content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--paper);
+}
+.k-table-wrap[tabindex] tbody tr.is-selected:hover > td { box-shadow: none; }
 /* each cell shows the middle of the brush; the row's two end cells show its torn ends */
 .k-table tbody td::before { -webkit-mask-size: 300% 100%; mask-size: 300% 100%; }
 .k-table tbody td:first-child::before { -webkit-mask-position: left center; mask-position: left center; }
@@ -488,8 +537,14 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 .k-kv-v > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* ── stat tiles, meters, status, tags ───────────────────────────────────── */
-.k-stat { position: relative; display: flex; border: 1px solid var(--rule); background: var(--ink-2); min-width: 0; }
-.k-stat-btn { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; padding: .875rem 1rem; min-width: 0; text-align: start; }
+.k-stat {
+  position: relative; display: flex; min-width: 0;
+  background-color: var(--ink);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .035), rgba(242, 242, 242, 0) 55%);
+  box-shadow: inset 0 0 1rem rgba(242, 242, 242, .07);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
+}
+.k-stat-btn { flex: 1; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; padding: 1rem 1.25rem; min-width: 0; text-align: start; }
 .k-stat.is-link .k-stat-btn:hover { background: var(--ink-3); }
 .k-stat-label { font-size: var(--fs-135); color: var(--paper-dim); }
 .k-stat-value { font: 700 var(--fs-26)/1.1 var(--f-ui); color: var(--paper); }
@@ -540,14 +595,16 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 @keyframes k-spin { to { transform: rotate(360deg); } }
 html.k-reduced-motion .k-skeleton span, html.k-reduced-motion .k-spinner { animation: none; }
 
-.k-alert { display: flex; align-items: flex-start; gap: .75rem; padding: .75rem 1rem; border: 1px solid var(--rule-2); background: var(--ink-2); }
+.k-alert { position: relative; display: flex; align-items: flex-start; gap: .75rem; padding: .875rem 1.25rem; border: 0; background: var(--ink-3); box-shadow: inset 0 0 .8rem rgba(242, 242, 242, .06); }
 .k-alert + .k-alert { margin-top: .5rem; }
 .k-alert-body { flex: 1; min-width: 0; }
 .k-alert-title { display: flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--paper); }
 .k-alert-text { margin-top: .125rem; font: 400 calc(var(--fs-15) * var(--k-text))/var(--lh-text) var(--f-text); color: var(--paper-dim); }
 .k-alert-actions { margin-top: .5rem; display: flex; flex-wrap: wrap; gap: .5rem; }
-.k-alert--warn { border-inline-start: 3px solid var(--paper); }
-.k-alert--danger { border-inline-start: 3px solid var(--red); }
+.k-alert--warn { box-shadow: inset 0 0 .8rem rgba(242, 242, 242, .06), inset 3px 0 0 var(--paper); }
+[dir='rtl'] .k-alert--warn { box-shadow: inset 0 0 .8rem rgba(242, 242, 242, .06), inset -3px 0 0 var(--paper); }
+.k-alert--danger { box-shadow: inset 0 0 .8rem rgba(242, 242, 242, .06), inset 3px 0 0 var(--red); }
+[dir='rtl'] .k-alert--danger { box-shadow: inset 0 0 .8rem rgba(242, 242, 242, .06), inset -3px 0 0 var(--red); }
 
 .k-gate.is-locked > .k-gate-body { opacity: .55; }
 .k-lockline { display: inline-flex; align-items: center; gap: .375rem; margin-bottom: .5rem; font-size: var(--fs-13); color: var(--paper-dim); }
@@ -590,11 +647,12 @@ html[lang='en'] .k-dialog-title { font: 600 1.5rem/1.15 var(--f-title); }
 .k-dialog-cancel { display: inline-flex; }
 /* controls on paper */
 .k-onpaper .k-input, .k-onpaper .k-textarea, .k-onpaper .k-select, .k-onpaper .k-seg, .k-onpaper .k-switch {
-  background: rgba(17, 17, 17, .06); border-color: var(--note-rule);
+  background: rgba(17, 17, 17, .06); border-color: var(--note-rule); box-shadow: inset 0 -1px 0 var(--note-rule);
 }
+.k-onpaper .k-chip:not(.is-on)::before { background: rgba(17, 17, 17, .08); }
 .k-onpaper .k-input input, .k-onpaper .k-textarea textarea, .k-onpaper .k-select { color: var(--note-ink); }
 .k-onpaper .k-input input::placeholder, .k-onpaper .k-textarea textarea::placeholder { color: var(--note-dim); }
-.k-onpaper .k-input:focus-within, .k-onpaper .k-textarea:focus-within { border-color: var(--note-ink); }
+.k-onpaper .k-input:focus-within, .k-onpaper .k-textarea:focus-within { background: rgba(17, 17, 17, .1); box-shadow: inset 0 -2px 0 var(--note-ink); }
 .k-onpaper .k-field-label, .k-onpaper .k-setrow-label { color: var(--note-ink); }
 .k-onpaper .k-field-hint, .k-onpaper .k-numrange, .k-onpaper .k-textarea-count { color: var(--note-dim); }
 .k-onpaper .k-seg-btn, .k-onpaper .k-chip, .k-onpaper .k-switch-opt { color: var(--note-dim); border-color: var(--note-rule); }
@@ -606,16 +664,20 @@ html[lang='en'] .k-dialog-title { font: 600 1.5rem/1.15 var(--f-title); }
 /* on the note the band turns over: the chosen option, the button under the cursor and the note's one
    action are an ink band with paper words (the pause menu's confirm) */
 .k-onpaper .k-seg-btn.is-on, .k-onpaper .k-chip.is-on { color: var(--note); }
-.k-onpaper .k-seg-btn.is-on::before, .k-onpaper .k-chip.is-on::before, .k-onpaper .k-btn::before { background: var(--note-ink); }
+.k-onpaper .k-seg-btn.is-on::before, .k-onpaper .k-chip.is-on::before,
+.k-onpaper .k-btn:hover:not(:disabled)::before, .k-onpaper .k-btn:focus-visible::before { background: var(--note-ink); }
+/* 2.3.0: a button at rest on the note is a faint ink band (the board's plate turned over) */
+.k-onpaper .k-btn::before { background: rgba(17, 17, 17, .1); }
 .k-onpaper .k-btn:hover:not(:disabled), .k-onpaper .k-btn:focus-visible { color: var(--note); }
 .k-onpaper .k-btn:active:not(:disabled)::before { background: var(--note-dim); }
 .k-onpaper .k-btn--ghost { color: var(--note-ink); border-color: var(--note-rule); }
 .k-onpaper .k-btn--primary { background: transparent; border-color: transparent; color: var(--note); }
-.k-onpaper .k-btn--primary::before { opacity: 1; }
+.k-onpaper .k-btn--primary::before { opacity: 1; background: var(--note-ink); }
 .k-onpaper .k-btn--primary:hover:not(:disabled)::before, .k-onpaper .k-btn--primary:focus-visible::before { background: var(--ink); }
 /* a note's primary that is not ready yet (the review before "I understand") is an outline on the paper,
    not the ink page's dark plate */
 .k-onpaper .k-btn--primary:disabled:not(.is-busy) { background: transparent; border-color: var(--note-rule); color: var(--note-dim); }
+.k-onpaper .k-btn--primary:disabled:not(.is-busy)::before { background: rgba(17, 17, 17, .1); }
 /* the destructive confirm is never the band at rest: like the pause menu's "Quit?" note, the cursor
    starts on the safe choice, and the red underline alone marks the destructive one until the cursor
    is on it (then the ink band, the underline kept) */
@@ -637,11 +699,13 @@ html[lang='en'] .k-dialog-title { font: 600 1.5rem/1.15 var(--f-title); }
 }
 .k-toast {
   pointer-events: auto; display: flex; align-items: center; gap: .625rem; max-width: 26rem;
-  padding: .625rem .875rem; background: var(--ink-2); border: 1px solid var(--rule-2);
-  color: var(--paper); font-size: var(--fs-145); text-align: start; box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+  padding: .875rem 1.25rem; background: var(--ink-3); border: 0;
+  color: var(--paper); font-size: var(--fs-145); text-align: start; box-shadow: var(--card-glow-hi);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
   animation: k-note-in var(--t-med) var(--ease);
 }
 .k-toast-shape { width: .5rem; height: .5rem; flex: none; background: var(--paper); }
 .k-toast--inform .k-toast-shape { background: none; border: 1.5px solid var(--paper-dim); }
-.k-toast--error { border-inline-start: 3px solid var(--red); }
+.k-toast--error { box-shadow: var(--card-glow-hi), inset 3px 0 0 var(--red); }
+[dir='rtl'] .k-toast--error { box-shadow: var(--card-glow-hi), inset -3px 0 0 var(--red); }
 .k-toast--error .k-toast-shape { background: var(--red); transform: rotate(45deg); }

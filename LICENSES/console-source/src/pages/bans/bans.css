@@ -32,7 +32,7 @@
 
 .bn-reason-full {
   white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; font-size: var(--fs-15); color: var(--paper);
-  background: var(--ink); border: 1px solid var(--rule); padding: .75rem .875rem;
+  background: var(--ink); box-shadow: inset 0 0 .8rem rgba(242, 242, 242, .05), inset 0 -1px 0 var(--rule); padding: .75rem .875rem;
 }
 
 /* free text from staff may be in either language: dir=auto orders it, the column keeps the page's alignment */

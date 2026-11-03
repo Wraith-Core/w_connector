@@ -4,7 +4,12 @@
 
 /* ── your level + the ladder ─────────────────────────────────────────────── */
 .pm-top { display: grid; grid-template-columns: minmax(16rem, 22rem) minmax(0, 1fr); gap: .75rem; }
-.pm-you-card, .pm-ladder { border: 1px solid var(--rule); background: var(--ink-2); padding: .875rem 1rem; min-width: 0; }
+/* 2.3.0 plates (the board look) */
+.pm-you-card, .pm-ladder {
+  position: relative; padding: 1.125rem 1.375rem; min-width: 0;
+  background-color: var(--ink); box-shadow: inset 0 0 1rem rgba(242, 242, 242, .07);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
+}
 .pm-you-head { display: flex; align-items: center; gap: .4rem; }
 .pm-cap { font-size: var(--fs-135); color: var(--paper-dim); }
 .pm-you-level { margin-top: .375rem; font: 400 var(--fs-26)/1.15 var(--f-title-ar); color: var(--paper); }
@@ -16,10 +21,10 @@ html[lang='en'] .pm-you-level { font: 600 1.5rem/1.15 var(--f-title); }
 .pm-steps { margin-top: .625rem; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .5rem; }
 .pm-step {
   position: relative; display: flex; flex-direction: column; gap: .2rem; min-width: 0;
-  border: 1px solid var(--rule); padding: .5rem .625rem .5rem; background: var(--ink);
+  padding: .5rem .625rem .5rem; background: var(--ink-2); box-shadow: inset 0 -1px 0 var(--rule);
 }
-.pm-step.is-reached { border-color: var(--rule-2); }
-.pm-step.is-here { border-color: var(--paper); background: var(--ink-3); }
+.pm-step.is-reached { box-shadow: inset 0 -1px 0 var(--rule-2); }
+.pm-step.is-here { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--paper-dim), inset 0 -2px 0 var(--paper); }
 .pm-step-top { display: flex; align-items: center; gap: .375rem; min-width: 0; }
 .pm-step-name { font: 700 var(--fs-145)/1.3 var(--f-ui); color: var(--paper); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pm-step:not(.is-reached) .pm-step-name { color: var(--paper-dim); }

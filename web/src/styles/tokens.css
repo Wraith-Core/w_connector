@@ -53,6 +53,11 @@
   --tex-grain: var(--w-tex-grain, none);         /* the pause menu's paper grain (notes, dialogs) */
   --tex-tear: var(--w-tex-tear, none);           /* the pause menu's torn edge (9-slice mask) */
   --edge: var(--w-edge, 1.7rem);                 /* how deep the torn edge bites */
+  /* 2.3.0 the board look: a card's edge (the housing board's 1.35 of its 20 px rem) and a plate's inside it */
+  --edge-card: 1.6rem;
+  --edge-plate: .9rem;
+  --card-glow: inset 0 0 1.25rem rgba(242, 242, 242, .11), inset 0 0 .45rem rgba(242, 242, 242, .1);
+  --card-glow-hi: inset 0 0 1.4rem rgba(242, 242, 242, .17), inset 0 0 .5rem rgba(242, 242, 242, .16);
 
   /* faces (w_lib fonts.css: Lalezar / Amiri / Tajawal / Aref Ruqaa, EB Garamond, the RDR faces).
      The w_admin copies injected by fonts.ts stay as the fallback for the faces both ship. */
@@ -61,7 +66,9 @@
      English title is still drawn by a role face. Read under html[lang=en] only. */
   --f-title: 'EB Garamond', 'Lalezar', 'Tajawal', 'W Noto Arabic', Georgia, serif;
   --f-mark: 'RDR Lino', Georgia, serif;          /* the WRAITH wordmark only */
-  --f-ui: 'Tajawal', 'W Noto Arabic', 'Noto Sans Arabic', sans-serif;   /* labels, controls, cells: all UI text, Latin digits */
+  /* labels, controls, cells: all UI text. 2.3.0 (the board look of w_housing / w_pets): Arabic letters in
+     Lalezar (the one Arabic face), Latin words and figures in EB Garamond, as on the housing board */
+  --f-ui: 'Lalezar', 'EB Garamond', 'Tajawal', 'W Noto Arabic', 'Noto Sans Arabic', Georgia, serif;
   /* reading text (help notes, descriptions, a confirm's question): Amiri in Arabic, EB Garamond in
      English. --w-f-text follows the page's dir, which i18n sets on <html>. */
   --f-text: var(--w-f-text, 'Amiri', 'EB Garamond', 'W Noto Arabic', 'Noto Sans Arabic', serif);
@@ -104,7 +111,7 @@
   --help-dot: 1.125rem;      /* 18: the circled ؟ */
   --help-hit: 1.75rem;       /* 28: its hit area */
   --shell-inset: 1.25rem;    /* 20 */
-  --side: 15.5rem;           /* 248 */
+  --side: 15rem;             /* 240 */
   --rail: 4rem;              /* 64 */
   --topbar: 3.5rem;          /* 56 */
   --drawer: 35rem;           /* 560 */

@@ -28,16 +28,19 @@ export interface PageHeaderProps {
   title: string;
   help: HelpProp;
   description?: ReactNode;
+  /** 2.3.0 a small line above the title (the board card's kicker: the page's section) */
+  kicker?: ReactNode;
   actions?: ReactNode;
   /** the element the page's <PageActions> portal into (the shell passes it) */
   slotRef?: (el: HTMLDivElement | null) => void;
   className?: string;
 }
 
-export function PageHeader({ title, help, description, actions, slotRef, className }: PageHeaderProps) {
+export function PageHeader({ title, help, description, kicker, actions, slotRef, className }: PageHeaderProps) {
   return (
     <header className={cls('k-pagehead', className)}>
       <div className="k-pagehead-main">
+        {kicker && <div className="k-pagehead-kicker">{kicker}</div>}
         <h1 className="k-pagehead-title">
           <span>{title}</span>
           <HelpTip help={help} label={title} size="lg" />

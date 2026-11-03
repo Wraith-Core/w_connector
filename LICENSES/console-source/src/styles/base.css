@@ -6,7 +6,7 @@
 
 html { font-size: clamp(13px, 1.48vh, 24px); }
 html, body, #root { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; }
-body { user-select: none; -webkit-font-smoothing: antialiased; }
+body { user-select: none; -webkit-font-smoothing: antialiased; font-synthesis: none; }
 
 .k-app, .k-app *, .k-app *::before, .k-app *::after,
 .k-layer, .k-layer *, .k-layer *::before, .k-layer *::after { box-sizing: border-box; }
@@ -17,7 +17,8 @@ body { user-select: none; -webkit-font-smoothing: antialiased; }
   line-height: 1.55;
   font-weight: 400;
   color: var(--paper);
-  font-variant-numeric: tabular-nums;
+  /* 2.3.0: EB Garamond draws the Latin figures: lining, like the housing board's .ws-num */
+  font-variant-numeric: lining-nums tabular-nums;
   letter-spacing: 0;
   text-align: start;
 }
@@ -45,11 +46,11 @@ html .k-app b, html .k-app strong, html .k-layer b, html .k-layer strong { font-
 .k-app :focus, .k-layer :focus { outline: none; }
 .k-app :focus-visible, .k-layer :focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
 
-/* scrollbars: thin paper on ink */
-.k-app ::-webkit-scrollbar, .k-layer ::-webkit-scrollbar { width: 8px; height: 8px; }
+/* scrollbars: thin paper on ink (2.3.0: the board's hairline, 4 px) */
+.k-app ::-webkit-scrollbar, .k-layer ::-webkit-scrollbar { width: 4px; height: 4px; }
 .k-app ::-webkit-scrollbar-track, .k-layer ::-webkit-scrollbar-track { background: transparent; }
-.k-app ::-webkit-scrollbar-thumb, .k-layer ::-webkit-scrollbar-thumb { background: var(--rule-2); border: 2px solid transparent; background-clip: padding-box; }
-.k-app ::-webkit-scrollbar-thumb:hover, .k-layer ::-webkit-scrollbar-thumb:hover { background: var(--rule-3); background-clip: padding-box; }
+.k-app ::-webkit-scrollbar-thumb, .k-layer ::-webkit-scrollbar-thumb { background: var(--rule-2); }
+.k-app ::-webkit-scrollbar-thumb:hover, .k-layer ::-webkit-scrollbar-thumb:hover { background: var(--rule-3); }
 .k-app ::-webkit-scrollbar-corner { background: transparent; }
 
 .k-app kbd, .k-layer kbd {
@@ -59,7 +60,7 @@ html .k-app b, html .k-app strong, html .k-layer b, html .k-layer strong { font-
 }
 
 /* ── utilities ──────────────────────────────────────────────────────────── */
-.k-num { font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+.k-num { font-variant-numeric: lining-nums tabular-nums; direction: ltr; unicode-bidi: isolate; }
 .k-ltr { direction: ltr; unicode-bidi: isolate; }
 .k-mono { font-family: var(--f-mono); font-size: .92em; direction: ltr; unicode-bidi: isolate; }
 .k-dim { color: var(--paper-dim); }

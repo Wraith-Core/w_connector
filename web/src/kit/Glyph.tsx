@@ -7,7 +7,7 @@
 export type GlyphName =
   | 'close' | 'search' | 'check' | 'chevron' | 'chevronDown' | 'chevronUp' | 'arrow' | 'lock' | 'copy' | 'refresh' | 'menu'
   | 'plus' | 'minus' | 'warn' | 'dot' | 'external' | 'reset'
-  | 'home' | 'people' | 'card' | 'ban' | 'map' | 'sun' | 'tool' | 'blocks' | 'stack' | 'shield' | 'list' | 'sliders' | 'news';
+  | 'home' | 'people' | 'card' | 'ban' | 'map' | 'sun' | 'tool' | 'blocks' | 'stack' | 'shield' | 'list' | 'sliders' | 'news' | 'pin';
 
 const PATHS: Record<GlyphName, string> = {
   close: 'M6 6l12 12M18 6L6 18',
@@ -41,6 +41,8 @@ const PATHS: Record<GlyphName, string> = {
   sliders: 'M4 7h9M17 7h3M4 17h3M11 17h9M15 5v4M9 15v4',
   /* a folded newspaper: the pause menu's news card */
   news: 'M4 5h13v14H6.5A2.5 2.5 0 0 1 4 16.5zM17 9h3v7.5a2.5 2.5 0 0 1-2.5 2.5M7 9h7M7 12.5h7M7 16h4',
+  /* 2.3.0 the quick menu's pin (a push pin) */
+  pin: 'M9 4h6M10 4v5l-3 4h10l-3-4V4M12 13v7',
 };
 
 export default function Glyph({ name, className, size }: { name: GlyphName; className?: string; size?: string }) {

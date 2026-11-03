@@ -1,68 +1,123 @@
 /* ════════════════════════════════════════════════════════════════════════════
  * w_admin · quick/quick.css
- * The PgUp quick menu: one ink panel at the right edge of the screen (the game stays in view),
- * the wordmark instead of an emblem, full-width tool rows, on / off as words. Tokens only; red
- * only for the picked player's marker and the danger rows' rule.
+ * The quick menu (F10), 2.3.0 the board look (w_housing / w_pets): a column at the right edge of the screen
+ * (the game stays in view) made of the masthead, one torn ink card (search, the recent row, the sections,
+ * the tools) and an actions strip, over a side scrim. On / off as words, full-width tool rows with the
+ * brushed band under the cursor. Tokens only; red only for the card's ribbon, the danger rows' rule and the
+ * picked player's marker.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 .q-panel {
-  position: fixed; top: var(--shell-inset); bottom: var(--shell-inset); right: var(--shell-inset);
-  width: 26.5rem; max-width: calc(100vw - 2 * var(--shell-inset));
-  display: flex; flex-direction: column; min-height: 0;
-  background: rgba(10, 10, 10, .97); border: 1px solid var(--rule-2);
-  box-shadow: 0 0 0 1px #000, 0 30px 80px rgba(0, 0, 0, .6);
+  position: fixed; top: 1.25rem; bottom: 1.25rem; right: 1.75rem;
+  width: 28rem; max-width: calc(100vw - 2 * var(--shell-inset));
+  display: flex; flex-direction: column; gap: .75rem; min-height: 0;
 }
+/* the scrim falls away from the panel's side so the game stays readable */
+.q-scrim {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(270deg, rgba(10, 10, 10, .82) 0%, rgba(10, 10, 10, .6) 22%, rgba(10, 10, 10, .2) 40%, rgba(10, 10, 10, 0) 55%);
+  animation: q-fade 220ms var(--ease) both;
+}
+@keyframes q-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes q-rise { from { opacity: 0; transform: translate3d(0, .6rem, 0); } to { opacity: 1; transform: none; } }
 
-/* ── head ───────────────────────────────────────────────────────────────── */
-.q-head { flex: none; display: flex; align-items: flex-start; gap: .75rem; padding: 1rem 1.125rem .875rem; border-bottom: 1px solid var(--rule); }
+/* ── the masthead ───────────────────────────────────────────────────────── */
+.q-head { flex: none; display: flex; align-items: flex-start; gap: .75rem; padding: 0 .25rem; text-shadow: 0 1px .4rem rgba(0, 0, 0, .6); }
 .q-brand { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .125rem; }
 .q-mark { font: 400 .9375rem/1 var(--f-mark); letter-spacing: .12em; color: var(--paper-dim); direction: ltr; unicode-bidi: isolate; align-self: flex-start; }
-.q-title { display: flex; align-items: center; gap: .5rem; margin-top: .25rem; font: 400 1.75rem/1.25 var(--f-title-ar); color: var(--paper); }
-html[lang='en'] .q-title { font: 600 1.5rem/1.15 var(--f-title); }
-.q-who { margin-top: .25rem; font-size: var(--fs-13); color: var(--paper-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.q-who b { color: var(--paper-dim); font-weight: 700; }
+.q-title { display: flex; align-items: center; gap: .5rem; margin-top: .25rem; font: 400 1.875rem/1.2 var(--f-title-ar); color: var(--paper); }
+html[lang='en'] .q-title { font: 600 1.6rem/1.15 var(--f-title); }
+.q-who { margin-top: .125rem; font-size: var(--fs-13); color: var(--paper-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.q-who b { color: var(--paper); font-weight: 700; }
 .q-close { flex: none; }
 
-.q-search { flex: none; padding: .75rem 1.125rem .25rem; }
+/* ── the card ───────────────────────────────────────────────────────────── */
+.q-wrap { position: relative; flex: 1; min-height: 0; display: flex; animation: q-rise 260ms var(--ease) backwards; }
+.q-card {
+  position: relative; flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  padding: 1.125rem .5rem .25rem;
+  background-color: var(--ink-2);
+  background-image: linear-gradient(160deg, rgba(242, 242, 242, .035), rgba(242, 242, 242, 0) 55%);
+  box-shadow: var(--card-glow);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-card) round;
+  transition: background-color var(--t-med) var(--ease), box-shadow var(--t-med) var(--ease);
+}
+.q-wrap:hover > .q-card, .q-wrap:focus-within > .q-card { background-color: var(--ink-3); box-shadow: var(--card-glow-hi); }
+.q-tick {
+  position: absolute; inset-inline-start: .15rem; top: 1.5rem; z-index: 3; width: .32rem; height: 2.6rem;
+  background: var(--red); -webkit-mask-box-image: var(--tex-tear) 64 fill / .22rem round;
+  opacity: 0; transform: scaleY(.4); transform-origin: top;
+  transition: opacity 140ms var(--ease), transform 180ms var(--ease); pointer-events: none;
+}
+.q-wrap:hover > .q-tick, .q-wrap:focus-within > .q-tick { opacity: 1; transform: none; }
+
+.q-search { flex: none; padding: 0 1rem .25rem; }
 .q-search > .k-ctlwrap { display: flex; width: 100%; }
 .q-search > .k-ctlwrap > .k-input { flex: 1; }
 
-.q-tabs { flex: none; margin: .25rem 1.125rem 0; }
+/* the recent row: pinned first; each tool one click (or Alt + its number) away */
+.q-recent { flex: none; margin: .5rem 1rem 0; padding-bottom: .5rem; border-bottom: 1px solid var(--rule); }
+.q-recent-head { display: flex; align-items: center; gap: .375rem; margin-bottom: .375rem; font: 700 var(--fs-13)/1.2 var(--f-ui); color: var(--paper-dim); }
+html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spacing: .1em; font-size: var(--fs-15); font-weight: 500; }
+.q-recent-row { display: flex; flex-wrap: wrap; gap: .375rem .375rem; }
+.q-recent-row > .k-btnwrap { min-width: 0; max-width: 100%; }
+.q-panel .k-btn.q-chip { height: 1.875rem; padding: 0 .625rem; font-size: var(--fs-13); }
+.q-panel .k-btn.q-chip kbd { font-size: var(--fs-11); }
+/* a pinned tool: a paper tick at its start */
+.q-panel .k-btn.q-chip.is-pinned { box-shadow: inset 2px 0 0 var(--paper); }
+[dir='rtl'] .q-panel .k-btn.q-chip.is-pinned { box-shadow: inset -2px 0 0 var(--paper); }
+.q-recent-empty { font-size: var(--fs-12); color: var(--paper-faint); }
+
+.q-tabs { flex: none; margin: .5rem 1rem 0; }
 .q-tabs .k-tab { height: 2.125rem; padding: 0 .5rem; font-size: var(--fs-14); }
 .q-tabs .k-tab-help { margin-inline-end: .125rem; }
+.q-tabs .k-tab-badge { border: 0; padding: 0; font-size: var(--fs-11); opacity: .8; }
 
 .q-watch {
   flex: none; display: flex; align-items: center; justify-content: space-between; gap: .75rem;
-  margin: .75rem 1.125rem 0; padding: .5rem .75rem; background: var(--ink-3); border-inline-start: 3px solid var(--paper);
+  margin: .75rem 1rem 0; padding: .5rem .75rem; background: var(--ink-3); box-shadow: inset 2px 0 0 var(--paper);
   font-size: var(--fs-14); font-weight: 700;
 }
+[dir='rtl'] .q-watch { box-shadow: inset -2px 0 0 var(--paper); }
 
 /* ── body ───────────────────────────────────────────────────────────────── */
-.q-body { flex: 1; min-height: 0; overflow-y: auto; padding: .375rem 1.125rem 1rem; }
+.q-body { flex: 1; min-height: 0; overflow-y: auto; padding: .375rem 1rem 1rem; }
 .q-list { display: flex; flex-direction: column; }
 .q-list > .k-btnwrap { gap: .25rem; }
 .q-empty { padding: .875rem 0; font-size: var(--fs-14); color: var(--paper-faint); }
 .q-note { font-size: var(--fs-13); color: var(--paper-dim); padding-inline-start: .5rem; border-inline-start: 2px solid var(--rule-3); }
 
-/* a tool row: the whole row is the button, its "؟" sits after it */
+/* a tool row: the whole row is the button, its pin and "؟" sit after it */
+.q-toolrow { display: flex; align-items: center; gap: .125rem; min-width: 0; }
+.q-toolrow > .k-btnwrap:first-child { flex: 1; min-width: 0; }
+.q-toolrow .q-pin { opacity: 0; transition: opacity var(--t-fast) var(--ease); }
+.q-toolrow:hover .q-pin, .q-toolrow .q-pin:focus-visible, .q-toolrow.is-pinned .q-pin { opacity: 1; }
 .q-panel .k-btn.q-tool {
-  height: auto; min-height: 3.375rem; padding: .5rem .5rem; justify-content: stretch;
+  height: auto; min-height: 3.25rem; padding: .5rem .625rem; justify-content: stretch;
   background: transparent; border: 0; border-bottom: 1px solid var(--rule); color: var(--paper);
   font-weight: 400; white-space: normal; text-align: start;
 }
+/* the rows are the board's list rows: no plate at rest, the long brushed band under the cursor */
+.q-panel .k-btn.q-tool::before, .q-panel .k-btn.q-prow::before {
+  inset: -1px -.25rem 0; opacity: 0; background: var(--paper);
+  -webkit-mask-image: var(--tex-band); mask-image: var(--tex-band);
+}
+.q-panel .k-btn.q-tool:hover:not(:disabled)::before, .q-panel .k-btn.q-tool:focus-visible::before,
+.q-panel .k-btn.q-prow:hover:not(:disabled)::before, .q-panel .k-btn.q-prow:focus-visible::before { opacity: 1; }
 /* a tool row (and a player row, below) under the cursor is the kit's paper band: its words turn ink
    (the row rules above set paper, so the kit's own hover colour would lose to them) */
 .q-panel .k-btn.q-tool:hover:not(:disabled), .q-panel .k-btn.q-tool:focus-visible,
-.q-panel .k-btn.q-prow:hover:not(:disabled), .q-panel .k-btn.q-prow:focus-visible { color: var(--ink); }
+.q-panel .k-btn.q-prow:hover:not(:disabled), .q-panel .k-btn.q-prow:focus-visible { color: var(--ink); border-bottom-color: transparent; }
 .q-panel .k-btn.q-tool:active:not(:disabled) { transform: none; }
 .q-tool .k-btn-label { flex: 1; min-width: 0; display: flex; align-items: center; gap: .75rem; overflow: visible; }
 .q-tool-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .125rem; }
 .q-tool-label { font: 700 var(--fs-15)/1.3 var(--f-ui); color: var(--paper); }
 .q-tool-hint { font-size: var(--fs-12); line-height: 1.35; color: var(--paper-faint); }
 .q-tool-state { flex: none; display: inline-flex; align-items: center; min-width: 1.5rem; justify-content: flex-end; color: var(--paper-faint); }
+/* on / off: the board's switch word */
 .q-state {
   display: inline-flex; align-items: center; height: 1.5rem; padding: 0 .5rem;
-  border: 1px solid var(--rule-2); font: 700 var(--fs-12)/1 var(--f-ui); color: var(--paper-faint); white-space: nowrap;
+  border: 1px solid rgba(242, 242, 242, .35); font: 700 var(--fs-12)/1 var(--f-ui); color: var(--paper-dim); white-space: nowrap;
 }
 .q-state.is-on { background: var(--paper); border-color: var(--paper); color: var(--ink); }
 .q-chev { width: .9rem; height: .9rem; }
@@ -86,15 +141,14 @@ html[lang='en'] .q-title { font: 600 1.5rem/1.15 var(--f-title); }
 .q-subhead { display: flex; align-items: center; gap: .5rem; padding-top: .75rem; border-top: 1px solid var(--rule); font: 700 var(--fs-13)/1.2 var(--f-ui); color: var(--paper-dim); }
 .q-plist { display: flex; flex-direction: column; }
 .q-panel .k-btn.q-prow {
-  height: auto; min-height: 2.875rem; padding: .375rem .5rem; justify-content: stretch;
+  height: auto; min-height: 2.875rem; padding: .375rem .625rem; justify-content: stretch;
   background: transparent; border: 0; border-bottom: 1px solid var(--rule); color: var(--paper);
   font-weight: 400; white-space: normal; text-align: start;
 }
-/* the chosen target keeps the paper band (the theme's selected row); the row under the cursor gets it from the kit */
+/* the chosen target: the board's picked row (a darker plate, a frame, a paper tick); the band stays the cursor */
 .q-panel .k-btn.q-prow:active:not(:disabled) { transform: none; }
-.q-panel .k-btn.q-prow.is-on { color: var(--ink); }
-.q-panel .k-btn.q-prow.is-on::before { opacity: 1; }
-.q-panel .k-btn.q-prow.is-on .k-btn-label * { color: inherit; }
+.q-panel .k-btn.q-prow.is-on { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--paper-dim); }
+.q-panel .k-btn.q-prow.is-on::after { content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--paper); }
 .q-prow .k-btn-label { flex: 1; min-width: 0; display: flex; align-items: center; gap: .75rem; overflow: visible; }
 .q-prow-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .q-prow-name { font: 700 var(--fs-145)/1.3 var(--f-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -103,11 +157,20 @@ html[lang='en'] .q-title { font: 600 1.5rem/1.15 var(--f-title); }
 
 .q-world { padding-top: .5rem; }
 
-/* ── foot ───────────────────────────────────────────────────────────────── */
-.q-foot { flex: none; display: flex; flex-direction: column; gap: .625rem; padding: .75rem 1.125rem .875rem; border-top: 1px solid var(--rule); }
+/* ── the actions strip ──────────────────────────────────────────────────── */
+.q-foot {
+  flex: none; display: flex; flex-direction: column; gap: .625rem; padding: 1rem 1.375rem 1.125rem;
+  background-color: var(--ink-2); box-shadow: var(--card-glow);
+  -webkit-mask-box-image: var(--tex-tear) 64 fill / var(--edge-plate) round;
+  animation: q-rise 260ms var(--ease) 60ms backwards;
+}
 .q-status { display: flex; align-items: center; gap: .5rem; font-size: var(--fs-135); color: var(--paper-dim); }
 .q-dot { width: .5rem; height: .5rem; border: 1.5px solid var(--paper-faint); flex: none; }
 .q-dot.is-on { background: var(--paper); border-color: var(--paper); }
 .q-status-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.q-keys { display: flex; justify-content: space-between; gap: .75rem; font-size: var(--fs-12); color: var(--paper-faint); }
+.q-keys { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem .75rem; font-size: var(--fs-12); color: var(--paper-faint); }
 .q-keys kbd { margin-inline-end: .125rem; }
+
+@media (prefers-reduced-motion: reduce) { .q-scrim, .q-wrap, .q-foot { animation: none; } }
+html.k-reduced-motion .q-scrim, html.k-reduced-motion .q-wrap, html.k-reduced-motion .q-foot { animation: none; }
+@media (max-width: 1500px) { .q-panel { top: .875rem; bottom: .875rem; right: 1.125rem; width: 27rem; } }

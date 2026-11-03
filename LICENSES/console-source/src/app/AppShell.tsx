@@ -5,6 +5,9 @@
  * banner, and the page frame (header from the page definition + body + an error boundary so one
  * broken page never takes the console down).
  * The chrome's "؟" are quiet (shown in help mode); the page's own "؟" are always visible.
+ * 2.3.0 the board look (w_housing / w_pets): the masthead runs over two torn cards (the menu, the page) on a
+ * dark scrim; the page card's head carries the section as its kicker. Keys: 1-9 open the menu's sections
+ * (again: the next page of that section), Alt+↑ / Alt+↓ the previous / next page, Ctrl+K the palette.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -70,6 +73,7 @@ function Sidebar({ rail }: { rail: boolean }) {
   const app = useApp();
   const { t } = useI18n();
   const groups = useMemo(() => sectionsOf(visiblePages(app)), [app]);
+  const current = pageById(app.route.page)?.section;
   const navRef = useRef<HTMLElement>(null);
 
   /* ↑ ↓ move between pages while the focus is in the menu */
@@ -85,18 +89,16 @@ function Sidebar({ rail }: { rail: boolean }) {
   const who = app.admin;
   const rank = app.rank ?? (who?.group as string | undefined);
   return (
-    <aside className="sh-side" id="sh-side">
-      <div className="sh-brand">
-        {!rail && <div className="sh-mark">WRAITH</div>}
-        {!rail && <div className="sh-brand-ar">{t('label.shell.brand')}</div>}
-        {!rail && app.serverName && <div className="sh-server k-ellipsis">{app.serverName}</div>}
-      </div>
+    <aside className="sh-side sh-card" id="sh-side">
       <nav className="sh-nav" ref={navRef} aria-label={t('label.shell.brand')} onKeyDown={onKey}>
         <span className="sh-nav-helprow"><HelpTip help="help.shell.nav" size="sm" className="k-help--quiet" /></span>
         {groups.length === 0 && <p className="sh-nav-empty">{t('label.shell.noPages')}</p>}
-        {groups.map((g) => (
-          <div className="sh-navsec" key={g.section}>
-            <h6 className="sh-navsec-title">{t(`label.shell.section.${g.section}`)}</h6>
+        {groups.map((g, i) => (
+          <div className={cls('sh-navsec', current === g.section && 'is-here')} key={g.section}>
+            <h6 className="sh-navsec-title">
+              {i < 9 && <kbd className="sh-navsec-key" title={t('label.shell.sectionKey', String(i + 1))}>{i + 1}</kbd>}
+              <span>{t(`label.shell.section.${g.section}`)}</span>
+            </h6>
             {g.pages.map((p) => <NavItem key={p.id} def={p} active={app.route.page === p.id} rail={rail} />)}
           </div>
         ))}
@@ -128,6 +130,11 @@ function TopBar({ rail, onRail, def }: { rail: boolean; onRail(): void; def: Pag
   const online = app.serverInfo ? `${fmtNum(app.serverInfo.playersOnline)} / ${fmtNum(app.serverInfo.maxPlayers)}` : fmtNum(app.players.length);
   return (
     <header className="sh-top">
+      <div className="sh-brand">
+        <span className="sh-brand-ar">{t('label.shell.brand')}</span>
+        {!rail && <span className="sh-mark">WRAITH</span>}
+        {!rail && app.serverName && <span className="sh-server k-ellipsis">{app.serverName}</span>}
+      </div>
       <IconButton
         icon="menu"
         aria-label={t(rail ? 'label.shell.navExpand' : 'label.shell.navCollapse')}
@@ -142,6 +149,7 @@ function TopBar({ rail, onRail, def }: { rail: boolean; onRail(): void; def: Pag
         {def && <><span className="sh-crumb-sep">/</span><span>{t(`label.shell.section.${def.section}`)}</span></>}
         {def && <><span className="sh-crumb-sep">/</span><span className="sh-crumb-here">{t(labelKeyOf(def))}</span></>}
       </nav>
+      <span className="sh-mast-rule" aria-hidden="true" />
       <span className="sh-cmdwrap">
         <button type="button" className="sh-cmd" onClick={() => app.openPalette()} aria-haspopup="dialog">
           <Glyph name="search" />
@@ -215,7 +223,7 @@ function PageFrame({ def }: { def: PageDef | undefined }) {
   return (
     <section className="sh-page" aria-label={t(labelKeyOf(def))}>
       {def.header !== false && (
-        <PageHeader title={t(labelKeyOf(def))} help={helpKeyOf(def)} description={t(descKeyOf(def))} slotRef={slotRef} />
+        <PageHeader kicker={t(`label.shell.section.${def.section}`)} title={t(labelKeyOf(def))} help={helpKeyOf(def)} description={t(descKeyOf(def))} slotRef={slotRef} />
       )}
       <PageActionsSlotProvider value={slot}>
         <div className={cls('sh-body', def.layout === 'fill' ? 'is-fill' : 'is-scroll', def.header === false && 'is-noheader')}>
@@ -245,6 +253,25 @@ export default function AppShell({ palette, setPalette }: { palette: { open: boo
   const found = pageById(app.route.page);
   const def = found && allowed(found, app) ? found : undefined;
 
+  /* 2.3.0 1-9 open the menu's sections: the first page of the section, or the next one when the open page is
+     already in it. Never while typing, never with Ctrl / Alt, never over a dialog or the palette. */
+  const paletteOpen = palette.open;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.repeat || e.ctrlKey || e.altKey || e.metaKey || paletteOpen) return;
+      const m = /^(?:Digit|Numpad)([1-9])$/.exec(e.code) ?? /^([1-9])$/.exec(e.key);
+      if (!m || isTypingTarget(e.target) || document.querySelector('.k-dialog-veil, .k-pop')) return;
+      const groups = sectionsOf(visiblePages(app));
+      const g = groups[Number(m[1]) - 1];
+      if (!g || g.pages.length === 0) return;
+      e.preventDefault();
+      const i = g.pages.findIndex((p) => p.id === app.route.page);
+      app.navigate(g.pages[i < 0 ? 0 : (i + 1) % g.pages.length].id);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [app, paletteOpen]);
+
   /* Alt+↑ / Alt+↓ move between pages from anywhere (not while typing) */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -260,11 +287,19 @@ export default function AppShell({ palette, setPalette }: { palette: { open: boo
 
   return (
     <div className={cls('k-app sh-root', rail && 'is-rail')} dir={rtl ? 'rtl' : 'ltr'}>
-      <Sidebar rail={rail} />
-      <main className="sh-main">
-        <TopBar rail={rail} onRail={toggleRail} def={def} />
-        <HelpBanner />
-        <PageFrame def={def} />
+      <div className="sh-scrim" aria-hidden="true" />
+      <TopBar rail={rail} onRail={toggleRail} def={def} />
+      <div className="sh-wrap sh-sidewrap">
+        <span className="sh-strip" aria-hidden="true" />
+        <span className="sh-tick" aria-hidden="true" />
+        <Sidebar rail={rail} />
+      </div>
+      <main className="sh-wrap sh-mainwrap">
+        <span className="sh-tick" aria-hidden="true" />
+        <div className="sh-main sh-card">
+          <HelpBanner />
+          <PageFrame def={def} />
+        </div>
       </main>
       {palette.open && <CommandPalette initial={palette.q} onClose={() => setPalette({ open: false, q: '' })} />}
     </div>

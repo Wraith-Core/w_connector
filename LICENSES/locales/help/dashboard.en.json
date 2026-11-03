@@ -51,7 +51,13 @@
     "openWorld": "Opens the Weather, time and notices page, with every kind of weather, ready times of day and the latest changes.",
     "recent": "The latest things staff did from this panel: who did what, to whom and when. It updates by itself.",
     "openLog": "Opens the full admin log with search and filters, the last 500 actions.",
-    "shortcuts": "Quick links to pages your website role allows. Press the ? beside a link to learn what is there."
+    "shortcuts": "Quick links to pages your website role allows. Press the ? beside a link to learn what is there.",
+    "desk": {
+      "list": "Everyone in the server now. Click a player or press Enter to select him; a double click opens his file. The actions above the list act on the selected player only.",
+      "search": "Searches the online players by name, citizen ID or session number like #5. Down arrow moves into the list; Enter selects the player when only one is left.",
+      "message": "Sends a private message that only this player sees. Type it in the window, then press Send. Shortcut M.",
+      "ban": "Opens the player file on its moderation section, where you write the reason, choose the length and confirm. This button never bans anyone by itself."
+    }
   },
   "label": {
     "dashboard": {
@@ -112,7 +118,20 @@
       "openLog": "Open the admin log",
       "shortcuts": "Shortcuts",
       "palette": "Quick search",
-      "refresh": "Refresh"
+      "refresh": "Refresh",
+      "desk": {
+        "title": "Players now",
+        "search": "Search by name, citizen ID or #session…",
+        "none": "Select a player in the list to see his actions here.",
+        "hint": "A click selects the player, a double click opens his file. The letter on each button is its keyboard shortcut.",
+        "empty": "No player matches the search.",
+        "noPlayers": "Nobody is online right now.",
+        "file": "File",
+        "message": "Message",
+        "messageTitle": "Private message to %s",
+        "kick": "Kick…",
+        "ban": "Ban…"
+      }
     }
   }
 }

@@ -20,7 +20,7 @@
       "reports": "The players’ reports, the same list as the website Reports page. Take, answer and close them here."
     },
     "nav": {
-      "text": "The side menu: each name opens a page of the panel. You only see the pages your level allows.",
+      "text": "The side menu: each name opens a page of the panel, and you only see the pages your level allows. The number beside each section opens it from the keyboard; press it again for the next page in it.",
       "title": "Side menu"
     },
     "navCollapse": {
@@ -128,7 +128,8 @@
       "whoLevel": "Role",
       "whoCid": "Citizen ID",
       "noPages": "No pages are allowed for your level.",
-      "legacy": "This page keeps its old look until its new design lands."
+      "legacy": "This page keeps its old look until its new design lands.",
+      "sectionKey": "Press %s to open this section"
     }
   }
 }
