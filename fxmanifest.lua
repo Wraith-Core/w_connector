@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '2.4.0'
+version '2.4.1'
 description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith control panel.'
 
 -- The website bridge, join queue and /wadmin menu share this resource.
@@ -25,7 +25,7 @@ description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith 
 
 dependencies { 'oxmysql' }
 
--- The original full console (Page Up) and quick menu (F10) share NUI with the spectate streamer.
+-- The original full console (F10) and quick menu (Page Up) share NUI with the spectate streamer.
 -- nui/index.html loads both (docs/admin-platform/08-ingame-menu.md). capture.html stays as the streamer alone.
 ui_page 'web/build/index.html'
 files { 'web/build/**/*', 'nui/capture.html', 'nui/spectate.js', 'core/console_contract.json', 'core/console_models.json', 'locales/ar.json', 'locales/en.json' }

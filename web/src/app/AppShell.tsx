@@ -173,7 +173,7 @@ function TopBar({ rail, onRail, def }: { rail: boolean; onRail(): void; def: Pag
         </button>
         <HelpTip help="help.shell.helpMode" size="sm" className="k-help--quiet" />
       </span>
-      <Button help="help.shell.quick" helpQuiet kind="ghost" size="sm" kbd="F10" className="sh-pill" onClick={() => app.setMode('quick')}>{t('label.shell.quick')}</Button>
+      <Button help="help.shell.quick" helpQuiet kind="ghost" size="sm" kbd="PgUp" className="sh-pill" onClick={() => app.setMode('quick')}>{t('label.shell.quick')}</Button>
       <Button help="help.shell.close" helpQuiet kind="ghost" size="sm" kbd="Esc" className="sh-pill" onClick={app.close}>{t('label.shell.close')}</Button>
     </header>
   );

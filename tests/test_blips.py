@@ -361,7 +361,7 @@ class Client(unittest.TestCase):
 class Wiring(unittest.TestCase):
     def test_manifest_loads_both_halves_after_the_console(self):
         m = text('fxmanifest.lua')
-        self.assertIn("version '2.4.0'", m)
+        self.assertRegex(m, r"version '2\.4\.\d+'")  # the blips arrived in 2.4.0
         self.assertLess(m.index("'ops/console.lua'"), m.index("'ops/native_blips.lua'"))
         self.assertLess(m.index("'client/cl_console.lua'"), m.index("'client/cl_blips.lua'"))
 

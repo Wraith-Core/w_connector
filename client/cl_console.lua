@@ -1,4 +1,4 @@
--- Host for the original w_admin full console and F10 quick menu.
+-- Host for the original w_admin full console (F10) and quick menu (Page Up).
 -- NUI shapes requests; the server and signed website decide every permission.
 WMenu = { open = false, game = GetGameName() == 'redm' and 'redm' or 'fivem' }
 WConsole = { session = nil, mode = 'full', ready = false, waiting = {} }
@@ -210,18 +210,27 @@ RegisterNetEvent('w_connector:console:command', function(what)
 end)
 RegisterCommand('wadmin', function() toggle('full') end, false)
 RegisterCommand('wquickadmin', function() toggle('quick') end, false)
--- RegisterKeyMapping is available on both games. When w_admin owns F10 its existing binding
+-- RegisterKeyMapping is available on both games. If an old w_admin is started its own binding
 -- delegates here, so neither resource races to toggle a second NUI or steals focus back.
-RegisterCommand('+wc_console_quick', function()
-    if GetResourceState('w_admin') ~= 'started' then toggle('quick') end
-end, false)
-RegisterCommand('-wc_console_quick', function() end, false)
-if RegisterKeyMapping then RegisterKeyMapping('+wc_console_quick', 'Wraith quick administration', 'keyboard', 'F10') end
-RegisterCommand('+wc_console_full', function()
-    if GetResourceState('w_admin') ~= 'started' then toggle('full') end
-end, false)
-RegisterCommand('-wc_console_full', function() end, false)
-if RegisterKeyMapping then RegisterKeyMapping('+wc_console_full', 'Wraith administration console', 'keyboard', 'PAGEUP') end
+-- 2.4.1 (owner 2026-11-03): Page Up opens the quick menu, F10 the full console. A saved binding wins over
+-- a mapping's default, so the keys live under NEW command names; the 2.4.0 names (+wc_console_quick,
+-- +wc_console_full) stay as plain commands with no key mapping.
+local function keyed(mode)
+    return function() if GetResourceState('w_admin') ~= 'started' then toggle(mode) end end
+end
+local function released() end
+RegisterCommand('+wc_quick_menu', keyed('quick'), false)
+RegisterCommand('-wc_quick_menu', released, false)
+RegisterCommand('+wc_admin_console', keyed('full'), false)
+RegisterCommand('-wc_admin_console', released, false)
+RegisterCommand('+wc_console_quick', keyed('quick'), false)
+RegisterCommand('-wc_console_quick', released, false)
+RegisterCommand('+wc_console_full', keyed('full'), false)
+RegisterCommand('-wc_console_full', released, false)
+if RegisterKeyMapping then
+    RegisterKeyMapping('+wc_quick_menu', 'Wraith quick administration', 'keyboard', 'PAGEUP')
+    RegisterKeyMapping('+wc_admin_console', 'Wraith administration console', 'keyboard', 'F10')
+end
 RegisterNUICallback('ready', function(_, cb) C.ready = true; cb({ ok = true }); if C.wantOpen and C.live() and not WMenu.open then open() end end)
 RegisterNUICallback('close', function(_, cb) WMenu.close(); cb({ ok = true }) end)
 RegisterNUICallback('mode', function(data, cb) C.mode = data.mode == 'quick' and 'quick' or 'full'; send('mode', { mode = C.mode }); cb({ ok = true }) end)

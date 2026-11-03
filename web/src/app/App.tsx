@@ -260,7 +260,7 @@ export default function App() {
     el.classList.toggle('k-reduced-motion', prefs.reducedMotion);
   }, [prefs.density, prefs.reducedMotion]);
 
-  /* ── keyboard: Esc closes, PgUp / F10 switch full ⇄ quick, Ctrl+K opens the palette ─ */
+  /* ── keyboard: Esc closes, F10 / PgUp switch full ⇄ quick, Ctrl+K opens the palette ─ */
   const dialogRef = useRef(dialog);
   dialogRef.current = dialog;
   const paletteRef = useRef(palette.open);
@@ -279,9 +279,9 @@ export default function App() {
       if (dialogRef.current || paletteRef.current) return;
       if (performance.now() - openedAt.current < 150) return;
       e.preventDefault();
-      // F10 is the quick menu's key, Page Up the console's (2026-10-22): the other mode's key switches, the
+      // Page Up is the quick menu's key, F10 the console's (2.4.1, owner 2026-11-03): the other mode's key switches, the
       // open mode's own key closes
-      if ((e.key === 'PageUp' && mode === 'quick') || (e.key === 'F10' && mode === 'full')) setMode(mode === 'quick' ? 'full' : 'quick');
+      if ((e.key === 'F10' && mode === 'quick') || (e.key === 'PageUp' && mode === 'full')) setMode(mode === 'quick' ? 'full' : 'quick');
       else close();
     };
     window.addEventListener('keydown', onKey);

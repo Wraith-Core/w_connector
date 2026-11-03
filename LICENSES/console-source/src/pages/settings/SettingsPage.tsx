@@ -62,8 +62,8 @@ function SamplePreview() {
 }
 
 const KEYS: { k: string; id: string }[] = [
-  { k: 'PgUp', id: 'open' },
-  { k: 'F10', id: 'quick' },
+  { k: 'F10', id: 'open' },
+  { k: 'PgUp', id: 'quick' },
   { k: 'Esc', id: 'close' },
   { k: 'Ctrl K', id: 'palette' },
   { k: 'F1', id: 'help' },

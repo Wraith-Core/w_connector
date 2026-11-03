@@ -70,7 +70,7 @@ export default function ToolsPage({ route }: PageProps) {
   return (
     <div className="tl-page" ref={root}>
       <PageActions>
-        <Button help="help.tools.openQuick" kind="ghost" kbd="F10" onClick={() => app.setMode('quick')}>{t('label.tools.openQuick')}</Button>
+        <Button help="help.tools.openQuick" kind="ghost" kbd="PgUp" onClick={() => app.setMode('quick')}>{t('label.tools.openQuick')}</Button>
       </PageActions>
 
       {spectating > 0 && (

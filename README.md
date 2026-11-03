@@ -1,7 +1,7 @@
 # w_connector (v2)
 
 يربط سيرفر FiveM أو RedM بلوحة Wraith، وينفذ أوامر الإدارة ويعرض حالة اللاعبين.
-تتوفر لوحة w_admin الأصلية داخل الموصل بالأمر `/wadmin` أو Page Up، وقائمتها السريعة بـF10 أو `/wquickadmin` في RedM وFiveM.
+تتوفر لوحة w_admin الأصلية داخل الموصل بالأمر `/wadmin` أو F10، وقائمتها السريعة بـPage Up أو `/wquickadmin` في RedM وFiveM.
 تظهر الصفحات والأفعال حسب صلاحيات حساب الموقع. إدارة الرتب المفوّضة متاحة من داخل اللعبة لمن لديه صلاحية إدارة الرتب.
 توجد أيضًا أوامر البلاغات بحسب الإعدادات. يتطلب المورد `oxmysql` وإطارًا مدعومًا.
 
@@ -43,6 +43,14 @@ Detected automatically. To force one: `set wraith_framework "vorp"` / `set wrait
 - Every request is signed (HMAC-SHA256, timestamp and one-time nonce) and goes out over HTTPS. The
   server opens no port.
 - The token cannot change who has access to your panel.
+
+## 2.4.1 — 2026-11-03
+
+- تبديل الأزرار: زر **F10** يفتح الآن لوحة الإدارة الكاملة، وزر **Page Up** يفتح القائمة السريعة. داخل اللوحة: F10 يغلق اللوحة الكاملة أو ينقلك إليها من القائمة السريعة، وPage Up يغلق القائمة السريعة أو ينقلك إليها من اللوحة.
+- تغيّرت الشروح داخل اللوحة والاختصارات المكتوبة على الأزرار إلى الترتيب الجديد.
+- للاعبين والإداريين: إذا بقي زر يفتح الشيء القديم، أعد ضبطه من الإعدادات ← أزرار التحكم (Key Bindings) ← FiveM أو RedM، وابحث عن «Wraith administration console» و«Wraith quick administration».
+- الأوامر `/wadmin` و`/wquickadmin` لم تتغير.
+- التجربة المطلوبة في اللعبة: اضغط F10 وتأكد أن اللوحة الكاملة تُفتح، ثم Page Up وتأكد أن القائمة السريعة تُفتح. من داخل كل واحدة جرّب زر الأخرى للتنقل، وزرها نفسه للإغلاق.
 
 ## 2.4.0 — 2026-11-03
 

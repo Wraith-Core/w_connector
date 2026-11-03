@@ -22,7 +22,7 @@
     "version": "The script version as its author wrote it. Useful when you report a problem and need to know which copy runs.",
     "overridden": "How many settings of this script differ from their original value because staff changed them. Restore them on its settings page.",
     "open": {
-      "text": "Closes the admin panel and opens the script's own interface. The server checks your permission first; press PgUp to come back.",
+      "text": "Closes the admin panel and opens the script's own interface. The server checks your permission first; press F10 to come back.",
       "undo": "Opening it changes nothing; close it to come back"
     },
     "openLocked": "Locked because the script itself does not let you open its interface. The reason is written under the button; ask the owner if you need it.",

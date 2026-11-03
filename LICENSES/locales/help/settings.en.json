@@ -38,7 +38,7 @@
     "accCid": "The fixed citizen ID of your current character. Type it into any player box to pick yourself.",
     "accSession": "Your session number (#) for this visit. It changes every time you join, which is why we use the citizen ID.",
     "openPerms": "Opens the Permissions page showing what each level can do. Read only; it changes nothing.",
-    "keys": "Keyboard shortcuts. They work while the panel is open; F10 and PgUp also open it from the game."
+    "keys": "Keyboard shortcuts. They work while the panel is open. From the game, F10 also opens the panel and PgUp the quick menu."
   },
   "label": {
     "settings": {

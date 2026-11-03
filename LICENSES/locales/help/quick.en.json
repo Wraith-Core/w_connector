@@ -1,7 +1,7 @@
 {
   "quick": {
-    "panel": "A small menu at the side of the screen with your tools, so you can use them while watching the game. F10 opens and closes it; PgUp opens the full panel.",
-    "close": "Closes the menu and takes you back to the game. Modes that are on stay on. Shortcut Esc or F10.",
+    "panel": "A small menu at the side of the screen with your tools, so you can use them while watching the game. PgUp opens and closes it; F10 opens the full panel.",
+    "close": "Closes the menu and takes you back to the game. Modes that are on stay on. Shortcut Esc or PgUp.",
     "search": "Searches every tool by name, like 'fly' or 'copy'; results come from all sections. In the Players section it searches their names.",
     "group": {
       "self": "Your own tools: flying, invisibility, protection and healing.",
@@ -17,7 +17,7 @@
       "example": "12 or #5"
     },
     "online": "Players online now. Press any name and their citizen ID fills the box above and their actions appear.",
-    "full": "Opens the full admin panel with every page. Shortcut PgUp.",
+    "full": "Opens the full admin panel with every page. Shortcut F10.",
     "active": "How many modes are on for you now, like Invisible or Noclip. Each stays until you turn it off.",
     "recent": "The tools you ran last, the pinned ones first. Click a tool to run it, or press Alt with its number. The digits 1 to 7 alone open the sections.",
     "pin": "Pins the tool to the Recent row at the top so it stays there. Press it again to unpin. Saved on this computer only."

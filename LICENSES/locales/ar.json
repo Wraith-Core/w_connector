@@ -290,7 +290,7 @@
   "toast_script_opened": "جارٍ فتح واجهة السكربت الأصلية",
   "toast_script_sent": "أُرسل الأمر للسكربت، ونتيجته تظهر في رسالته",
   "toast_script_console": "تم. النتيجة مكتوبة في كونسول السيرفر",
-  "toast_back_to_admin": "اضغط زر لوحة الإدارة (PgUp عادةً) للعودة إليها",
+  "toast_back_to_admin": "اضغط زر لوحة الإدارة (F10 عادةً) للعودة إليها",
   "toast_time_frozen": "توقفت الساعة عند الجميع",
   "toast_time_unfrozen": "عادت الساعة إلى الدوران",
   "toast_weather_dynamic": "عاد الجو يتغيّر تلقائيًا",

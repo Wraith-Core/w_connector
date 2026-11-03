@@ -20,7 +20,7 @@
     "spawned": "How many temporary things you have spawned now, out of 25 allowed. At the limit, remove them first, then spawn again.",
     "noclip": {
       "text": "Fly through walls while hidden and protected. Q goes up, E goes down, Shift is faster. The panel closes so you can move.",
-      "undo": "Yes, turn it off here or in the quick menu (F10)"
+      "undo": "Yes, turn it off here or in the quick menu (PgUp)"
     },
     "invisible": {
       "text": "Hides your character from every player, so nobody sees you. Useful while watching or investigating.",
@@ -104,7 +104,7 @@
       "example": "30"
     },
     "stopSpectate": "Stops watching the player and puts you back where you were before you started watching.",
-    "openQuick": "Opens the small quick menu at the side of the screen with these same tools, so you can use them while watching the game. Shortcut F10."
+    "openQuick": "Opens the small quick menu at the side of the screen with these same tools, so you can use them while watching the game. Shortcut PgUp."
   },
   "label": {
     "tools": {

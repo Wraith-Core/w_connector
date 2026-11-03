@@ -44,7 +44,7 @@
       "undo": "Yes, press it again or F1"
     },
     "quick": {
-      "text": "Opens the small quick menu at the side of the screen, so you can use your tools while watching the game. Shortcut F10.",
+      "text": "Opens the small quick menu at the side of the screen, so you can use your tools while watching the game. Shortcut PgUp.",
       "title": "Quick menu"
     },
     "close": {

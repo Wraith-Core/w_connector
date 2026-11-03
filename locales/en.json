@@ -290,7 +290,7 @@
   "toast_script_opened": "Opening the script's own interface",
   "toast_script_sent": "Sent to the script. Its own message shows the result",
   "toast_script_console": "Done. The result is written in the server console",
-  "toast_back_to_admin": "Press the admin panel key (PgUp by default) to go back to it",
+  "toast_back_to_admin": "Press the admin panel key (F10 by default) to go back to it",
   "toast_time_frozen": "The clock is stopped for everyone",
   "toast_time_unfrozen": "The clock runs again",
   "toast_weather_dynamic": "The weather changes by itself again",
