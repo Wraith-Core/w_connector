@@ -75,7 +75,21 @@ C.define('query.resources', nil, function() return op('resources.list') end)
 C.define('query.catalog', nil, function(_, ctx)
     local out = { jobs = {}, gangs = {}, items = {}, weathers = {}, horses = {}, wagons = {}, animals = {}, peds = {}, groups = {} }
     if ctx.session.allowed['player.setJob'] and hasOp('jobs.list') then local ok, list = op('jobs.list'); if ok then out.jobs = list end end
-    if ctx.session.allowed['player.giveItem'] and hasOp('items.catalog') then local ok, list = op('items.catalog'); if ok then out.items = list end end
+    if ctx.session.allowed['player.giveItem'] and hasOp('items.catalog') then
+        local ok, list = op('items.catalog')
+        -- 2.4.2: every inventory adapter answers the website panel's map { [name] = { label, weight } }; the
+        -- pages read a list (App.tsx arr()), so a map arrived as an EMPTY item picker (give item, both pages)
+        if ok and type(list) == 'table' then
+            local items = {}
+            for name, def in pairs(list) do
+                if type(name) == 'string' then
+                    items[#items + 1] = { name = name, label = type(def) == 'table' and def.label or name, weight = type(def) == 'table' and def.weight or nil }
+                elseif type(def) == 'table' and type(def.name) == 'string' then items[#items + 1] = def end
+            end
+            table.sort(items, function(a, b) return tostring(a.name) < tostring(b.name) end)
+            out.items = items
+        end
+    end
     if fw() and type(fw().consoleCatalog) == 'function' then
         local read, more = pcall(fw().consoleCatalog)
         more = read and type(more) == 'table' and more or {}

@@ -68,7 +68,10 @@ end
 local function pushSelf() if WConsoleTools then send('self', WConsoleTools.state()) end end
 local PUSH = { players = { 'query.players', 'players', 'list' }, server = { 'query.server', 'serverInfo' },
     bans = { 'query.bans', 'bans', 'list' }, catalog = { 'query.catalog', 'catalog' },
-    modules = { 'scripts.list', 'modules', 'list' }, blocks = { 'characters.blocks', 'blocks', 'list' }, map = { 'query.map', 'mapCfg' } }
+    modules = { 'scripts.list', 'modules', 'list' }, blocks = { 'characters.blocks', 'blocks', 'list' }, map = { 'query.map', 'mapCfg' },
+    -- 2.4.2: the HUD's own settings page (pages/hub ModulePage, built-in source) asks refresh('hud'); without this
+    -- entry nothing answered and the page stayed read-only, waiting for values that never came
+    hud = { 'query.hud', 'hudCfg', 'cfg' } }
 -- 2.3.1: the permissions page's data (ops/console.lua C.access): asked when the page opens, then again only
 -- when the session's accessRev changes while the console stays open
 local accessWanted, accessRev = false, nil
