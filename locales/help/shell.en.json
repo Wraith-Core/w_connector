@@ -16,6 +16,7 @@
       "settings": "Settings of this panel for you only: language, table size, help mode and motion. Nobody else is affected.",
       "kit": "A sample of every component of the panel for developers to review. It exists only in the browser copy, never on the server.",
       "news": "The news card of the pause menu (Esc in the game). Add, edit, order or delete the news here; players see a change at once, and it stays after a restart.",
+      "blips": "The blips every player sees on the game's own map: add, edit, delete and go to them. This page shows only while the w_map map script is stopped.",
       "ranks": "Staff ranks and what each one allows. Create a rank, choose its permissions, and give it to a player or take it away, online or not. Changes apply at once.",
       "reports": "The players’ reports, the same list as the website Reports page. Take, answer and close them here."
     },
@@ -82,6 +83,7 @@
         "settings": "Panel settings",
         "kit": "Component sample",
         "news": "News",
+        "blips": "Blips",
         "ranks": "Ranks",
         "reports": "Reports"
       },
@@ -101,6 +103,7 @@
         "settings": "Your language, table size and help mode.",
         "kit": "Every component of the panel on one page, for developers only.",
         "news": "The news card of the pause menu: add, edit, order and delete.",
+        "blips": "Blips on the game's own map for every player: add, edit and delete.",
         "ranks": "Ranks, their permissions and who holds them.",
         "reports": "The players’ reports: take, answer and close them."
       },

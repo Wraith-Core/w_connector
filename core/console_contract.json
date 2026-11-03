@@ -447,6 +447,18 @@
     "permission": "news.manage",
     "area": "news"
   },
+  "blips.list": {
+    "permission": "world.control",
+    "area": "blips"
+  },
+  "blips.save": {
+    "permission": "world.control",
+    "area": "blips"
+  },
+  "blips.delete": {
+    "permission": "world.control",
+    "area": "blips"
+  },
   "reports.list": {
     "permission": "reports.view",
     "area": "reports"

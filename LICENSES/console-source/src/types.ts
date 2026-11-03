@@ -38,6 +38,7 @@ export type Area =
   | 'logs'             // the admin log page (admin)
   | 'perms'            // the read-only permissions matrix (mod)
   | 'news'             // the pause menu's news (w_pausemenu): add, edit, order, delete (admin)
+  | 'blips'            // 2.4.0 · blips on the game's own map (w_connector, only while w_map is stopped)
   | 'reports'          // the players' reports, the website's list (w_connector): claim, answer, close (mod)
   | 'ranks';           // the ranks page (w_core ranks): edit ranks, give / take them (the server sends level 'master')
 /** @deprecated the old name of Area */
@@ -48,7 +49,7 @@ export type Perms = Partial<Record<Area, boolean>>;
 export type LevelsMap = Partial<Record<Area, Level>>;
 
 /** The runner kinds of w_admin:server:action (Config.ActionPerms keys) */
-export type ActionKind = 'player' | 'self' | 'server' | 'hud' | 'bans' | 'map' | 'characters' | 'scripts' | 'settings' | 'logs' | 'news';
+export type ActionKind = 'player' | 'self' | 'server' | 'hud' | 'bans' | 'map' | 'characters' | 'scripts' | 'settings' | 'logs' | 'news' | 'blips';
 /** L1 · Config.ActionPerms as sent: kind → action → area */
 export type ActionAreas = Partial<Record<ActionKind, Record<string, Area>>>;
 

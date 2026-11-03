@@ -59,11 +59,11 @@ const LEVELS: LevelsMap = {
   kick: 'mod', ban: 'admin', server: 'admin', hud: 'admin', dev: 'god', map: 'mod', bans: 'admin', resources: 'god',
   spawn: 'admin', vehicle: 'admin', entities: 'god', characters: 'admin', citizenId: 'god', charDelete: 'god',
   scripts: 'mod', scriptsRun: 'admin', scriptsConsole: 'god', settings: 'admin', settingsImport: 'god', logs: 'admin', perms: 'mod',
-  news: 'admin', ranks: 'god', reports: 'mod',
+  news: 'admin', ranks: 'god', reports: 'mod', blips: 'admin',
 };
 const ORDER: Level[] = ['mod', 'admin', 'god'];
 const atLeast = (need: Level) => ORDER.indexOf(RANK) >= ORDER.indexOf(need);
-const perms = Object.fromEntries(Object.entries(LEVELS).map(([a, lv]) => [a, atLeast(lv as Level)])) as Record<Area, boolean>;
+const perms = Object.fromEntries(Object.entries(LEVELS).map(([a, lv]) => [a, atLeast(lv as Level) && !(a === 'blips' && params.get('wmap') === '1')])) as Record<Area, boolean>;
 const ACTIONS = {
   player: { teleportTo: 'teleport', bring: 'teleport', bringBack: 'teleport', tpCoords: 'teleport', revive: 'revive', heal: 'revive', needs: 'needs', setJob: 'job', setGang: 'job', setGroup: 'job', money: 'money', giveItem: 'items', clearInventory: 'items', openInventory: 'items', kick: 'kick', ban: 'ban', freeze: 'players', spectate: 'players', notify: 'players', sitOnMount: 'players', wardrobe: 'items' },
   server: { announce: 'server', announceClear: 'server', weather: 'server', time: 'server', freezeTime: 'server', dynamicWeather: 'server', blackout: 'server', restartResource: 'resources', stopResource: 'resources', startResource: 'resources' },
@@ -73,6 +73,7 @@ const ACTIONS = {
   settings: { list: 'settings', schema: 'settings', values: 'settings', apply: 'settings', reset: 'settings', history: 'settings', export: 'settings', openPanel: 'settings', import: 'settingsImport', presets: 'settingsImport' },
   logs: { query: 'logs' },
   news: { newsList: 'news', newsSave: 'news', newsReset: 'news' },
+  blips: { list: 'blips', save: 'blips', delete: 'blips' },
   reports: { list: 'reports', stats: 'reports', claim: 'reports', resolve: 'reports', reopen: 'reports', message: 'reports' },
 };
 const COMMANDS: Record<string, Level> = { menu: 'mod', staffchat: 'mod', noclip: 'admin', announce: 'admin', warn: 'admin', bring: 'admin', bringback: 'admin', goto: 'admin', reportr: 'admin', vector3: 'god', vector4: 'god', heading: 'god' };
@@ -423,6 +424,49 @@ function newsCallback(data: Record<string, unknown>): unknown {
   return ok(STRINGS[lang].toast_news_saved, newsState());
 }
 
+/* ── 2.4.0 · map blips (ops/native_blips.lua): ?wmap=1 w_map is running (the page is hidden) · ?blips=0 none ── */
+const WMAP = params.get('wmap') === '1';
+interface MockBlip { id: string; name: string; sprite: string; color?: string; x: number; y: number; z?: number; scale: number; by?: string; at?: number }
+const BLIP_SEED: MockBlip[] = [
+  { id: 'b1', name: 'مخزن فالنتاين', sprite: 'blip_shop_store', color: 'BLIP_MODIFIER_MP_COLOR_8', x: -322.4, y: 803.1, z: 117.9, scale: 1, by: 'Wraith', at: now() - 3600 },
+  { id: 'b2', name: 'Saint Denis Bank', sprite: 'blip_proc_bank', x: 2644.6, y: -1294.2, z: 52.2, scale: 1.2, by: 'أبو فهد', at: now() - 86400 },
+  { id: 'b3', name: 'معسكر الصيادين', sprite: 'blip_camp_tent', color: 'BLIP_MODIFIER_MP_COLOR_23', x: -1640.2, y: -1366.5, scale: 0.8, by: 'Wraith', at: now() - 7200 },
+  { id: 'b4', name: 'طبيب رودس', sprite: 'blip_shop_doctor', color: 'BLIP_MODIFIER_MP_COLOR_2', x: 1369.1, y: -1309.4, z: 77.6, scale: 1, by: 'ريم', at: now() - 600 },
+];
+const blipCount = Number(params.get('blips') ?? NaN);
+let blipList: MockBlip[] = Number.isFinite(blipCount) ? BLIP_SEED.slice(0, Math.max(0, blipCount)).map((b) => ({ ...b })) : BLIP_SEED.map((b) => ({ ...b }));
+let blipSeq = 4;
+let blipRev = 1;
+const blipLimits = { name: 48, nameBytes: 128, scaleMin: 0.2, scaleMax: 2, xy: 10000, zMin: -500, zMax: 3000 };
+const blipState = () => ({ list: blipList, rev: blipRev, max: 200, limits: blipLimits });
+const blipFail = (key: string, data?: unknown) => ({ ok: false, error: STRINGS[lang][key] ?? key, errorKey: key, data });
+function blipsCallback(data: Record<string, unknown>): unknown {
+  if (WMAP) return blipFail('w_map_running');
+  if (data.action === 'list') return ok(undefined, blipState());
+  if (data.action === 'delete') {
+    if (!blipList.some((b) => b.id === data.id)) return blipFail('err_blip_gone', blipState());
+    blipList = blipList.filter((b) => b.id !== data.id);
+    blipRev += 1;
+    return ok(undefined, blipState());
+  }
+  const name = String(data.name ?? '').trim();
+  if (!name) return blipFail('err_blip_name', { field: 'name' });
+  if ([...name].length > 48) return blipFail('err_blip_name_long', { field: 'name' });
+  if (typeof data.x !== 'number' || typeof data.y !== 'number') return blipFail('err_blip_coords', { field: 'coords' });
+  const row: MockBlip = { id: '', name, sprite: String(data.sprite), color: typeof data.color === 'string' ? data.color : undefined,
+    x: data.x, y: data.y, z: typeof data.z === 'number' ? data.z : undefined, scale: Number(data.scale) || 1, by: 'Wraith', at: now() };
+  if (typeof data.id === 'string') {
+    const i = blipList.findIndex((b) => b.id === data.id);
+    if (i < 0) return blipFail('err_blip_gone', blipState());
+    blipList[i] = { ...row, id: data.id };
+  } else {
+    blipSeq += 1;
+    blipList = [...blipList, { ...row, id: `b${blipSeq}` }];
+  }
+  blipRev += 1;
+  return ok(undefined, blipState());
+}
+
 /* ── ranks (w_core ranks over server/sv_ranks.lua): every answer is the whole state ──
    the real server sends levels.ranks = 'master'; the mock keeps 'god' so ?perms=admin hides the page */
 interface MockRank { name: string; label: string; color: string; sort: number; protected: boolean; permissions: string[] }
@@ -536,6 +580,8 @@ const connectorFixture = () => {
       'characters.setJob', 'characters.setGang', 'scripts.open', 'scripts.run'].includes(name);
   const unavailable = Object.fromEntries(Object.keys(connectorContract).filter((name) => native(name)
     || game === 'gta5' && ['self.spawnHorse', 'self.healMount'].includes(name)).map((name) => [name, 'capability_missing']));
+  // 2.4.0: the blips page is RedM's and only while w_map is stopped (ops/native_blips.lua)
+  for (const name of Object.keys(connectorContract)) if (name.startsWith('blips.') && (game === 'gta5' || WMAP)) unavailable[name] = game === 'gta5' ? 'capability_missing' : 'w_map_running';
   const actions = Object.entries(connectorContract).filter(([name, def]) => !unavailable[name] && perms[def.area as Area]).map(([name]) => name);
   return { levels: undefined, admin: { id: SELF_ID, name: 'Wraith', group: L('إداري الموقع', 'Website administrator') },
     connector: { actions, unavailable, game } };
@@ -736,6 +782,8 @@ async function callback(name: string, data: Record<string, unknown>): Promise<un
       if (data.action === 'save') return ok(L('حُفظت إعدادات الواجهة', 'HUD settings saved'));
       return { ok: true };
     case 'news': return newsCallback(data);
+    case 'blips': return blipsCallback(data);
+    case 'blipsWhere': return data.what === 'waypoint' ? ok(undefined, { x: 2550.4, y: -1190.75 }) : ok(undefined, { x: -175.3, y: 626.8, z: 113.2 });
     case 'reports': return reportsCallback(data);
     case 'ranks': return ranksCallback(data);
     default:

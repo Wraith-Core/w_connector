@@ -72,6 +72,13 @@ local function package(s)
         actionAreas = actionAreas, permissions = s.permissions, accessRev = s.accessRev, self = s.source, game = WC.gameName(),
         serverName = GetConvar('sv_projectName', GetConvar('sv_hostname', 'Wraith')), lease = math.max(0, LEASE - (now() - s.at)) }
 end
+-- 2.4.0: an action's availability changed (w_map started or stopped, ops/native_blips.lua): every live lease
+-- gets its new list now, not on the next refresh, so a page that depends on it goes or comes back at once
+function C.repackage()
+    for src, s in pairs(C.sessions) do
+        if C.valid(s) then TriggerClientEvent('w_connector:console:permissions', src, package(s)) end
+    end
+end
 local function retire(s, reason)
     if not s then return end
     if C.sessions[s.source] == s then C.sessions[s.source] = nil end
@@ -252,7 +259,11 @@ RegisterNetEvent('w_connector:console:request', function(id, name, data, session
     local s = C.sessions[src]
     if not C.valid(s) or sessionNonce ~= s.nonce then retire(s); answer({ ok = false, error = 'no_session' }); return end
     if not s.allowed[name] then answer({ ok = false, error = 'no_permission' }); return end
-    if not WEB[name] and not C.available(name, src) then answer({ ok = false, error = 'capability_missing' }); return end
+    if not WEB[name] then
+        -- 2.4.0: with its reason (w_map_running), so the page can say why
+        local capable, reason = C.available(name, src)
+        if not capable then answer({ ok = false, error = 'capability_missing', data = reason and { reason = reason } or nil }); return end
+    end
     -- Read the live server through the bounded website lease. This avoids a website round trip and
     -- queue poll for each player-list refresh. Every mutation still gets a fresh website decision.
     if LOCAL_READS[name] then

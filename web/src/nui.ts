@@ -36,6 +36,9 @@ export function useConsoleCapabilities() {
 export function actionAvailable(name: string): boolean { return capabilities === null || capabilities.actions.includes(name); }
 export function actionReason(name: string): string {
   const ar = document.documentElement.lang !== 'en';
+  // 2.4.0: the blips page while w_map runs (ops/native_blips.lua)
+  if (capabilities?.unavailable?.[name] === 'w_map_running') return ar
+    ? 'سكربت الخريطة w_map يعمل الآن، فالعلامات تُدار من محرره بالأمر /mapedit.' : 'The w_map map script is running, so blips are managed in its editor (/mapedit).';
   if (capabilities?.unavailable?.[name] === 'native_permission') return ar
     ? 'تحتاج إلى صلاحية هذه الأداة في إضافة السيرفر أيضًا.' : 'This tool also requires permission in the server integration.';
   return capabilities?.unavailable?.[name]
@@ -48,7 +51,7 @@ export const isMock = (): boolean => !!(window as unknown as { __waMock?: MockHo
 
 export async function post<T = unknown>(name: string, data: unknown = {}): Promise<Result<T>> {
   const d = (data && typeof data === 'object' ? data : {}) as { action?: string; args?: { state?: boolean } };
-  const domains = ['player', 'self', 'server', 'hud', 'characters', 'scripts', 'settings', 'news', 'reports', 'ranks', 'bans', 'map'];
+  const domains = ['player', 'self', 'server', 'hud', 'characters', 'scripts', 'settings', 'news', 'reports', 'ranks', 'bans', 'map', 'blips'];
   const canonical = d.action && domains.includes(name) && !(name === 'map' && d.action === 'stopPlayers')
     ? `${name}.${d.action}` : name === 'citizen' ? 'citizen.lookup' : name === 'logs' ? 'logs.query' : null;
   const safeOff = name === 'self' && d.args?.state === false;

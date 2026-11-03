@@ -1,0 +1,71 @@
+/* ════════════════════════════════════════════════════════════════════════════
+ * w_connector · pages/blips/blips.css (2.4.0)
+ * The Blips page: the list and the editor beside it. Tokens only; the game's icons are white on the ink,
+ * a blip's colour is a small dot (the swatches are content: the game's own colours, close).
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.bl-page { display: flex; flex-direction: column; gap: .75rem; min-width: 0; }
+.bl-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: .75rem; align-items: start; }
+.bl-grid.has-editor { grid-template-columns: minmax(0, 1fr) minmax(0, 34rem); }
+.bl-col, .bl-side { min-width: 0; }
+.bl-side { position: sticky; top: 0; }
+
+/* ── the list ───────────────────────────────────────────────────────────── */
+.bl-listacts { display: inline-flex; align-items: center; gap: .75rem; }
+.bl-countline { display: inline-flex; align-items: center; gap: .25rem; font: 700 var(--fs-135)/1.4 var(--f-ui); color: var(--paper-dim); white-space: nowrap; }
+.bl-search { display: flex; margin-bottom: .75rem; max-width: 26rem; }
+.bl-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.bl-row {
+  display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) auto; gap: .875rem; align-items: center;
+  padding: .625rem; border-bottom: 1px solid var(--rule);
+  transition: background-color var(--t-fast) var(--ease);
+}
+.bl-row:first-child { border-top: 1px solid var(--rule); }
+.bl-row:hover, .bl-row.is-sel { background: var(--ink-2); }
+.bl-main { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }
+.bl-name { font: 700 var(--fs-16)/1.4 var(--f-ui); color: var(--paper); overflow-wrap: anywhere; }
+.bl-sub { display: flex; flex-wrap: wrap; gap: .25rem 1rem; font: 400 var(--fs-12)/1.5 var(--f-ui); color: var(--paper-faint); }
+.bl-sprite { direction: ltr; }
+.bl-by { font: 400 var(--fs-12)/1.5 var(--f-ui); color: var(--paper-faint); }
+.bl-acts { display: flex; align-items: center; gap: .25rem; }
+.bl-full { font: 400 var(--fs-135)/1.5 var(--f-ui); color: var(--paper-dim); }
+
+/* the game's icon (a cell of public/blips/sprites.webp) with the colour as a dot */
+.bl-icon { position: relative; display: inline-block; flex: none; justify-self: center; }
+.bl-icon-img { display: block; background-repeat: no-repeat; }
+.bl-icon-dot {
+  position: absolute; inset-inline-end: -3px; bottom: -3px; width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid var(--ink);
+}
+
+/* ── the editor ─────────────────────────────────────────────────────────── */
+.bl-form { display: flex; flex-direction: column; gap: 1rem; }
+.bl-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+.bl-count { font: 700 var(--fs-12)/1.4 var(--f-ui); color: var(--paper-faint); white-space: nowrap; }
+.bl-count.is-over { color: var(--paper); }
+.bl-count.is-over::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-inline-end: .375em; vertical-align: .1em; background: var(--red); }
+.bl-where { display: inline-flex; gap: .25rem; }
+.bl-apply { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; padding-top: .25rem; }
+.bl-why { font: 400 var(--fs-135)/1.5 var(--f-ui); color: var(--paper-dim); }
+
+/* the options of the icon and colour lists */
+.bl-opt { display: inline-flex; align-items: center; gap: .625rem; min-width: 0; }
+.bl-opt-img { display: block; flex: none; background-repeat: no-repeat; }
+.bl-swatch { display: block; flex: none; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--rule-2); }
+.bl-swatch.is-none { background: transparent; border-style: dashed; }
+
+/* the preview: the icon on a dark plate the size the map draws it */
+.bl-pv { margin-top: 1.25rem; display: flex; flex-direction: column; gap: .5rem; }
+.bl-pv-head { display: inline-flex; align-items: center; gap: .25rem; font: 700 var(--fs-135)/1.4 var(--f-ui); color: var(--paper-dim); }
+.bl-pv-map {
+  display: flex; align-items: center; justify-content: center; gap: .75rem; min-height: 6rem; padding: 1rem;
+  background: var(--ink-3); border: 1px solid var(--rule);
+}
+.bl-pv-name { font: 700 var(--fs-14)/1.4 var(--f-ui); color: var(--paper); overflow-wrap: anywhere; }
+.bl-pv-none { width: 32px; height: 32px; border: 1px dashed var(--rule-2); border-radius: 50%; }
+
+@media (max-width: 1200px) {
+  .bl-grid.has-editor { grid-template-columns: minmax(0, 1fr); }
+  .bl-side { position: static; }
+  .bl-pair { grid-template-columns: minmax(0, 1fr); }
+}

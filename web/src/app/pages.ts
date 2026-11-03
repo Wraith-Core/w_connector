@@ -28,7 +28,7 @@ export const NAV_SECTIONS: readonly NavSection[] = ['overview', 'people', 'world
 /** The pages of the redesign (any other folder name works too) */
 export type KnownPageId =
   | 'dashboard' | 'players' | 'characters' | 'bans' | 'map' | 'world' | 'tools'
-  | 'hub' | 'resources' | 'perms' | 'log' | 'settings' | 'news' | 'ranks';
+  | 'hub' | 'resources' | 'perms' | 'log' | 'settings' | 'news' | 'ranks' | 'blips';
 export type PageId = KnownPageId | (string & {});
 
 export interface PageProps {

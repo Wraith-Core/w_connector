@@ -29,7 +29,12 @@ local function send(action, data) SendNUIMessage({ action = action, data = data 
 local function foreign() local inv = GetInvokingResource(); return inv ~= nil and inv ~= GetCurrentResourceName() end
 local function finish(r)
     if type(r) ~= 'table' then return { ok = false, error = ERRORS[lang].failed } end
-    if not r.ok then local key = tostring(r.error or 'failed'); r.errorKey = key; r.error = ERRORS[lang][key] or strings()[key] or ERRORS[lang].failed end
+    if not r.ok then
+        local key = tostring(r.error or 'failed'); r.errorKey = key
+        -- 2.4.0: an unavailable action says why when the server names a reason with a text (w_map_running)
+        local why = key == 'capability_missing' and type(r.data) == 'table' and type(r.data.reason) == 'string' and strings()[r.data.reason] or nil
+        r.error = why or ERRORS[lang][key] or strings()[key] or ERRORS[lang].failed
+    end
     if r.ok and type(r.data) == 'table' and r.data.banId and r.data.kicked == false then
         send('toast', { type = 'info', text = lang == 'ar' and 'تم حفظ الحظر. تعذر فصل جلسة اللاعب الحالية؛ تحقق من قائمة اللاعبين.' or 'The ban was saved. The current connection could not be removed; check the player list.' })
     end
@@ -262,7 +267,8 @@ local function forward(kind, data, cb)
         cb(r)
     end)
 end
-for _, kind in ipairs({ 'player', 'self', 'server', 'hud', 'characters', 'scripts', 'settings', 'news', 'reports', 'ranks', 'bans' }) do
+-- 2.4.0: 'blips' (ops/native_blips.lua, the page in web/src/pages/blips)
+for _, kind in ipairs({ 'player', 'self', 'server', 'hud', 'characters', 'scripts', 'settings', 'news', 'reports', 'ranks', 'bans', 'blips' }) do
     RegisterNUICallback(kind, function(data, cb) forward(kind, data, cb) end)
 end
 RegisterNUICallback('citizen', function(data, cb) C.ask('citizen.lookup', { input = data.input }, cb) end)

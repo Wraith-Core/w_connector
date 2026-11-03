@@ -5,7 +5,7 @@ rdr3_warning 'I acknowledge that this is a prerelease build of RedM, and I am aw
 
 name 'w_connector'
 author 'Wraith Studio'
-version '2.3.1'
+version '2.4.0'
 description 'Wraith Connector v2 — links a FiveM or RedM server to its Wraith control panel.'
 
 -- The website bridge, join queue and /wadmin menu share this resource.
@@ -30,7 +30,7 @@ dependencies { 'oxmysql' }
 ui_page 'web/build/index.html'
 files { 'web/build/**/*', 'nui/capture.html', 'nui/spectate.js', 'core/console_contract.json', 'core/console_models.json', 'locales/ar.json', 'locales/en.json' }
 
-client_scripts { 'client/cl_actions.lua', 'client/cl_death.lua', 'client/cl_spectate.lua', 'client/cl_map.lua', 'client/cl_console.lua', 'client/cl_menu_self.lua', 'client/cl_console_tools.lua' }
+client_scripts { 'client/cl_actions.lua', 'client/cl_death.lua', 'client/cl_spectate.lua', 'client/cl_map.lua', 'client/cl_console.lua', 'client/cl_menu_self.lua', 'client/cl_console_tools.lua', 'client/cl_blips.lua' }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
@@ -71,6 +71,7 @@ server_scripts {
     'ops/native_characters.lua',
     'ops/native_settings.lua',
     'ops/native_news.lua',
+    'ops/native_blips.lua',     -- 2.4.0: map blips on the game's own map, while w_map is not running
     'core/scripts_registry.lua',
     'ops/native_scripts.lua',
     'ops/native_player.lua',

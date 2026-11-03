@@ -111,6 +111,14 @@
     "permission": "players.warn",
     "area": "players"
   },
+  "player.warn": {
+    "permission": "players.warn",
+    "area": "players"
+  },
+  "staff.chat": {
+    "permission": "staffchat.use",
+    "area": "perms"
+  },
   "player.sitOnMount": {
     "permission": "players.manage",
     "area": "players"
@@ -438,6 +446,18 @@
   "news.newsReset": {
     "permission": "news.manage",
     "area": "news"
+  },
+  "blips.list": {
+    "permission": "world.control",
+    "area": "blips"
+  },
+  "blips.save": {
+    "permission": "world.control",
+    "area": "blips"
+  },
+  "blips.delete": {
+    "permission": "world.control",
+    "area": "blips"
   },
   "reports.list": {
     "permission": "reports.view",
