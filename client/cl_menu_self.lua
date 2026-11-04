@@ -173,11 +173,20 @@ local function teleport(x, y, z)
 end
 
 local function waypoint()
-    if not IsWaypointActive() then return nil end
     if GAME == 'redm' then
-        local c = GetWaypointCoords()
-        return c and c.x, c and c.y
+        if IsWaypointActive() then
+            local c = GetWaypointCoords()
+            return c and c.x, c and c.y
+        end
+        -- 2.4.4: w_map draws its waypoint as its own GPS blip, not the game's waypoint (IsWaypointActive stays
+        -- false), so "teleport to waypoint" said "set a waypoint first" with one on the map. Ask w_map for it.
+        if GetResourceState('w_map') == 'started' then
+            local ok, w = pcall(function() return exports.w_map:GetWaypoint() end)
+            if ok and type(w) == 'table' and tonumber(w.x) and tonumber(w.y) then return tonumber(w.x), tonumber(w.y) end
+        end
+        return nil
     end
+    if not IsWaypointActive() then return nil end
     local c = GetBlipInfoIdCoord(GetFirstBlipInfoId(8))
     return c.x, c.y
 end

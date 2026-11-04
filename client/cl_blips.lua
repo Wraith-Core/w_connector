@@ -62,8 +62,13 @@ end)
 RegisterNUICallback('blipsWhere', function(data, cb)
     if not WMenu or not WMenu.open then cb({ ok = false, errorKey = 'no_session' }); return end
     if type(data) == 'table' and data.what == 'waypoint' then
-        if not IsWaypointActive() then cb({ ok = false, errorKey = 'err_no_waypoint' }); return end
-        local c = GetWaypointCoords()
+        local c = IsWaypointActive() and GetWaypointCoords() or nil
+        -- 2.4.4: w_map's waypoint is its own GPS blip, not the game's waypoint: ask w_map for it too
+        if not c and GetResourceState('w_map') == 'started' then
+            local ok, w = pcall(function() return exports.w_map:GetWaypoint() end)
+            if ok and type(w) == 'table' and tonumber(w.x) and tonumber(w.y) then c = { x = tonumber(w.x), y = tonumber(w.y) } end
+        end
+        if not c then cb({ ok = false, errorKey = 'err_no_waypoint' }); return end
         local found, z = GetGroundZFor_3dCoord(c.x + 0.0, c.y + 0.0, 1000.0, false)
         cb({ ok = true, data = { x = c.x, y = c.y, z = found and z or nil } })
         return
