@@ -22,13 +22,16 @@ import { post, useLuaMessage } from '../../nui';
 import type { Result } from '../../types';
 import { COLORS, SPRITES, checkDraft, cleanName, colorOf, draftOf, sameDraft, spriteLabel, spriteStyle, toState, wireOf } from './model';
 import type { Blip, BlipsState, Draft } from './model';
+import { wsScale } from '../../wsScale';
 
 interface Editing { id: string | null; start: Draft; draft: Draft }
 
+/** `size` in design px (1080p); spriteStyle multiplies it by the screen scale */
 function Icon({ sprite, color, size }: { sprite: string; color?: string; size: number }) {
   const c = colorOf(color);
+  const px = Math.max(1, Math.round(size * wsScale()));
   return (
-    <span className="bl-icon" style={{ width: size, height: size }} aria-hidden="true">
+    <span className="bl-icon" style={{ width: px, height: px }} aria-hidden="true">
       <span className="bl-icon-img" style={spriteStyle(sprite, size)} />
       {c && <span className="bl-icon-dot" style={{ background: c.hex }} />}
     </span>

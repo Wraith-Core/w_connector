@@ -4,7 +4,10 @@
  * CEF target is Chrome 87: no :has(), no container queries, no aspect-ratio, no :is().
  * ════════════════════════════════════════════════════════════════════════════ */
 
-html { font-size: clamp(13px, 1.48vh, 24px); }
+/* 1rem = 16 design px: by height, and on a screen narrower than 16:9 (4:3, 16:10) by width, like --ws-px,
+   but never below 0.8 of the height there (1.1852vh = the --ws-fpx text floor; the narrow layouts take over).
+   ui-scale.cjs turns the caps into 13 / 24 x the screen scale, so the middle term wins from 720p to 8K. */
+html { font-size: clamp(13px, min(1.48vh, max(.8333vw, 1.1852vh)), 24px); }
 html, body, #root { width: 100%; height: 100%; overflow: hidden; margin: 0; padding: 0; }
 body { user-select: none; -webkit-font-smoothing: antialiased; font-synthesis: none; }
 

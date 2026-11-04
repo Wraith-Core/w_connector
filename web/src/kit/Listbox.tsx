@@ -17,6 +17,7 @@ import { useField } from './Field';
 import { cls } from './format';
 import { useLock } from './Gate';
 import Glyph from './Glyph';
+import { wsScale } from '../wsScale';
 
 export interface Option<V extends string = string> {
   value: V;
@@ -59,11 +60,13 @@ function usePosition(anchor: HTMLElement | null, open: boolean) {
     const calc = () => {
       const r = anchor.getBoundingClientRect();
       const vh = window.innerHeight;
-      const below = vh - r.bottom - 12;
-      const above = r.top - 12;
-      const up = below < 220 && above > below;
-      const maxH = Math.max(140, Math.min(360, up ? above : below));
-      setPos({ top: up ? r.top - 4 : r.bottom + 4, left: r.left, width: Math.max(r.width, 200), maxH, up });
+      /* design px (1080p) x the screen scale, like the CSS (ui-scale.cjs) */
+      const k = wsScale();
+      const below = vh - r.bottom - 12 * k;
+      const above = r.top - 12 * k;
+      const up = below < 220 * k && above > below;
+      const maxH = Math.max(140 * k, Math.min(360 * k, up ? above : below));
+      setPos({ top: up ? r.top - 4 * k : r.bottom + 4 * k, left: r.left, width: Math.max(r.width, 200 * k), maxH, up });
     };
     calc();
     window.addEventListener('resize', calc);
