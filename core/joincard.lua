@@ -47,12 +47,12 @@ function JoinCard.render(c)
         .. 'background:rgba(255,255,255,0.05);border-%s:4px solid %s;line-height:1.85;font-size:16px;color:#e6e6e6">')
         :format(rtl and 'rtl' or 'ltr', side, side, accent)
     if c.title and c.title ~= '' then
-        h[#h + 1] = ('<div style="font-size:21px;font-weight:700;color:#ffffff;margin-bottom:6px">%s %s</div>')
+        h[#h + 1] = ('<div style="font-size:22px;line-height:1.6;font-weight:700;color:#ffffff;margin-bottom:8px">%s %s</div>')
             :format(ICONS[c.tone] or ICONS.error, esc(c.title))
     end
     local body = type(c.body) == 'table' and c.body or { c.body }
     for _, text in ipairs(body) do
-        if text and text ~= '' then h[#h + 1] = ('<div style="color:#d2d2d2">%s</div>'):format(esc(text)) end
+        if text and text ~= '' then h[#h + 1] = ('<div style="color:#d2d2d2;font-size:16px;line-height:1.9">%s</div>'):format(esc(text)) end
     end
     if type(c.facts) == 'table' and #c.facts > 0 then
         h[#h + 1] = '<div style="margin-top:10px">'
@@ -62,20 +62,20 @@ function JoinCard.render(c)
                     .. 'padding:1px 8px;border-radius:5px;color:#ffffff">%s</span>'):format(esc(f[2]))
                 -- plaintext: a date reads left to right, an Arabic reason right to left
                 or ('<strong style="color:#ffffff;unicode-bidi:plaintext">%s</strong>'):format(esc(f[2]))
-            h[#h + 1] = ('<div><span style="color:#9c9c9c">%s:</span> %s</div>'):format(esc(f[1]), value)
+            h[#h + 1] = ('<div style="font-size:16px;line-height:2"><span style="color:#9c9c9c">%s:</span> %s</div>'):format(esc(f[1]), value)
         end
         h[#h + 1] = '</div>'
     end
     if type(c.steps) == 'table' and #c.steps > 0 then
         if c.stepsTitle then
-            h[#h + 1] = ('<div style="margin-top:12px;font-weight:700;color:%s">%s</div>'):format(accent, esc(c.stepsTitle))
+            h[#h + 1] = ('<div style="margin-top:12px;font-size:16px;line-height:1.9;font-weight:700;color:%s">%s</div>'):format(accent, esc(c.stepsTitle))
         end
         h[#h + 1] = ('<ol style="margin:4px 0 0;padding-%s:24px;padding-%s:0">'):format(side, rtl and 'left' or 'right')
-        for _, s in ipairs(c.steps) do h[#h + 1] = ('<li style="margin:2px 0">%s</li>'):format(esc(s)) end
+        for _, s in ipairs(c.steps) do h[#h + 1] = ('<li style="margin:4px 0;font-size:16px;line-height:1.9">%s</li>'):format(esc(s)) end
         h[#h + 1] = '</ol>'
     end
     if c.note and c.note ~= '' then
-        h[#h + 1] = ('<div style="margin-top:12px;font-size:13px;color:#9c9c9c">%s</div>'):format(esc(c.note))
+        h[#h + 1] = ('<div style="margin-top:12px;font-size:14px;line-height:1.8;color:#9c9c9c">%s</div>'):format(esc(c.note))
     end
     h[#h + 1] = '</div>'
     return (table.concat(h):gsub('\r?\n', '<br>'))
