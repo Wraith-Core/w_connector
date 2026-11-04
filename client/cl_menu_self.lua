@@ -142,35 +142,90 @@ local function setNoclip(on)
 end
 
 -- ── Teleports ─────────────────────────────────────────────────────────────────────────────────────
-local function groundAt(x, y)
-    local e = ped()
-    for h = 950.0, 0.0, -50.0 do
-        RequestCollisionAtCoord(x, y, h)
-        SetEntityCoordsNoOffset(e, x, y, h, false, false, false)
-        Wait(50)
-        local found, z = GetGroundZFor_3dCoord(x, y, h, false)
-        if found then return z end
+-- 2.4.4 (owner 2026-11-04: "teleport everything the way txAdmin does"): txAdmin's method (monitor resource,
+-- menu/client/cl_main_page.lua handleTpNormally + cl_functions.lua FindZForCoords, MIT): fade out, the ped, its
+-- horse and its vehicle lifted to the spot and frozen, wait for the world collision, the ground read from the sky
+-- down (five tries, half a second apart), set down 0.5 m above it, released, camera behind the ped, fade in.
+-- The old way walked the ped down in 50 m steps on screen and often missed the ground.
+local function findZ(x, y)
+    local found, z, START = true, 1500.0, 1500.0
+    while found and z > 0 do
+        local hit, gz = GetGroundZAndNormalFor_3dCoord(x + 0.0, y + 0.0, z - 1.0)
+        if hit then z = gz + 0.0 end
+        found = hit
+        Wait(0)
     end
-    return nil
+    if z == START then return nil end
+    return z + 0.0
 end
 
-local function teleport(x, y, z)
-    WMenu.remember()
-    local e = flyingEntity()
-    FreezeEntityPosition(e, true)
+local function place(e, x, y, z)
+    SetEntityCoords(e, x + 0.0, y + 0.0, z + 0.0, false, false, false, false)
+end
+
+--- x, y, z (z nil = the ground there); opts.heading, opts.remember (default true). -> true | false (no ground)
+local function teleport(x, y, z, opts)
+    opts = opts or {}
+    x, y, z = tonumber(x), tonumber(y), tonumber(z)
+    if not x or not y then return false end
+    if opts.remember ~= false then WMenu.remember() end
+    local from = GetEntityCoords(ped())
+    DoScreenFadeOut(500)
+    local fade = GetGameTimer() + 2000
+    while not IsScreenFadedOut() and GetGameTimer() < fade do Wait(0) end
+
+    local p = ped()
+    local veh = GetVehiclePedIsIn(p, false)
+    if veh ~= 0 and GetPedInVehicleSeat(veh, -1) ~= p then veh = 0 end -- a passenger moves alone
+    local horse = (GAME == 'redm' and IsPedOnMount(p)) and GetMount(p) or 0
+    SetEntityInvincible(p, true)
+    -- lifted to the spot and held while the world there loads
+    local hold = z or 100.0
+    RequestCollisionAtCoord(x + 0.0, y + 0.0, hold + 0.0)
+    if horse ~= 0 then place(horse, x, y, hold) FreezeEntityPosition(horse, true) end
+    if veh ~= 0 then
+        SetEntityCollision(veh, false, false)
+        place(veh, x, y, hold)
+        SetPedIntoVehicle(p, veh, -1)
+        FreezeEntityPosition(veh, true)
+    else
+        place(p, x, y, hold)
+    end
+    FreezeEntityPosition(p, true)
+    local wait = GetGameTimer() + 5000
+    while IsEntityWaitingForWorldCollision(p) and GetGameTimer() < wait do Wait(100) end
+
     if not z then
-        z = groundAt(x, y)
-        if not z then
-            SetEntityCoordsNoOffset(e, back.x, back.y, back.z, false, false, false)
-            FreezeEntityPosition(e, state.frozen)
-            return false
+        for _ = 1, 5 do
+            z = findZ(x, y)
+            if z then break end
+            Wait(500)
         end
     end
-    RequestCollisionAtCoord(x, y, z)
-    SetEntityCoordsNoOffset(e, x, y, z + 1.0, false, false, false)
-    FreezeEntityPosition(e, e == ped() and state.frozen or false)
-    return true
+    local ok = z ~= nil
+    if not ok then x, y, z = from.x, from.y, from.z - 0.5 end -- no ground there: back where he stood
+
+    p = ped()
+    if horse ~= 0 then place(horse, x, y, z + 0.5) FreezeEntityPosition(horse, false) end
+    if veh ~= 0 then
+        place(veh, x, y, z + 0.5)
+        SetPedIntoVehicle(p, veh, -1)
+        if GAME == 'fivem' then SetVehicleOnGroundProperly(veh) end
+        SetEntityCollision(veh, true, true)
+        FreezeEntityPosition(veh, false)
+    elseif horse == 0 then
+        place(p, x, y, z + 0.5)
+    end
+    if tonumber(opts.heading) then SetEntityHeading(horse ~= 0 and horse or veh ~= 0 and veh or p, tonumber(opts.heading) + 0.0) end
+    FreezeEntityPosition(p, state.frozen)
+    SetEntityInvincible(p, state.godmode)
+    -- the camera behind the ped again
+    if GAME == 'fivem' then SetGameplayCamRelativeHeading(0.0)
+    else Citizen.InvokeNative(0x14F3947318CA8AD2, 0.0, 0.0) end
+    DoScreenFadeIn(500)
+    return ok
 end
+WMenu.teleport = teleport
 
 local function waypoint()
     if GAME == 'redm' then

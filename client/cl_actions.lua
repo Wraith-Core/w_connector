@@ -54,6 +54,12 @@ EFFECTS.teleport = function(data)
     data = type(data) == 'table' and data or {}
     local x, y, z = tonumber(data.x), tonumber(data.y), tonumber(data.z)
     if not (x and y and z) then return end
+    -- 2.4.4: one teleport for everything, txAdmin's way (client/cl_menu_self.lua WMenu.teleport): the horse or
+    -- wagon comes along, the world waits to load, the camera turns behind him
+    if WMenu and WMenu.teleport then
+        WMenu.teleport(x, y, z, { heading = tonumber(data.h), remember = false })
+        return
+    end
     local ped = myPed()
 
     DoScreenFadeOut(500)

@@ -6,8 +6,7 @@
  * No emblem: the wordmark "WRAITH" and the title are the only brand.
  *   ↑ ↓ move between the rows · Enter runs · Esc / PgUp close · F10 the full panel (App.tsx)
  * 2.3.0 the board look (w_housing / w_pets): the masthead over a torn card and an actions strip; 1-7 open the
- * sections, a "recent" row keeps the last tools (and the pinned ones first) one click or Alt+number away.
- * Recent and pinned live in this viewer's localStorage only (w_admin:quick.recent / w_admin:quick.pins).
+ * sections. 2.4.4 (owner 2026-11-04): the "recent" row, its pins and Alt+number are gone.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -19,7 +18,7 @@ import { useI18n } from '../i18n';
 import { Button, Glyph, HelpTip, IconButton, Tabs, TextInput, cls, isTypingTarget } from '../kit';
 import { ClearAreaForm, CoordsJump, NoclipSpeed, SpawnForm } from '../pages/tools/forms';
 import {
-  TOOLS, activeTools, bundledT, canTool, isOn, toolById, toolHint, toolLabel, useToolRunner,
+  TOOLS, activeTools, bundledT, canTool, isOn, toolHint, toolLabel, useToolRunner,
 } from '../pages/tools/tools';
 import type { ToolDef, ToolRunner, ToolSection } from '../pages/tools/tools';
 import { WorldControls } from '../pages/world/WorldControls';
@@ -42,34 +41,6 @@ const GROUPS: { id: QuickGroup; help: HelpKey; visible(app: AppCtx): boolean }[]
 const groupOf = (s: ToolSection): QuickGroup => (s === 'me' || s === 'health' ? 'self' : s);
 
 const norm = (s: string) => s.toLocaleLowerCase().normalize('NFKD').replace(/[ً-ٰٟ]/g, '');
-
-/* ── 2.3.0 recent and pinned tools (this viewer only) ─────────────────────── */
-const LS_RECENT = 'w_admin:quick.recent';
-const LS_PINS = 'w_admin:quick.pins';
-const ROW_MAX = 6;
-const readIds = (key: string): string[] => {
-  try {
-    const v = JSON.parse(localStorage.getItem(key) ?? '[]') as unknown;
-    return Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!toolById(x)).slice(0, ROW_MAX) : [];
-  } catch { return []; }
-};
-const writeIds = (key: string, ids: string[]) => { try { localStorage.setItem(key, JSON.stringify(ids)); } catch { /* optional */ } };
-
-function useToolMemory() {
-  const [recent, setRecent] = useState<string[]>(() => readIds(LS_RECENT));
-  const [pins, setPins] = useState<string[]>(() => readIds(LS_PINS));
-  const remember = useCallback((id: string) => setRecent((l) => {
-    const next = [id, ...l.filter((x) => x !== id)].slice(0, ROW_MAX);
-    writeIds(LS_RECENT, next);
-    return next;
-  }), []);
-  const togglePin = useCallback((id: string) => setPins((l) => {
-    const next = l.includes(id) ? l.filter((x) => x !== id) : [...l, id].slice(-ROW_MAX);
-    writeIds(LS_PINS, next);
-    return next;
-  }), []);
-  return { recent, pins, remember, togglePin };
-}
 
 /** One tool as a full-width row: name + one line, and "مفعّل / متوقف" (toggles) or an arrow (actions) */
 function QuickTool({ tool, runner, onOpen, onRun, pinned, onPin }: {
@@ -126,7 +97,6 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
   const app = useApp();
   const { t, rtl, lang } = useI18n();
   const runner = useToolRunner();
-  const memory = useToolMemory();
   const [group, setGroup] = useState<QuickGroup>('self');
   const [search, setSearch] = useState('');
   const root = useRef<HTMLDivElement>(null);
@@ -153,29 +123,18 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
   const active = activeTools(app.self);
   const spectating = app.self?.spectating ?? 0;
 
-  /* the recent row: pinned first, then the last used, only the tools this admin may run */
-  const runTool = useCallback((x: ToolDef) => { memory.remember(x.id); runner.run(x); }, [memory, runner]);
-  const rowIds = [...memory.pins, ...memory.recent.filter((id) => !memory.pins.includes(id))].slice(0, ROW_MAX);
-  const rowTools = rowIds.map((id) => toolById(id)).filter((x): x is ToolDef => !!x && x.kind !== 'form' && allowed(x));
+  const runTool = useCallback((x: ToolDef) => { runner.run(x); }, [runner]);
 
-  /* 1-7 open the sections, Alt+1-6 run a tool of the recent row (never while typing) */
-  const keysRef = useRef({ groups, rowTools, runTool });
-  keysRef.current = { groups, rowTools, runTool };
+  /* 1-7 open the sections (never while typing) */
+  const keysRef = useRef({ groups });
+  keysRef.current = { groups };
   useEffect(() => {
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.defaultPrevented || e.repeat || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (e.defaultPrevented || e.repeat || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
       const m = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
       if (!m || isTypingTarget(e.target) || document.querySelector('.k-dialog-veil, .k-pop')) return;
       const n = Number(m[1]) - 1;
-      const k = keysRef.current;
-      if (e.altKey) {
-        const x = k.rowTools[n];
-        if (!x) return;
-        e.preventDefault();
-        k.runTool(x);
-        return;
-      }
-      const g = k.groups[n];
+      const g = keysRef.current.groups[n];
       if (!g) return;
       e.preventDefault();
       setGroup(g.id);
@@ -200,7 +159,7 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
   };
 
   const list = (tools: ToolDef[]) => tools.map((x) => (
-    <QuickTool key={x.id} tool={x} runner={runner} onRun={runTool} pinned={memory.pins.includes(x.id)} onPin={memory.togglePin} />
+    <QuickTool key={x.id} tool={x} runner={runner} onRun={runTool} />
   ));
 
   let body;
@@ -213,8 +172,6 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
             tool={x}
             runner={runner}
             onRun={runTool}
-            pinned={memory.pins.includes(x.id)}
-            onPin={memory.togglePin}
             onOpen={x.kind === 'form' ? () => { setGroup(groupOf(x.section)); setSearch(''); } : undefined}
           />
         ))}
@@ -285,38 +242,6 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
           label={t(group === 'players' ? 'label.quick.searchPlayers' : 'label.quick.search')}
           help="help.quick.search"
         />
-      </div>
-
-      <div className="q-recent" role="group" aria-label={t('label.quick.recent')}>
-        <span className="q-recent-head">
-          <span>{t('label.quick.recent')}</span>
-          <HelpTip help="help.quick.recent" label={t('label.quick.recent')} size="sm" />
-        </span>
-        <div className="q-recent-row">
-          {rowTools.map((x, i) => {
-            const on = isOn(x, app.self);
-            return (
-              <Button
-                key={x.id}
-                help={x.help}
-                helpQuiet
-                helpLabel={toolLabel(t, x.id)}
-                area={x.area}
-                size="sm"
-                kind={x.kind === 'toggle' && on ? 'primary' : 'secondary'}
-                kbd={`Alt ${i + 1}`}
-                className={cls('q-chip', memory.pins.includes(x.id) && 'is-pinned')}
-                aria-pressed={x.kind === 'toggle' ? on : undefined}
-                busy={runner.busy === x.id}
-                disabled={!!runner.busy && runner.busy !== x.id}
-                onClick={() => runTool(x)}
-              >
-                {toolLabel(t, x.id)}
-              </Button>
-            );
-          })}
-          {rowTools.length === 0 && <span className="q-recent-empty">{t('label.quick.recentEmpty')}</span>}
-        </div>
       </div>
 
       <Tabs
