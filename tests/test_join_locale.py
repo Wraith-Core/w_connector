@@ -3,7 +3,9 @@ from pathlib import Path
 import unittest
 from lupa import lua54
 
-SOURCE = (Path(__file__).resolve().parents[1] / 'core/join.lua').read_text(encoding='utf-8-sig')
+ROOT = Path(__file__).resolve().parents[1]
+# join.lua draws its refusals with core/joincard.lua (2.4.4), loaded before it as in fxmanifest.lua
+SOURCE = '\n'.join((ROOT / f).read_text(encoding='utf-8-sig') for f in ('core/joincard.lua', 'core/join.lua'))
 
 class JoinTests(unittest.TestCase):
     def run_flow(self, lang, linked=True, denied=False, full=False):
@@ -96,5 +98,34 @@ D={defer=function() end,update=function(s) UPDATES[#UPDATES+1]=s end,done=functi
     def test_player_who_leaves_is_not_answered(self):
         lua = self.run_wait([{'status': 'pending'}], leave_after=1)
         self.assertEqual(lua.eval('#DONE'), 0)
+
+
+class JoinCardTests(unittest.TestCase):
+    """2.4.4: refusals are one right-to-left HTML card (RedM's dialog renders HTML, turns each newline into <br>)."""
+    def setUp(self):
+        self.lua = lua54.LuaRuntime()
+        self.lua.execute((ROOT / 'core/joincard.lua').read_text(encoding='utf-8-sig'))
+
+    def test_card_is_one_line_rtl_and_escaped(self):
+        html = self.lua.eval("JoinCard.render({ tone = 'ban', title = 'أنت محظور', facts = { { 'السبب', '<b>x</b>\\nسطر' }, { 'رقم', '7', code = true } } })")
+        self.assertNotIn('\n', html)
+        self.assertIn('direction:rtl', html)
+        self.assertIn('&lt;b&gt;x&lt;/b&gt;<br>سطر', html)
+        self.assertNotIn('<b>x', html)
+
+    def test_english_card_is_left_to_right(self):
+        self.assertIn('direction:ltr', self.lua.eval("JoinCard.render({ title = 'Closed', body = 'Try later.' })"))
+
+    def test_progress_line_isolates_arabic_only(self):
+        self.assertEqual(self.lua.eval("JoinCard.line('Checking…')"), 'Checking…')
+        self.assertEqual(self.lua.eval("JoinCard.line('أ\\nب')"), '⁧أ⁩\n⁧ب⁩')
+
+    def test_the_three_copies_are_equal(self):
+        here = (ROOT / 'core/joincard.lua').read_bytes()
+        for other in ('w_core/server/joincard.lua', 'w_guard/server/joincard.lua'):
+            path = ROOT.parent / other
+            if path.exists():
+                self.assertEqual(path.read_bytes(), here, other)
+
 
 if __name__ == '__main__': unittest.main()

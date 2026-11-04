@@ -10,7 +10,8 @@
 
 .sh-root {
   position: absolute;
-  inset: 1.25rem 1.75rem 1.5rem;
+  /* ultrawide: inside the centred 16:9 frame (--ws-gutter, ui-scale.cjs), never stretched across 32:9 */
+  inset: 1.25rem calc(1.75rem + var(--ws-gutter)) 1.5rem;
   display: grid;
   grid-template-columns: var(--side) minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);

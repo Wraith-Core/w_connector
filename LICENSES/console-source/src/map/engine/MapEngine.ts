@@ -19,13 +19,19 @@
  * ═══ The coordinates ═══
  *
  *   The map is one image whose size is proj.image at refZoom. The position = a pixel in it (cx, cy),
- *   and the zoom is fractional. The screen scale s = 2^(zoom - refZoom):
+ *   and the zoom is fractional. The screen scale s = k . 2^(zoom - refZoom):
  *       screen = (px - c) . s + the centre of the screen
  *   And the game <-> the pixel through Projection.
+ *
+ *   k = wsScale() (the console's screen scale: 1 at 1080p, 2 at 4K, 4 at 8K, the height on an ultrawide),
+ *   so one zoom shows the same piece of the map on every screen, as the CSS around it does. The tile
+ *   level follows the real pixels (zoom + log2 k, at most one level finer: tiles as sharp as at 4K), so a
+ *   big screen is not drawn from blurred tiles nor asks for 16x the tiles at 8K.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 import { Projection, type ProjectionCfg } from './coords';
 import { TileCache } from './tiles';
+import { wsScale } from '../../wsScale';
 
 const TILE_DEFAULT = 512;
 
@@ -99,6 +105,9 @@ export class MapEngine {
 
   private W = 1;
   private H = 1;
+  /** The screen scale (wsScale) and the tile-level shift it gives (log2, capped at 1). */
+  private k = 1;
+  private lk = 0;
 
   private cx: number;
   private cy: number;
@@ -205,6 +214,8 @@ export class MapEngine {
     /* NUI is already drawn at the game's resolution: no devicePixelRatio doubling. */
     this.W = w;
     this.H = h;
+    this.k = wsScale();
+    this.lk = clamp(Math.log2(this.k), 0, 1);
     this.canvas.width = w;
     this.canvas.height = h;
     this.canvas.style.width = `${w}px`;
@@ -228,13 +239,13 @@ export class MapEngine {
   }
 
   private scaleAt(zoom: number): number {
-    return Math.pow(2, zoom - this.proj.cfg.refZoom);
+    return this.k * Math.pow(2, zoom - this.proj.cfg.refZoom);
   }
 
   /** The lowest zoom at which the paper covers the whole view - never any bare edges. */
   minZoom(): number {
     const [iw, ih] = this.proj.cfg.image;
-    const cover = this.proj.cfg.refZoom + Math.log2(Math.max((this.W + 2) / iw, (this.H + 2) / ih));
+    const cover = this.proj.cfg.refZoom + Math.log2(Math.max((this.W + 2) / iw, (this.H + 2) / ih) / this.k);
     return clamp(Math.max(cover, this.tileMin - 1), this.tileMin - 1, this.viewMax);
   }
 
@@ -307,7 +318,7 @@ export class MapEngine {
 
   /** Ask for the tiles of a view we have not reached yet, so they arrive before the motion ends. */
   private prefetchAt(px: number, py: number, zoom: number): void {
-    const tz = clamp(Math.round(zoom), this.tileMin, this.tileMax);
+    const tz = clamp(Math.round(zoom + this.lk), this.tileMin, this.tileMax);
     const s = this.scaleAt(zoom);
     const tileMap = this.tile * Math.pow(2, this.proj.cfg.refZoom - tz);
     const [iw, ih] = this.proj.cfg.image;
@@ -497,7 +508,7 @@ export class MapEngine {
     const p = this.local(ev);
     const dx = p.x - this.down.x;
     const dy = p.y - this.down.y;
-    if (this.down.moved || Math.hypot(dx, dy) > 4) {
+    if (this.down.moved || Math.hypot(dx, dy) > 4 * this.k) {
       this.down.moved = true;
       const s = this.scaleAt(this.zoom);
       this.cx = this.down.cx - dx / s;
@@ -627,7 +638,7 @@ export class MapEngine {
     }
 
     if (this.panKeys.size) {
-      const v = 14;
+      const v = 14 * this.k;
       let dx = 0, dy = 0;
       if (this.panKeys.has('left')) dx += v;
       if (this.panKeys.has('right')) dx -= v;
@@ -672,7 +683,7 @@ export class MapEngine {
        we stay coarse (the destination is prefetched), and during a wheel motion we hold the level
        the view settled on - one level of stretch at most - so the decode never lands mid-motion. */
     const cap = this.fly ? Math.min(this.tileMax, this.tileMin + 3) : this.tileMax;
-    let tz = clamp(Math.round(zoom), this.tileMin, cap);
+    let tz = clamp(Math.round(zoom + this.lk), this.tileMin, cap);
     const rest = !this.fly && Math.abs(this.zoomTarget - this.zoom) < 0.002;
     if (rest) this.tileZ = tz;
     else if (this.tileZ !== null && Math.abs(tz - this.tileZ) <= 1) tz = this.tileZ;
@@ -708,7 +719,7 @@ export class MapEngine {
 
   private drawTile(ctx: CanvasRenderingContext2D, z: number, x: number, y: number, dx: number, dy: number, dw: number, dh: number): void {
     if (this.tilesBase === 'grid:') {
-      ctx.strokeStyle = '#303030'; ctx.lineWidth = 1;
+      ctx.strokeStyle = '#303030'; ctx.lineWidth = Math.max(1, Math.round(this.k));
       ctx.strokeRect(dx, dy, dw, dh);
       return;
     }
@@ -735,7 +746,7 @@ export class MapEngine {
   }
 
   private placeNodes(): void {
-    const margin = 80;
+    const margin = 80 * this.k;
     const s = this.scaleAt(this.zoom);
     const ox = this.W / 2 - this.cx * s;
     const oy = this.H / 2 - this.cy * s;

@@ -17,7 +17,7 @@ local joinText = {
         checking = 'جارٍ التحقق من صلاحية دخولك…',
         denied = 'لا يمكنك دخول السيرفر. راجع الإدارة لمعرفة السبب.',
         queued = 'السيرفر ممتلئ. ترتيبك %d من %d في قائمة الانتظار. انتظر؛ سيدخلك السيرفر تلقائيًا عند توفر مكان.',
-        closed = 'السيرفر مغلق الآن. حاول الدخول لاحقًا.',
+        closed = 'حاول الدخول لاحقًا، وتابع الإعلانات في الديسكورد.',
         banned = 'أنت محظور من هذا السيرفر. السبب: %s (رقم الحظر %s).',
         banned_until = 'أنت محظور من هذا السيرفر حتى %s بتوقيت UTC. السبب: %s (رقم الحظر %s).',
         whitelist = 'هذا السيرفر للقائمة المسموحة فقط، واسمك ليس فيها. راجع الإدارة.',
@@ -33,13 +33,35 @@ local joinText = {
         waiting = 'بانتظار موافقة الإدارة. رقم طلبك: %s\nابقَ في هذه الشاشة، وستدخل السيرفر تلقائيًا عند الموافقة. (مضى %s)',
         wait_denied = 'رفضت الإدارة طلب دخولك.',
         wait_timeout = 'لم ترد الإدارة على طلبك (رقم %s) بعد. حاول الدخول لاحقًا.',
+        -- 2.4.4: the connecting screen's cards (core/joincard.lua): a title per refusal, the facts' labels
+        t_unavailable = 'تعذّر التحقق الآن',
+        t_denied = 'لا يمكنك الدخول',
+        t_closed = 'السيرفر مغلق الآن',
+        t_banned = 'أنت محظور من هذا السيرفر',
+        t_whitelist = 'الدخول لقائمة خاصة',
+        t_allowlist = 'لم تتم الموافقة عليك بعد',
+        t_admins = 'السيرفر في صيانة',
+        t_discord_missing = 'لم نجد حساب الديسكورد',
+        t_discord_member = 'انضم إلى الديسكورد أولًا',
+        t_discord_roles = 'تنقصك رتبة في الديسكورد',
+        t_discord_unavailable = 'تعذّر التحقق من الديسكورد',
+        t_wait_denied = 'رُفض طلب دخولك',
+        t_wait_timeout = 'انتهى وقت الانتظار',
+        t_closing = 'السيرفر يُغلق الآن',
+        f_reason = 'السبب',
+        f_until = 'ينتهي الحظر',
+        f_forever = 'حظر دائم',
+        f_ban = 'رقم الحظر',
+        f_request = 'رقم طلبك',
+        ban_note = 'للاعتراض، تواصل مع الإدارة في الديسكورد واذكر رقم الحظر.',
+        request_note = 'أعطِ رقم طلبك للإدارة لتوافق عليك.',
     },
     en = {
         unavailable = 'Access could not be checked. Please try again shortly.',
         checking = 'Checking your access…',
         denied = 'You cannot join this server. Contact staff for the reason.',
         queued = 'The server is full. You are %d of %d in the queue. Please wait; you will join automatically when a slot opens.',
-        closed = 'The server is closed right now. Please try again later.',
+        closed = 'Please try again later, and follow the news on our Discord.',
         banned = 'You are banned from this server. Reason: %s (ban #%s).',
         banned_until = 'You are banned from this server until %s UTC. Reason: %s (ban #%s).',
         whitelist = 'This server is whitelisted, and you are not on the list. Contact staff.',
@@ -55,11 +77,49 @@ local joinText = {
         waiting = 'Waiting for staff approval. Your request ID: %s\nStay on this screen; you will join automatically once approved. (%s so far)',
         wait_denied = 'Staff denied your join request.',
         wait_timeout = 'Staff have not answered your request (%s) yet. Please try again later.',
+        -- 2.4.4: the connecting screen's cards (core/joincard.lua): a title per refusal, the facts' labels
+        t_unavailable = 'Access could not be checked',
+        t_denied = 'You cannot join',
+        t_closed = 'The server is closed',
+        t_banned = 'You are banned from this server',
+        t_whitelist = 'Whitelisted server',
+        t_allowlist = 'Not approved yet',
+        t_admins = 'Maintenance',
+        t_discord_missing = 'Discord account not found',
+        t_discord_member = 'Join our Discord first',
+        t_discord_roles = 'Discord role missing',
+        t_discord_unavailable = 'Discord could not be checked',
+        t_wait_denied = 'Join request denied',
+        t_wait_timeout = 'The wait timed out',
+        t_closing = 'The server is closing',
+        f_reason = 'Reason',
+        f_until = 'Ban ends',
+        f_forever = 'Permanent',
+        f_ban = 'Ban number',
+        f_request = 'Request ID',
+        ban_note = 'To appeal, contact the staff on Discord and give your ban number.',
+        request_note = 'Give your request ID to the staff so they can approve you.',
     },
 }
 local function joinMessage(key, ...)
     local lang = GetConvar('w_lib:locale', 'ar') == 'ar' and 'ar' or 'en'
     return joinText[lang][key]:format(...)
+end
+
+-- 2.4.4: a refusal is one card on the "Connection failed" dialog (RedM draws it as HTML; the plain text read
+-- scrambled: Arabic mixed with Discord / Steam in a left-to-right block). Progress lines stay text (JoinCard.line).
+local TONES = { closed = 'closed', admins = 'closed', closing = 'closed', allowlist = 'info', wait_timeout = 'info',
+    banned = 'ban', wait_denied = 'ban' }
+local function card(key, body, facts, note)
+    return JoinCard.render({ tone = TONES[key] or 'error', title = joinMessage('t_' .. key), body = body, facts = facts, note = note })
+end
+local function say(key, ...) return card(key, joinMessage(key, ...)) end
+local function banCard(reason, untilText, id)
+    return card('banned', nil, {
+        { joinMessage('f_reason'), (reason and reason ~= '') and reason or '-' },
+        { joinMessage('f_until'), untilText or joinMessage('f_forever') },
+        { joinMessage('f_ban'), tostring(id or '-'), code = true },
+    }, joinMessage('ban_note'))
 end
 local queue = {} -- { src, prio, at }
 
@@ -77,8 +137,7 @@ local function bannedLocally(src)
     local b = WC.Bans.cached(WC.identifiers(src))
     if not b then return nil end
     local id = tostring(b.id or '-')
-    if b['until'] then return joinMessage('banned_until', os.date('!%Y-%m-%d %H:%M', b['until']), b.reason ~= '' and b.reason or '-', id) end
-    return joinMessage('banned', b.reason ~= '' and b.reason or '-', id)
+    return banCard(b.reason, b['until'] and (os.date('!%Y-%m-%d %H:%M', b['until']) .. ' UTC') or nil, id)
 end
 
 -- 2.2.3: the join mode refusals; `instructions` (the panel's text, 500 characters at most) follows the reason
@@ -93,13 +152,13 @@ local function instructionsOf(body)
 end
 
 local function modeRefusal(body)
-    local lines = { joinMessage(body.reason) }
+    local lines, facts, note = { joinMessage(body.reason) }, nil, nil
     if body.reason == 'allowlist' and type(body.requestId) == 'string' and body.requestId:match(REQUEST_ID) then
-        lines[#lines + 1] = joinMessage('request_id', body.requestId)
+        facts, note = { { joinMessage('f_request'), body.requestId, code = true } }, joinMessage('request_note')
     end
     local text = instructionsOf(body)
     if text ~= '' then lines[#lines + 1] = text end
-    return table.concat(lines, '\n')
+    return card(body.reason, lines, facts, note)
 end
 
 --- The website's refusal in the player's language (2.2.0: it sends a reason code; older sites only English text).
@@ -107,15 +166,15 @@ local function refusal(body)
     if body.reason == 'banned' then
         local reason = type(body.banReason) == 'string' and body.banReason:sub(1, 200) or '-'
         local id = tostring(math.tointeger(tonumber(body.banId)) or '-')
-        if type(body['until']) == 'string' then return joinMessage('banned_until', body['until']:sub(1, 20), reason, id) end
-        return joinMessage('banned', reason, id)
+        return banCard(reason, type(body['until']) == 'string' and (body['until']:sub(1, 20) .. ' UTC') or nil, id)
     end
     if body.reason == 'closed' then
-        return type(body.closedMessage) == 'string' and body.closedMessage ~= '' and body.closedMessage:sub(1, 300) or joinMessage('closed')
+        local text = type(body.closedMessage) == 'string' and body.closedMessage ~= '' and body.closedMessage:sub(1, 300)
+        return card('closed', text or joinMessage('closed'))
     end
-    if body.reason == 'whitelist' then return joinMessage('whitelist') end
+    if body.reason == 'whitelist' then return say('whitelist') end
     if MODE_REFUSALS[body.reason] then return modeRefusal(body) end
-    return type(body.message) == 'string' and body.message:sub(1, 500) or joinMessage('denied')
+    return card('denied', type(body.message) == 'string' and body.message:sub(1, 500) or joinMessage('denied'))
 end
 
 -- 2.2.4: the 'waitApproval' join mode. The player stays on the connecting screen while staff decide on the panel;
@@ -128,18 +187,18 @@ local function waitForApproval(src, deferrals, reqId, instructions)
     local started = GetGameTimer()
     while true do
         if GetPlayerName(src) == nil then return nil end
-        if WC.Host and WC.Host.shuttingDown then deferrals.done(WC.Host.say('closing')) return nil end
+        if WC.Host and WC.Host.shuttingDown then deferrals.done(card('closing', WC.Host.say('closing'))) return nil end
         local elapsed = GetGameTimer() - started
-        if elapsed >= limit then deferrals.done(joinMessage('wait_timeout', reqId)) return nil end
+        if elapsed >= limit then deferrals.done(say('wait_timeout', reqId)) return nil end
         local sec = elapsed // 1000
-        local card = joinMessage('waiting', reqId, ('%d:%02d'):format(sec // 60, sec % 60))
-        deferrals.update(instructions ~= '' and (card .. '\n' .. instructions) or card)
+        local text = joinMessage('waiting', reqId, ('%d:%02d'):format(sec // 60, sec % 60))
+        deferrals.update(JoinCard.line(instructions ~= '' and (text .. '\n' .. instructions) or text))
         Wait(WAIT_POLL_MS)
         if GetPlayerName(src) == nil then return nil end
         local status, body = WC.request('POST', '/join/wait', { requestId = reqId, identifiers = WC.identifiers(src) })
         if status == 200 and type(body) == 'table' then
             if body.status == 'approved' then return math.tointeger(tonumber(body.priority)) or 0 end
-            if body.status == 'denied' then deferrals.done(joinMessage('wait_denied')) return nil end
+            if body.status == 'denied' then deferrals.done(say('wait_denied')) return nil end
         end
     end
 end
@@ -165,23 +224,23 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
     deferrals.defer()
     Wait(0)
     -- 2.2.0: the host agent announced a shutdown (core/host.lua): nobody new comes in
-    if WC.Host and WC.Host.shuttingDown then return deferrals.done(WC.Host.say('closing')) end
+    if WC.Host and WC.Host.shuttingDown then return deferrals.done(card('closing', WC.Host.say('closing'))) end
     -- (Not `a and done(x) or done()`: done returns nothing, so that form calls done twice.)
     if not WC.linked() then
         local banned = bannedLocally(src)
         if banned then return deferrals.done(banned) end
-        if closedLocally(src) then return deferrals.done(joinMessage('closed')) end
-        if failClosed() then return deferrals.done(joinMessage('unavailable')) end
+        if closedLocally(src) then return deferrals.done(say('closed')) end
+        if failClosed() then return deferrals.done(say('unavailable')) end
         return deferrals.done()
     end
 
-    deferrals.update(joinMessage('checking'))
+    deferrals.update(JoinCard.line(joinMessage('checking')))
     local status, body = WC.request('POST', '/join', { name = tostring(name or ''):sub(1, 64), identifiers = WC.identifiers(src) })
     if status ~= 200 or type(body) ~= 'table' then
         local banned = bannedLocally(src)
         if banned then return deferrals.done(banned) end
-        if closedLocally(src) then return deferrals.done(joinMessage('closed')) end
-        if failClosed() then return deferrals.done(joinMessage('unavailable')) end
+        if closedLocally(src) then return deferrals.done(say('closed')) end
+        if failClosed() then return deferrals.done(say('unavailable')) end
         return deferrals.done()
     end
     local priority = math.tointeger(tonumber(body.priority)) or 0
@@ -205,7 +264,7 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
             leave(src)
             return deferrals.done()
         end
-        deferrals.update(joinMessage('queued', pos or 0, #queue))
+        deferrals.update(JoinCard.line(joinMessage('queued', pos or 0, #queue)))
         Wait(2000)
     end
 end)

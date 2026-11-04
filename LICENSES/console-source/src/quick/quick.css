@@ -8,7 +8,7 @@
  * ════════════════════════════════════════════════════════════════════════════ */
 
 .q-panel {
-  position: fixed; top: 1.25rem; bottom: 1.25rem; right: 1.75rem;
+  position: fixed; top: 1.25rem; bottom: 1.25rem; right: calc(1.75rem + var(--ws-gutter));
   width: 28rem; max-width: calc(100vw - 2 * var(--shell-inset));
   display: flex; flex-direction: column; gap: .75rem; min-height: 0;
 }

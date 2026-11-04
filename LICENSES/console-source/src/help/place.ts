@@ -3,11 +3,17 @@
 
 export interface Placement { top: number; left: number; arrowX: number; side: 'below' | 'above' }
 
-const MARGIN = 12;
-const GAP = 10;
-const OVERHANG = 22;
+import { wsScale } from '../wsScale';
+
+/* design px (1080p); multiplied by the screen scale on every placement, like the CSS (ui-scale.cjs) */
+const MARGIN_D = 12;
+const GAP_D = 10;
+const OVERHANG_D = 22;
+const ARROW_D = 14;
 
 export function placeNote(anchor: DOMRect, w: number, h: number, rtl: boolean, vw: number, vh: number): Placement {
+  const k = wsScale();
+  const MARGIN = MARGIN_D * k, GAP = GAP_D * k, OVERHANG = OVERHANG_D * k, ARROW = ARROW_D * k;
   let side: Placement['side'] = 'below';
   let top = anchor.bottom + GAP;
   if (top + h > vh - MARGIN) {
@@ -17,6 +23,6 @@ export function placeNote(anchor: DOMRect, w: number, h: number, rtl: boolean, v
   let left = rtl ? anchor.right + OVERHANG - w : anchor.left - OVERHANG;
   left = Math.min(Math.max(left, MARGIN), Math.max(MARGIN, vw - MARGIN - w));
   const cx = anchor.left + anchor.width / 2;
-  const arrowX = Math.min(Math.max(cx - left, 14), w - 14);
+  const arrowX = Math.min(Math.max(cx - left, ARROW), w - ARROW);
   return { top: Math.round(top), left: Math.round(left), arrowX: Math.round(arrowX), side };
 }

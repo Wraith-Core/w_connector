@@ -191,7 +191,7 @@ function ReportDrawer({ r, statusTag, onClose, onChanged }: {
       </KeyValueList>
       <Section title={t('label.reports.thread')} help="help.reports.thread" tone="plain">
         {(r.messages?.length ? r.messages : [{ sender_name: r.reporter_username, sender_type: 'player', message: r.description }]).map((m, i) => (
-          <p key={i} dir="auto" style={{ margin: '0 0 8px' }}>
+          <p key={i} dir="auto" style={{ margin: '0 0 calc(8 * var(--ws-px))' }}>
             <b>{m.sender_type === 'system' ? t('label.reports.system') : (m.sender_name || '—')}</b>{' '}
             <span className="k-dim k-num">{fmtDate(secs(m.timestamp))}</span><br />
             {m.message}

@@ -7,6 +7,7 @@
 
 import catalog from '../../../../core/blip_sprites.json';
 import type { CSSProperties } from 'react';
+import { wsScale } from '../../wsScale';
 
 export interface Blip {
   id: string;
@@ -40,8 +41,10 @@ export const isSprite = (name: string): boolean => AT.has(name);
 /** 'blip_shop_gunsmith' → 'shop gunsmith' (what the list shows; the search also reads the full name) */
 export const spriteLabel = (name: string): string => name.replace(/^blip_/, '').replace(/_/g, ' ');
 
-/** The sprite's cell of the atlas, drawn `size` px square (the atlas is the page's own file) */
-export function spriteStyle(name: string, size: number): CSSProperties {
+/** The sprite's cell of the atlas, drawn `size` design px square (x the screen scale, whole px so the
+ *  cells line up; the atlas is the page's own file) */
+export function spriteStyle(name: string, design: number): CSSProperties {
+  const size = Math.max(1, Math.round(design * wsScale()));
   const i = AT.get(name);
   if (i === undefined) return { width: size, height: size };
   const k = size / CELL;
