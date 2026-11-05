@@ -26,7 +26,7 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: linear-gradient(90deg, rgba(10, 10, 10, .9) 0%, rgba(10, 10, 10, .86) 45%, rgba(10, 10, 10, .78) 100%);
+  background: linear-gradient(90deg, rgba(11, 10, 10, .9) 0%, rgba(11, 10, 10, .86) 45%, rgba(11, 10, 10, .78) 100%);
   animation: sh-fade 220ms var(--ease) both;
 }
 [dir='rtl'] .sh-scrim { transform: scaleX(-1); }
@@ -215,7 +215,7 @@ html[lang='en'] .sh-brand-ar { font: 600 1.6rem/1 var(--f-title); }
 /* ── command palette: a torn card over a soft scrim ─────────────────────── */
 .sh-pal-veil {
   position: fixed; inset: 0; z-index: var(--z-palette);
-  background: radial-gradient(60% 55% at 50% 35%, rgba(10, 10, 10, .7), rgba(10, 10, 10, .35) 100%);
+  background: radial-gradient(60% 55% at 50% 35%, rgba(11, 10, 10, .7), rgba(11, 10, 10, .35) 100%);
   display: flex; justify-content: center; align-items: flex-start; padding-top: 12vh;
   animation: sh-fade 160ms var(--ease) both;
 }

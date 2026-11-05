@@ -15,7 +15,7 @@
 /* the scrim falls away from the panel's side so the game stays readable */
 .q-scrim {
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background: linear-gradient(270deg, rgba(10, 10, 10, .82) 0%, rgba(10, 10, 10, .6) 22%, rgba(10, 10, 10, .2) 40%, rgba(10, 10, 10, 0) 55%);
+  background: linear-gradient(270deg, rgba(11, 10, 10, .82) 0%, rgba(11, 10, 10, .6) 22%, rgba(11, 10, 10, .2) 40%, rgba(11, 10, 10, 0) 55%);
   animation: q-fade 220ms var(--ease) both;
 }
 @keyframes q-fade { from { opacity: 0; } to { opacity: 1; } }
@@ -119,11 +119,11 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
   display: inline-flex; align-items: center; height: 1.5rem; padding: 0 .5rem;
   border: 1px solid rgba(242, 242, 242, .35); font: 700 var(--fs-12)/1 var(--f-ui); color: var(--paper-dim); white-space: nowrap;
 }
-.q-state.is-on { background: var(--paper); border-color: var(--paper); color: var(--ink); }
+.q-state.is-on { background: var(--green); border-color: var(--green); color: var(--ink); }
 .q-chev { width: .9rem; height: .9rem; }
 [dir='rtl'] .q-chev { transform: scaleX(-1); }
-.q-panel .k-btn.q-tool.is-on { box-shadow: inset 2px 0 0 var(--paper); }
-[dir='rtl'] .q-panel .k-btn.q-tool.is-on { box-shadow: inset -2px 0 0 var(--paper); }
+.q-panel .k-btn.q-tool.is-on { box-shadow: inset 2px 0 0 var(--green); }
+[dir='rtl'] .q-panel .k-btn.q-tool.is-on { box-shadow: inset -2px 0 0 var(--green); }
 .q-panel .k-btn.q-tool.is-danger { box-shadow: inset 2px 0 0 var(--red); }
 [dir='rtl'] .q-panel .k-btn.q-tool.is-danger { box-shadow: inset -2px 0 0 var(--red); }
 .q-panel .k-btn.q-tool:disabled { opacity: .5; }
@@ -147,8 +147,8 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
 }
 /* the chosen target: the board's picked row (a darker plate, a frame, a paper tick); the band stays the cursor */
 .q-panel .k-btn.q-prow:active:not(:disabled) { transform: none; }
-.q-panel .k-btn.q-prow.is-on { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--paper-dim); }
-.q-panel .k-btn.q-prow.is-on::after { content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--paper); }
+.q-panel .k-btn.q-prow.is-on { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--mark); }
+.q-panel .k-btn.q-prow.is-on::after { content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--mark); }
 .q-prow .k-btn-label { flex: 1; min-width: 0; display: flex; align-items: center; gap: .75rem; overflow: visible; }
 .q-prow-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .q-prow-name { font: 700 var(--fs-145)/1.3 var(--f-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -166,7 +166,7 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
 }
 .q-status { display: flex; align-items: center; gap: .5rem; font-size: var(--fs-135); color: var(--paper-dim); }
 .q-dot { width: .5rem; height: .5rem; border: 1.5px solid var(--paper-faint); flex: none; }
-.q-dot.is-on { background: var(--paper); border-color: var(--paper); }
+.q-dot.is-on { background: var(--green); border-color: var(--green); }
 .q-status-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .q-keys { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem .75rem; font-size: var(--fs-12); color: var(--paper-faint); }
 .q-keys kbd { margin-inline-end: .125rem; }

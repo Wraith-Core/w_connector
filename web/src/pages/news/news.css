@@ -91,10 +91,10 @@
   background-image: var(--tex-grain); background-size: 256px 256px; opacity: .1; mix-blend-mode: screen; filter: invert(1);
 }
 .nw-plate { position: absolute; inset: 0; background: var(--ink-3) center / cover no-repeat; filter: grayscale(1); transform: scale(1.03); }
-.nw-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(0deg, rgba(10, 10, 10, .72) 0%, rgba(10, 10, 10, 0) 18%); }
+.nw-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(0deg, rgba(11, 10, 10, .72) 0%, rgba(11, 10, 10, 0) 18%); }
 .nw-body {
   position: relative; z-index: 2; padding: 1.55em 1.8em 3.4em;
-  background: linear-gradient(180deg, rgba(10, 10, 10, .95) 0%, rgba(10, 10, 10, .9) calc(100% - 2.9em), rgba(10, 10, 10, .5) calc(100% - 1.5em), rgba(10, 10, 10, 0) 100%);
+  background: linear-gradient(180deg, rgba(11, 10, 10, .95) 0%, rgba(11, 10, 10, .9) calc(100% - 2.9em), rgba(11, 10, 10, .5) calc(100% - 1.5em), rgba(11, 10, 10, 0) 100%);
 }
 .nw-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1em; }
 .nw-heads { min-width: 0; }
@@ -108,7 +108,7 @@
 }
 .nw-text {
   margin: .4em 0 0; max-width: 94%; font: 400 1.02em/1.38 'EB Garamond', 'Amiri', Georgia, serif; color: #D5D5D5;
-  text-shadow: 0 1px .5em rgba(10, 10, 10, .9); overflow-wrap: anywhere;
+  text-shadow: 0 1px .5em rgba(11, 10, 10, .9); overflow-wrap: anywhere;
   display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
 }
 .nw-date { margin: .55em 0 0; font: italic 400 .98em/1.2 'EB Garamond', 'Amiri', Georgia, serif; color: var(--paper-dim); }

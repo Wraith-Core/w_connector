@@ -23,7 +23,7 @@
 .mc-map::after {
   content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 38;
   background:
-    radial-gradient(120% 95% at 50% 50%, rgba(10, 10, 10, 0) 60%, rgba(10, 10, 10, .18) 84%, rgba(10, 10, 10, .42) 100%);
+    radial-gradient(120% 95% at 50% 50%, rgba(11, 10, 10, 0) 60%, rgba(11, 10, 10, .18) 84%, rgba(11, 10, 10, .42) 100%);
 }
 
 /* ── markers ────────────────────────────────────────────────────────────── */
@@ -48,7 +48,7 @@
 .mc-map .wa-mk.is-selected .wa-mk-inner::before {
   content: ''; position: absolute; left: 50%; top: 50%; width: 200%; height: 200%; margin: -100% 0 0 -100%;
   border-radius: 50%; border: 3px solid var(--paper);
-  box-shadow: 0 0 0 1.5px rgba(10, 10, 10, .85), inset 0 0 0 1.5px rgba(10, 10, 10, .85);
+  box-shadow: 0 0 0 1.5px rgba(11, 10, 10, .85), inset 0 0 0 1.5px rgba(11, 10, 10, .85);
   animation: mc-ring 240ms var(--ease) both;
 }
 @keyframes mc-ring { from { transform: scale(1.6); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -63,7 +63,7 @@
 .mc-map .wa-mk-tip {
   position: absolute; inset-inline-start: 1.125rem; top: -1.75rem; z-index: 1; display: none;
   white-space: nowrap; padding: .125rem .5rem .1875rem;
-  background: rgba(10, 10, 10, .92); border: 1px solid var(--rule-2); color: var(--paper);
+  background: rgba(11, 10, 10, .92); border: 1px solid var(--rule-2); color: var(--paper);
   font: 700 var(--fs-13)/1.3 var(--f-ui); unicode-bidi: plaintext; pointer-events: none;
 }
 .mc-map .wa-mk.is-hover .wa-mk-tip, .mc-map .wa-mk.is-selected .wa-mk-tip { display: block; }
@@ -79,7 +79,7 @@
 }
 .mc-map.theme-dark .wa-mk.is-label .wa-mk-tip,
 .mc-map.theme-ember .wa-mk.is-label .wa-mk-tip,
-.mc-map.theme-blueprint .wa-mk.is-label .wa-mk-tip { color: var(--paper); text-shadow: 0 0 3px rgba(10, 10, 10, .9), 0 1px 2px rgba(10, 10, 10, .9); }
+.mc-map.theme-blueprint .wa-mk.is-label .wa-mk-tip { color: var(--paper); text-shadow: 0 0 3px rgba(11, 10, 10, .9), 0 1px 2px rgba(11, 10, 10, .9); }
 
 /* ── overlays (.wa-map-ui: the engine ignores their clicks) ─────────────── */
 .mc-map .wa-map-ui { position: absolute; z-index: 40; cursor: default; }
@@ -89,13 +89,13 @@
 
 .mc-follow {
   top: .75rem; inset-inline-start: .75rem; display: flex; align-items: center; gap: .5rem;
-  padding: .375rem .75rem; background: rgba(10, 10, 10, .92); border: 1px solid var(--rule-2);
+  padding: .375rem .75rem; background: rgba(11, 10, 10, .92); border: 1px solid var(--rule-2);
   border-inline-start: 3px solid var(--paper); font: 700 var(--fs-14)/1.3 var(--f-ui);
 }
 
 .mc-legend {
   bottom: .75rem; inset-inline-start: .75rem; display: flex; align-items: center; flex-wrap: wrap; gap: .25rem .875rem;
-  max-width: calc(100% - 1.5rem); padding: .375rem .75rem; background: rgba(10, 10, 10, .88); border: 1px solid var(--rule-2);
+  max-width: calc(100% - 1.5rem); padding: .375rem .75rem; background: rgba(11, 10, 10, .88); border: 1px solid var(--rule-2);
   font-size: var(--fs-13); color: var(--paper-dim);
 }
 .mc-legend-title { font-weight: 700; color: var(--paper); }

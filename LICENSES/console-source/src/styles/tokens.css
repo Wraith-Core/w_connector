@@ -19,10 +19,12 @@
 :root {
   /* palette (w_lib tokens.css): the Wraith launcher's neutral black and white - every grey has
      r = g = b; no warm, cream or "aged paper" tint anywhere, red stays a mark */
-  --ink: var(--w-ink, #0A0A0A);                  /* page */
-  --ink-2: var(--w-ink-2, #111111);              /* sidebar, drawer, inputs */
-  --ink-3: var(--w-ink-3, #191919);              /* raised, selected */
-  --ink-4: var(--w-ink-4, #222222);              /* pressed, meter track */
+  /* 2026-11-05 (owner): the website's look (store.wraith7.com): its inks, its red, the selected item and the
+     main button as the red mark, ok states in its soft green. Paper (text) stays neutral. */
+  --ink: var(--w-ink, #0B0A0A);                  /* page */
+  --ink-2: var(--w-ink-2, #151313);              /* sidebar, drawer, inputs */
+  --ink-3: var(--w-ink-3, #1C1919);              /* raised, selected */
+  --ink-4: var(--w-ink-4, #242020);              /* pressed, meter track */
   --paper: var(--w-paper, #F2F2F2);              /* text */
   --paper-lit: var(--w-paper-lit, #FFFFFF);      /* the primary band under the cursor */
   --paper-dim: var(--w-paper-dim, #B4B4B4);      /* secondary text */
@@ -31,9 +33,16 @@
   /* the console keeps boxed controls, so its stronger rules stay a step below the theme's brushed ones */
   --rule-2: rgba(242, 242, 242, .22);
   --rule-3: rgba(242, 242, 242, .38);
-  --red: var(--w-red, #CB0101);                  /* the only accent, a mark */
-  --red-hover: var(--w-red, #CB0101);            /* one red: there is no darker second red */
-  --red-soft: var(--w-red-soft, rgba(242, 242, 242, .06));   /* the theme's: a paper lift, red is never a fill */
+  --red: var(--w-red, #D0161B);                  /* the only accent, a mark */
+  --red-hover: var(--w-red, #D0161B);            /* one red: there is no darker second red */
+  --red-deep: var(--w-red-deep, #8F0B0E);        /* the rest of a bar, a pressed mark */
+  --red-soft: var(--w-red-soft, rgba(208, 22, 27, .14));     /* the theme's: a red wash behind an error */
+  /* the mark: a selected item and the main button (kit.css "the red mark"), and the ok / running green */
+  --mark: var(--w-mark, #D0161B);
+  --mark-lit: var(--w-mark-lit, #E01A1F);        /* the mark under the cursor */
+  --mark-deep: var(--w-mark-deep, #8F0B0E);      /* the mark pressed */
+  --mark-ink: var(--w-mark-ink, #F2F2F2);        /* the words on the mark */
+  --green: var(--w-green, #9FC79A);              /* ok / online / running */
   --note: var(--w-note, #E9E9E9);                /* help notes and confirm dialogs: the paper note */
   --note-ink: var(--w-note-ink, #111111);
   --note-dim: var(--w-note-dim, #555555);
@@ -47,7 +56,7 @@
   /* The band. These never turn over inside a band (kit.css swaps --paper / --ink there), so a band
      is always drawn in paper whatever it sits in. Without the theme the mask is none: a plain paper bar. */
   --band: var(--w-paper, #F2F2F2);
-  --band-ink: var(--w-ink, #0A0A0A);             /* the words on the band */
+  --band-ink: var(--w-ink, #0B0A0A);             /* the words on the band */
   --tex-band: var(--w-tex-band, none);           /* selection_box_bg_1a: rows, nav items */
   --tex-band-sm: var(--w-tex-band-sm, none);     /* selection_box_bg_1c: tabs, buttons, chips */
   --tex-grain: var(--w-tex-grain, none);         /* the pause menu's paper grain (notes, dialogs) */

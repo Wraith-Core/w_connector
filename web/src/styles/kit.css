@@ -19,8 +19,8 @@
 .k-seg-btn.is-on, .k-switch.is-on .k-switch-opt.is-active, .k-chip.is-on,
 .k-table-wrap[tabindex] tbody tr:hover > td,
 .k-pop-opt.is-active, .sh-pal-item.is-active, .sh-helpbtn.is-on, .sh-helpbtn:hover, .sh-helpbtn:focus-visible {
-  --paper: var(--w-ink, #0A0A0A);
-  --paper-lit: var(--w-ink-3, #191919);
+  --paper: var(--w-ink, #0B0A0A);
+  --paper-lit: var(--w-ink-3, #1C1919);
   --paper-dim: var(--w-note-dim, #555555);
   --paper-faint: var(--w-note-dim, #555555);
   --rule: var(--w-note-rule, rgba(17, 17, 17, .18));
@@ -32,6 +32,31 @@
   --ink-4: rgba(17, 17, 17, .16);
   color: var(--paper);
 }
+/* ── the red mark (2026-11-05, owner: the site's look) ─────────────────────
+ * A SELECTED item drawn as a band (the open page, the open settings group, a chosen option or filter, a
+ * switch that is on, help mode on) is that band in the red mark with light words; only the cursor on an
+ * unselected item stays the paper band. Inside the mark the palette does NOT turn to ink. The board-look
+ * marks that are not a band (the open tab's rule, the selected row's hairlines and tick) take the red too. */
+.sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn, .k-settings-item.is-active .k-settings-btn,
+.k-seg-btn.is-on, .k-switch.is-on .k-switch-opt.is-active, .k-chip.is-on, .sh-helpbtn.is-on {
+  --band: var(--mark);
+  --paper: var(--mark-ink);
+  --paper-lit: var(--w-paper-lit, #FFFFFF);
+  --paper-dim: rgba(242, 242, 242, .8);
+  --paper-faint: rgba(242, 242, 242, .66);
+  --rule: rgba(242, 242, 242, .3);
+  --rule-2: rgba(242, 242, 242, .42);
+  --rule-3: rgba(242, 242, 242, .56);
+  --ink: var(--w-ink, #0B0A0A);
+  --ink-2: rgba(11, 10, 10, .14);
+  --ink-3: rgba(11, 10, 10, .22);
+  --ink-4: rgba(11, 10, 10, .3);
+  color: var(--paper);
+}
+/* the mark under the cursor */
+.sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn:hover, .k-settings-item.is-active .k-settings-btn:hover,
+.k-seg-btn.is-on:hover:not(:disabled), .k-switch.is-on:hover:not(:disabled) .k-switch-opt.is-active,
+.k-chip.is-on:hover:not(:disabled), .sh-helpbtn.is-on:hover { --band: var(--mark-lit); }
 /* the band is a ::before behind the content (the content is never masked). A table cell takes the
    middle of the brush and the row's two end cells its torn ends, so a row reads as one stroke. */
 .sh-nav-btn, .k-settings-btn, .k-tab, .k-seg-btn, .k-switch-opt, .k-chip, .k-pop-opt, .sh-pal-item, .sh-helpbtn {
@@ -103,6 +128,14 @@
 .k-btn--primary { background: transparent; border-color: transparent; color: var(--ink); }
 .k-btn--primary::before { opacity: 1; background: var(--paper); }
 .k-btn--primary:hover:not(:disabled)::before, .k-btn--primary:focus-visible::before { background: var(--paper-lit); }
+/* 2026-11-05 (owner): the main button is the red mark (the site's): the lit mark under the cursor, the deep
+   one pressed, light words. On the paper note it keeps the note's own ink band (k-onpaper below). */
+.k-btn--primary:is(:not(:disabled), .is-busy) {
+  --paper: var(--mark); --paper-lit: var(--mark-lit); --paper-dim: var(--mark-deep); --ink: var(--mark-ink);
+}
+.k-onpaper .k-btn--primary {
+  --paper: var(--w-paper, #F2F2F2); --paper-lit: var(--w-paper-lit, #FFFFFF); --paper-dim: var(--w-paper-dim, #B4B4B4); --ink: var(--w-ink, #0B0A0A);
+}
 /* a disabled or locked primary must not read as the one live action of the view: it drops to the plain look */
 .k-btn--primary:disabled:not(.is-busy) { color: var(--paper-dim); }
 .k-btn--primary:disabled:not(.is-busy)::before { background: var(--ink-4); }
@@ -240,7 +273,7 @@
 .k-slider .k-ctlwrap { width: 6.5rem; flex: none; }
 .k-slider-track { position: relative; flex: 1; height: 1.5rem; display: flex; align-items: center; }
 .k-slider-track::before { content: ''; position: absolute; inset-inline: 0; height: 4px; background: var(--ink-4); }
-.k-slider-track::after { content: ''; position: absolute; left: 0; width: var(--pct, 0%); height: 4px; background: var(--paper-dim); pointer-events: none; }
+.k-slider-track::after { content: ''; position: absolute; left: 0; width: var(--pct, 0%); height: 4px; background: var(--red); pointer-events: none; }
 .k-slider.is-low .k-slider-track::after { background: var(--red); }
 .k-slider-track input { position: relative; z-index: 1; width: 100%; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; height: 1.5rem; }
 .k-slider-track input::-webkit-slider-runnable-track { height: 4px; background: transparent; }
@@ -382,7 +415,7 @@ html[lang='en'] .k-section-title { font: 600 var(--fs-18)/1.25 var(--f-title); }
   content: ''; position: absolute; inset-inline: .75rem; bottom: -1px; height: 2px;
   background: var(--paper); opacity: 0; transition: opacity var(--t-fast) var(--ease); pointer-events: none;
 }
-.k-tab.is-active::after { opacity: 1; }
+.k-tab.is-active::after { opacity: 1; background: var(--mark); }
 .k-tabs--box .k-tab { border: 1px solid var(--rule); }
 .k-tabs--box .k-tab.is-active, .k-tabs--box .k-tab-wrap:hover > .k-tab:not(:disabled) { border-color: transparent; }
 .k-tab:disabled { opacity: .45; }
@@ -510,9 +543,9 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 .k-table-wrap[tabindex] tbody tr:hover > td { background: transparent; border-bottom-color: transparent; }
 /* 2.3.0 the selected row (the board's .ws-row.is-picked): a darker plate between two paper hairlines and a
    paper tick at its end - never a second band; a hover never moves it, a click or Enter does */
-.k-table tbody tr.is-selected > td { background: var(--ink-3); box-shadow: inset 0 1px 0 var(--paper-dim), inset 0 -1px 0 var(--paper-dim); }
+.k-table tbody tr.is-selected > td { background: var(--ink-3); box-shadow: inset 0 1px 0 var(--mark), inset 0 -1px 0 var(--mark); }
 .k-table tbody tr.is-selected > td:last-child::after {
-  content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--paper);
+  content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--mark);
 }
 .k-table-wrap[tabindex] tbody tr.is-selected:hover > td { box-shadow: none; }
 /* each cell shows the middle of the brush; the row's two end cells show its torn ends */
@@ -556,7 +589,7 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 
 .k-meter { display: inline-flex; align-items: center; gap: .375rem; direction: ltr; }
 .k-meter-bar { position: relative; width: 3.375rem; height: 5px; background: var(--ink-4); }
-.k-meter-fill { position: absolute; inset: 0 auto 0 0; background: var(--paper-dim); }
+.k-meter-fill { position: absolute; inset: 0 auto 0 0; background: var(--red); }
 .k-meter.is-low .k-meter-fill { background: var(--red); }
 .k-meter b { font-weight: 700; font-size: var(--fs-14); min-width: 1.6rem; text-align: end; }
 .k-meter.is-none { color: var(--paper-faint); }
@@ -573,7 +606,7 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 .k-status--blocked .k-status-shape { background: none; border: 1.5px solid var(--paper); border-radius: 50%; }
 .k-status--offline .k-status-shape { background: none; border: 1.5px solid var(--paper-faint); }
 .k-status--offline { color: var(--paper-faint); }
-.k-status--online .k-status-shape, .k-status--running .k-status-shape { background: var(--paper); }
+.k-status--online .k-status-shape, .k-status--running .k-status-shape { background: var(--green); }
 
 .k-tag { display: inline-flex; align-items: center; font-size: var(--fs-12); line-height: 1.45; border: 1px solid var(--rule-2); padding: 0 .375rem; color: var(--paper-dim); white-space: nowrap; }
 .k-tag--strong { background: var(--paper); color: var(--ink); border-color: var(--paper); font-weight: 700; }

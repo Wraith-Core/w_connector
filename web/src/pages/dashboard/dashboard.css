@@ -58,13 +58,13 @@ html[lang='en'] .dsh-desk-name { font: 600 var(--fs-22)/1.2 var(--f-title); }
   transition: opacity var(--t-fast) var(--ease);
 }
 .dsh-row.is-here {
-  --paper: var(--w-ink, #0A0A0A); --paper-dim: var(--w-note-dim, #555555); --paper-faint: var(--w-note-dim, #555555);
+  --paper: var(--w-ink, #0B0A0A); --paper-dim: var(--w-note-dim, #555555); --paper-faint: var(--w-note-dim, #555555);
   --rule-2: rgba(17, 17, 17, .3); --ink: var(--w-paper, #F2F2F2);
   color: var(--paper); border-bottom-color: transparent;
 }
 .dsh-row.is-here::before { opacity: 1; }
-.dsh-row.is-picked { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--paper-dim); }
-.dsh-row.is-picked::after { content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--paper); }
+.dsh-row.is-picked { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--mark); }
+.dsh-row.is-picked::after { content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--mark); }
 .dsh-row.is-picked.is-here { background: transparent; box-shadow: none; }
 .dsh-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .0625rem; }
 .dsh-row-name { font: 700 var(--fs-15)/1.25 var(--f-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
