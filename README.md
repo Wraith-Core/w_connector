@@ -44,6 +44,12 @@ Detected automatically. To force one: `set wraith_framework "vorp"` / `set wrait
   server opens no port.
 - The token cannot change who has access to your panel.
 
+## 2.6.0 — 2026-11-06
+
+- طلب المالك (التعويض): أمران جديدان للموقع. `losses.list` يعرض ما فقدته الشخصية من أغراض (سجل w_inventory) ومن مال (دفتر w_centralbank)، مع السبب ومن فعلها والوقت. `losses.restore` يُرجع سطرًا واحدًا مرة واحدة فقط.
+- `player.profile` صار فيه `losses` للاعب نفسه في «حسابي»، بدون اسم من أخذ منه.
+- الصلاحية والسجل في الموقع. الملف `ops/losses.lua`.
+
 ## 2.4.2 — 2026-11-03
 
 - فحص كامل لأزرار لوحة الإدارة وأوامرها بدون تشغيل اللعبة: كل زر وكل أمر دردشة يمر الآن في اختبار آلي بالطريق كاملًا (الصفحة ← اللعبة ← الموقع ← التنفيذ)، على Wraith Core وRSG وVORP (`tests/test_console_roundtrip.py`).

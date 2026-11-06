@@ -265,5 +265,7 @@ WC.Ops.define('player.profile', wcore, function(args)
         farms = part(function() return farmsOf(cid) end),
         tribe = part(function() return tribeOf(cid) end),
         kingdom = part(function() return kingdomOf(cid) end),
+        -- 2.6.0: what he lost (items + money), without who took it (ops/losses.lua)
+        losses = part(function() return WC.Losses and WC.Losses.forPlayer(cid) or nil end),
     }
 end)
