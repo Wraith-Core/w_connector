@@ -47,8 +47,11 @@ function WMenu.close()
     SetNuiFocus(false, false); SetNuiFocusKeepInput(false); send('close')
     TriggerServerEvent('w_connector:console:closed')
 end
+-- 2.6.1: the server's lease is up to 10 minutes now (ops/console.lua LEASE); it ends early only when the server
+-- revokes it. The old 45 s cap closed the menu and switched every mode off whenever one renewal was late.
+local LEASE_MAX = 600000
 function C.live()
-    return C.session ~= nil and GetGameTimer() - C.session.at >= 0 and GetGameTimer() - C.session.at < math.min(45000, C.session.lease or 45000)
+    return C.session ~= nil and GetGameTimer() - C.session.at >= 0 and GetGameTimer() - C.session.at < math.min(LEASE_MAX, C.session.lease or 45000)
 end
 function C.ask(name, data, cb)
     if not C.live() then cb(finish({ ok = false, error = 'no_session' })); return end
@@ -194,7 +197,8 @@ local function toggle(mode)
     if opening or IsPauseMenuActive() then return false end
     if IsNuiFocused() then return false end
     C.mode, opening = mode, true
-    TriggerServerEvent('w_connector:console:open'); SetTimeout(10000, function() opening = false end)
+    -- 2.6.1: the server may wait for a website ask already on its way before it answers (up to ~20 s)
+    TriggerServerEvent('w_connector:console:open'); SetTimeout(25000, function() opening = false end)
     return true
 end
 exports('OpenAdminConsole', toggle)

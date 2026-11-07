@@ -97,6 +97,11 @@ export default function App() {
 
   const toastSeq = useRef(0);
   const openedAt = useRef(0);
+  /* 2.6.1: the key that opened the page (Page Up quick, F10 full) may still be held down when the page takes the
+     focus. The game's browser reports its auto-repeats with repeat=false, so after the 150 ms guard the first repeat
+     closed the page again ("it opens and shuts at once"). That key is ignored until it is let go, or until a second
+     has passed with no repeat of it (it was let go before the page had the focus). */
+  const heldKey = useRef<{ key: string; seen: boolean } | null>(null);
   const stringsRef = useRef<Strings>({});
   stringsRef.current = strings;
   const t = useMemo(() => makeT(strings, lang), [strings, lang]);
@@ -148,6 +153,7 @@ export default function App() {
           setDialog(null);
           setPalette({ open: false, q: '' });
           openedAt.current = performance.now();
+          heldKey.current = { key: o.mode === 'quick' ? 'PageUp' : 'F10', seen: false };
           /* browser mock only: ?page=players&sel=2 (or the old ?tab=) lands on a page, for screenshots */
           if (isMock()) {
             const q = new URLSearchParams(location.search);
@@ -278,14 +284,21 @@ export default function App() {
       if (!['Escape', 'PageUp', 'F10'].includes(e.key)) return;
       if (dialogRef.current || paletteRef.current) return;
       if (performance.now() - openedAt.current < 150) return;
+      const held = heldKey.current;
+      if (held && held.key === e.key) {
+        if (held.seen || performance.now() - openedAt.current < 1000) { held.seen = true; e.preventDefault(); return; }
+        heldKey.current = null;
+      }
       e.preventDefault();
       // Page Up is the quick menu's key, F10 the console's (2.4.1, owner 2026-11-03): the other mode's key switches, the
       // open mode's own key closes
       if ((e.key === 'F10' && mode === 'quick') || (e.key === 'PageUp' && mode === 'full')) setMode(mode === 'quick' ? 'full' : 'quick');
       else close();
     };
+    const onKeyUp = (e: KeyboardEvent) => { if (heldKey.current && heldKey.current.key === e.key) heldKey.current = null; };
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('keyup', onKeyUp);
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('keyup', onKeyUp); };
   }, [open, mode, close, setMode]);
 
   /* ── page enter: its pushes and its own hook ─────────────────────────── */

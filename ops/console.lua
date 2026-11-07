@@ -2,7 +2,14 @@
 -- boundary; a queued result is accepted only for a request this connection actually issued.
 WC.Console = { sessions = {}, issued = {}, handlers = {}, clientPending = {}, refreshHooks = {} }
 local C = WC.Console
-local LEASE, REFRESH, TIMEOUT = 45000, 15000, 18000
+-- 2.6.1 (owner 2026-11-08: "the permissions must not hang, the toggles must not switch off by themselves"):
+-- LEASE = how long a session stays good after the website last said yes (was 45 s); REFRESH = how often it is
+-- asked again while the menu is open or a mode is on (was every 15 s); RETRY = after a failed or narrower answer;
+-- CONFIRM = answers in a row before a refusal or a narrower list is believed. One website/Discord hiccup used
+-- to end the session at once: the menu closed and every mode (invisible, god mode ...) switched off.
+-- Every action that changes anything is still decided by the website on its own request (C.dispatch).
+local LEASE, REFRESH, RETRY, CONFIRM, TIMEOUT = 600000, 120000, 15000, 3, 18000
+local GUARD_GRANT, GUARD_RENEW = 30, 20000 -- w_guard allowance for a running mode (seconds), renewed every 20 s
 local rates, opening, modes = {}, {}, {}
 local contract = json.decode(LoadResourceFile(GetCurrentResourceName(), 'core/console_contract.json') or '{}')
 C.contract = contract
@@ -12,10 +19,10 @@ local MODE_FLAGS = {
     ['self.invisible'] = { 'invisible' }, ['self.godmode'] = { 'godmode' },
     ['self.boost'] = { 'move' }, ['player.spectate'] = { 'move', 'invisible', 'godmode' },
 }
-function C.allowMode(name, src)
+function C.allowMode(name, src, seconds)
     if not WC.started('w_guard') then return true end
     for _, flag in ipairs(MODE_FLAGS[name] or {}) do
-        local ok, accepted = pcall(function() return exports.w_guard:AllowFlag(src, flag, 3) end)
+        local ok, accepted = pcall(function() return exports.w_guard:AllowFlag(src, flag, seconds or 3) end)
         if not ok or accepted ~= true then return false end
     end
     return true
@@ -23,13 +30,20 @@ end
 local function nonce()
     return ('%08x%08x%08x%08x'):format(math.random(0, 0xffffffff), math.random(0, 0xffffffff), math.random(0, 0xffffffff), math.random(0, 0xffffffff))
 end
+-- 2.6.1: kept for 3 s. C.valid asks it every second for every session and every mode, and the framework
+-- read behind it copies the whole player across resources (w_core); a character change is still seen in 3 s.
+local IDENTITY_MS, identities = 3000, {}
 local function identity(src)
-    if not WC.onlineSource(src) then return nil end
+    if not WC.onlineSource(src) then identities[src] = nil; return nil end
+    local t, kept = now(), identities[src]
+    if kept and t >= kept.at and t - kept.at < IDENTITY_MS then return kept.value end
     local ids = WC.identifiers(src)
-    if not (ids.license or ids.license2) then return nil end
+    if not (ids.license or ids.license2) then identities[src] = nil; return nil end
     local fw, cid = WC.Adapters.get('framework'), ''
     if fw then local ok, p = pcall(fw.player, src); if ok and p then cid = tostring(p.charId or '') end end
-    return table.concat({ ids.license or ids.license2, ids.discord or '', cid }, '|')
+    local value = table.concat({ ids.license or ids.license2, ids.discord or '', cid }, '|')
+    identities[src] = { value = value, at = t }
+    return value
 end
 C.identity = identity
 function C.valid(s)
@@ -163,6 +177,16 @@ function C.access(s)
         scripts = { held = held, from = from, groups = built and type(catalog) == 'table' and catalog.groups or {} },
         manage = s.manage }
 end
+-- 2.6.1: the website answers 403 no_access when it could not read his Discord roles for a moment (a Discord
+-- rate limit or timeout reads as "no roles"): one more ask before such an answer is believed.
+local function askWebsite(path, body, timeout)
+    local status, res = WC.request('POST', path, body, timeout)
+    if status == 403 and type(res) == 'table' and res.error == 'no_access' then
+        Wait(1000)
+        status, res = WC.request('POST', path, body, timeout)
+    end
+    return status, res
+end
 local function refresh(src, old)
     if opening[src] then return nil, 'busy' end
     local bound, at = identity(src), now()
@@ -170,23 +194,50 @@ local function refresh(src, old)
     local lock = {}; opening[src] = lock
     local ask = who(src)
     ask.catalogTag = C.webCatalog and C.webCatalog.tag or nil -- 2.3.1: the website omits names we already hold
-    local status, body = WC.request('POST', '/ingame/console/session', ask, 10000)
+    local status, body = askWebsite('/ingame/console/session', ask, 10000)
     if opening[src] ~= lock then return nil, 'no_session' end
     opening[src] = nil
     if identity(src) ~= bound or now() - at >= LEASE or (old and C.sessions[src] ~= old) then return nil, 'no_session' end
+    local live = old ~= nil and C.valid(old)
     if status ~= 200 or type(body) ~= 'table' or not body.ok or type(body.actions) ~= 'table' then
+        local err = type(body) == 'table' and type(body.error) == 'string' and body.error or 'offline'
+        -- 2.6.1: a live session outlasts a failed ask: kept as it is and asked again soon. Only CONFIRM
+        -- refusals in a row end it; a timeout or a website fault never does before the lease runs out.
+        if live then
+            old.nextCheck = now() + RETRY
+            if status == 403 then old.refusals = (old.refusals or 0) + 1 end
+            if (old.refusals or 0) < CONFIRM then return old end
+        end
         retire(old, 'no_access')
         -- 2.2.2: a refusal also takes back his chat suggestions (ops/native_commands.lua)
         if status == 403 then for _, fn in ipairs(C.refreshHooks) do pcall(fn, src, nil) end end
-        return nil, type(body) == 'table' and body.error or 'offline'
+        return nil, err
+    end
+    local allowed = {}
+    for _, name in ipairs(body.actions) do if contract[name] then allowed[name] = true end end
+    -- 2.6.1: a narrower list (a Discord role missing for a moment) must come CONFIRM times in a row before it
+    -- is applied: applied at once it switched off his modes and closed the pages he had open.
+    if live then
+        local narrower = false
+        for name in pairs(old.allowed) do if not allowed[name] then narrower = true; break end end
+        old.refusals = 0
+        if narrower then
+            old.narrower = (old.narrower or 0) + 1
+            if old.narrower < CONFIRM then
+                old.at, old.nextCheck = at, now() + RETRY
+                TriggerClientEvent('w_connector:console:permissions', src, package(old)) -- the client's lease too
+                return old
+            end
+        end
+        old.narrower = 0
     end
     local s = old or { source = src, identity = bound, nonce = nonce() }
-    s.allowed, s.at, s.refreshAt, s.role, s.permissions = {}, at, now(), body.role, body.permissions or {}
+    s.allowed, s.at, s.refreshAt, s.role, s.permissions = allowed, at, now(), body.role, body.permissions or {}
+    s.nextCheck, s.refusals, s.narrower = now() + REFRESH, 0, 0
     s.customRoles = {}
     for _, name in ipairs(type(body.customRoles) == 'table' and body.customRoles or {}) do
         if type(name) == 'string' and #s.customRoles < 16 then s.customRoles[#s.customRoles + 1] = name:sub(1, 120) end
     end
-    for _, name in ipairs(body.actions) do if contract[name] then s.allowed[name] = true end end
     keepAccess(s, body) -- 2.3.1
     C.sessions[src] = s
     -- Modes use their exact action, not a broad area; a revoked mode stops on the next watchdog tick.
@@ -237,9 +288,21 @@ RegisterNetEvent('w_connector:console:open', function()
     local src = source
     if not WC.onlineSource(src) or limited(src) then return end
     local s = C.sessions[src]
-    if C.valid(s) and now() - s.refreshAt < 2000 then s.uiOpen = true; TriggerClientEvent('w_connector:console:session', src, package(s)); return end
+    -- 2.6.1: a live session opens at once (no website round trip in the way); when it is due, it is asked
+    -- again behind the open menu. Only an expired or missing session waits for the website.
+    if C.valid(s) then
+        s.uiOpen = true
+        TriggerClientEvent('w_connector:console:session', src, package(s))
+        if now() >= (s.nextCheck or 0) and not opening[src] then CreateThread(function() refresh(src, s) end) end
+        return
+    end
     CreateThread(function()
-        local fresh, err = refresh(src, s)
+        -- 2.6.1: an ask already on its way (the watchdog's) is waited for; it used to answer "busy" (a failure)
+        local deadline = now() + 11000
+        while opening[src] and now() < deadline do Wait(50) end
+        local current = C.sessions[src]
+        local fresh, err
+        if C.valid(current) then fresh = current else fresh, err = refresh(src, current) end
         if fresh then fresh.uiOpen = true end
         TriggerClientEvent('w_connector:console:session', src, fresh and package(fresh) or { ok = false, error = err })
     end)
@@ -309,11 +372,13 @@ function C.dispatch(src, s, name, data, answer)
             body.subjects[#body.subjects + 1] = { source = n, name = GetPlayerName(n), charId = WC.playerView(n).charId, discord = WC.identifiers(n).discord }
         end
     end
-    local status, res = WC.request('POST', '/ingame/console', body, 8000)
+    local status, res = askWebsite('/ingame/console', body, 8000)
     if not C.valid(s) then C.issued[t], WC.Menu.pending[t] = nil, nil; answer({ ok = false, error = 'no_session' }); return end
     if status ~= 200 or type(res) ~= 'table' or not res.ok or not res.queued then
         C.issued[t], WC.Menu.pending[t] = nil, nil
-        if status == 403 then retire(s, 'no_access') end
+        -- 2.6.1: this action is refused; the session is asked again now instead of ended here (one refusal
+        -- used to close the menu and switch every mode off). Repeated refusals end it in refresh().
+        if status == 403 then s.nextCheck = 0 end
         answer(type(res) == 'table' and res or { ok = false, error = 'offline' }); return
     end
     if WC.Menu.pending[t] then SetTimeout(math.max(1, TIMEOUT - (now() - issue.at)), function()
@@ -342,8 +407,10 @@ function C.runAs(src, name, data)
     local s = C.sessions[src]
     -- a character change (or a reused server id) ends the old lease; never renew it in place
     if s and s.identity ~= identity(src) then retire(s, 'no_session'); s = nil end
-    if C.valid(s) and now() - s.refreshAt < 2000 then
+    -- 2.6.1: a live session is used as it is (the website still decides the action itself in C.dispatch)
+    if C.valid(s) then
         TriggerClientEvent('w_connector:console:permissions', src, package(s))
+        if now() >= (s.nextCheck or 0) and not opening[src] then CreateThread(function() refresh(src, s) end) end
     else
         local err
         s, err = refresh(src, s)
@@ -425,15 +492,20 @@ function C.watchdog()
         for src, s in pairs(C.sessions) do
             if not C.valid(s) then retire(s, 'session_expired')
             else
-                if (s.uiOpen or next(modes[src] or {})) and now() - s.refreshAt >= REFRESH and not opening[src] then CreateThread(function() refresh(src, s) end) end
+                if (s.uiOpen or next(modes[src] or {})) and now() >= (s.nextCheck or 0) and not opening[src] then CreateThread(function() refresh(src, s) end) end
                     for name, mode in pairs(modes[src] or {}) do
                         if mode.target and identity(mode.target) ~= mode.identity then
                             modes[src][name] = nil
                             TriggerClientEvent('w_connector:console:stopMode', src, name)
                         end
-                        if modes[src][name] and s.allowed[name] and not C.allowMode(name, src) then
-                            modes[src][name] = nil
-                            TriggerClientEvent('w_connector:console:stopMode', src, name)
+                        -- 2.6.1: the w_guard allowance is renewed every 20 s for 30 s (was 3 s, every second:
+                        -- one guard log line per flag per second, and a list that only grew)
+                        if modes[src][name] and s.allowed[name] and now() >= (mode.guardAt or 0) then
+                            if C.allowMode(name, src, GUARD_GRANT) then mode.guardAt = now() + GUARD_RENEW
+                            else
+                                modes[src][name] = nil
+                                TriggerClientEvent('w_connector:console:stopMode', src, name)
+                            end
                         end
                     end
             end
@@ -442,7 +514,12 @@ end
 CreateThread(function() while true do Wait(1000); C.watchdog() end end)
 AddEventHandler('playerDropped', function()
     local src = source
-    retire(C.sessions[src]); rates[src], opening[src], modes[src] = nil, nil, nil
+    retire(C.sessions[src]); rates[src], opening[src], modes[src], identities[src] = nil, nil, nil, nil
+end)
+-- 2.6.1: a server rank given or taken (w_core/server/ranks.lua) gets every live session asked again at once,
+-- so a change is seen without asking the website every few seconds
+AddEventHandler('w_core:ranks:changed', function()
+    for _, s in pairs(C.sessions) do s.nextCheck = 0 end
 end)
 AddEventHandler('onResourceStop', function(res)
     if res ~= GetCurrentResourceName() then return end
