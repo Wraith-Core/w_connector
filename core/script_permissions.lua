@@ -67,6 +67,30 @@ local function gone(principal, node)
     if allowed == false then return true end
     return allowed == true and aceAllowed(CONTROL, node) == true
 end
+-- 2.7.2 (owner 2026-11-08: staff saw «ليست لديك صلاحية» now and then and had to retry): ACE is hierarchical, so a
+-- child node (w_farming.admin.cleanup) stays allowed while its parent (w_farming.admin) is still granted. Removing
+-- the child first could never be proven, the whole grant was cleared and re-applied, and the staff member had no
+-- permission in between. Parents are removed first now, and an obsolete child covered by a node that stays is
+-- simply dropped (the parent grants it on purpose).
+local function depth(node) return select(2, tostring(node):gsub('%.', '')) end
+local function byDepth(set)
+    local list = {}
+    for node in pairs(set) do list[#list + 1] = node end
+    table.sort(list, function(a, b)
+        local da, db = depth(a), depth(b)
+        if da ~= db then return da < db end
+        return a < b
+    end)
+    return list
+end
+local function coveredBy(set, node)
+    local parent = tostring(node)
+    while true do
+        parent = parent:match('^(.+)%.[^.]+$')
+        if not parent then return false end
+        if set[parent] then return true end
+    end
+end
 local function persist()
     if journalBlocked or type(SetResourceKvp) ~= 'function' or type(GetResourceKvpString) ~= 'function'
         or type(json) ~= 'table' or type(json.encode) ~= 'function' then
@@ -106,7 +130,7 @@ local function clear(s)
         unbound = execute(('remove_principal player.%d %s'):format(s.source, s.principal))
         if unbound and gone('player.' .. s.source, probe(s)) then s.bound = false; changed = true end
     end
-    for node in pairs(s.nodes) do
+    for _, node in ipairs(byDepth(s.nodes)) do
         local ok = execute(('remove_ace %s %s allow'):format(s.principal, node))
         if ok and gone(s.principal, node) then s.nodes[node] = nil; changed = true end
     end
@@ -210,9 +234,11 @@ local function apply(s, grants, allowed, deadline, started)
     end
     -- Revoke obsolete nodes before adding the new set. Verification is conservative: an inherited
     -- ancestor may prevent proving one exact removal, in which case clear all owned grants and retry.
-    for node in pairs(before) do
+    for _, node in ipairs(byDepth(before)) do
         if not nodes[node] then
-            if not execute(('remove_ace %s %s allow'):format(s.principal, node)) or aceAllowed(s.principal, node) ~= false then clear(s); return false end
+            local ok = execute(('remove_ace %s %s allow'):format(s.principal, node))
+            -- a node still covered by a parent that stays is allowed on purpose: no proof needed
+            if not ok or (not coveredBy(nodes, node) and aceAllowed(s.principal, node) ~= false) then clear(s); return false end
             s.nodes[node] = nil
             changed = true
         end
