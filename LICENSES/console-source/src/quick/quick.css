@@ -8,8 +8,8 @@
  * ════════════════════════════════════════════════════════════════════════════ */
 
 .q-panel {
-  /* 2.7.0: docked at the inline start like every board of the shared kit (the right in Arabic, the left in English) */
-  position: fixed; top: 1.25rem; bottom: 1.25rem; inset-inline-start: calc(1.75rem + var(--ws-gutter));
+  /* 2.7.1: on the right in both languages again, where it stood before 2.7.0 (the content stays RTL in Arabic) */
+  position: fixed; top: 1.25rem; bottom: 1.25rem; right: calc(1.75rem + var(--ws-gutter));
   width: 28rem; max-width: calc(100vw - 2 * var(--shell-inset));
   display: flex; flex-direction: column; gap: .75rem; min-height: 0;
 }
@@ -19,7 +19,6 @@
   background: linear-gradient(270deg, rgba(11, 10, 10, .82) 0%, rgba(11, 10, 10, .6) 22%, rgba(11, 10, 10, .2) 40%, rgba(11, 10, 10, 0) 55%);
   animation: q-fade 220ms var(--ease) both;
 }
-.q-panel[dir='ltr'] .q-scrim { background: linear-gradient(90deg, rgba(11, 10, 10, .82) 0%, rgba(11, 10, 10, .6) 22%, rgba(11, 10, 10, .2) 40%, rgba(11, 10, 10, 0) 55%); }
 @keyframes q-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes q-rise { from { opacity: 0; transform: translate3d(0, .6rem, 0); } to { opacity: 1; transform: none; } }
 
@@ -186,4 +185,4 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
 
 @media (prefers-reduced-motion: reduce) { .q-scrim, .q-wrap, .q-foot { animation: none; } }
 html.k-reduced-motion .q-scrim, html.k-reduced-motion .q-wrap, html.k-reduced-motion .q-foot { animation: none; }
-@media (max-width: 1500px) { .q-panel { top: .875rem; bottom: .875rem; inset-inline-start: calc(1.125rem + var(--ws-gutter)); width: 27rem; } }
+@media (max-width: 1500px) { .q-panel { top: .875rem; bottom: .875rem; right: calc(1.125rem + var(--ws-gutter)); width: 27rem; } }
