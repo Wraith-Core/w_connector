@@ -219,10 +219,48 @@ end
 
 function WC.queueSize() return #queue end
 
+-- 2.6.2 (owner): the loading screen greets the player by his Discord name and picture, not the RedM
+-- account name (often a random one like "BluntCrab2043"). w_logs' bot reads them (exports.w_logs:DiscordProfile,
+-- cached); the join waits for that answer at most PROFILE_WAIT_MS, and only on the way in, never on a refusal.
+local PROFILE_WAIT_MS = 2500
+
+local function askProfile(src)
+    local ask = { done = false, at = GetGameTimer() }
+    local discord = WC.identifiers(src).discord
+    if not discord then ask.done = true return ask end
+    local ok = pcall(function()
+        if GetResourceState('w_logs') ~= 'started' then error('w_logs is not running') end
+        exports.w_logs:DiscordProfile(discord, function(profile)
+            ask.profile = profile
+            ask.done = true
+        end)
+    end)
+    if not ok then ask.done = true end
+    return ask
+end
+
+local function handProfile(deferrals, ask)
+    while not ask.done and GetGameTimer() - ask.at < PROFILE_WAIT_MS do Wait(50) end
+    local profile = ask.profile
+    if type(profile) ~= 'table' then return end
+    local name = type(profile.name) == 'string' and #profile.name <= 160 and profile.name or nil
+    local avatar = type(profile.avatar) == 'string' and #profile.avatar <= 200
+        and profile.avatar:match('^https://cdn%.discordapp%.com/avatars/%d+/[%w_]+%.%a+%?size=%d+$') and profile.avatar or nil
+    if not name and not avatar then return end
+    pcall(deferrals.handover, { wl_discord_name = name, wl_discord_avatar = avatar })
+end
+
+--- Let the player in (after the loading screen got his Discord name and picture).
+local function allow(deferrals, ask)
+    handProfile(deferrals, ask)
+    deferrals.done()
+end
+
 AddEventHandler('playerConnecting', function(name, _, deferrals)
     local src = source
     deferrals.defer()
     Wait(0)
+    local ask = askProfile(src)
     -- 2.2.0: the host agent announced a shutdown (core/host.lua): nobody new comes in
     if WC.Host and WC.Host.shuttingDown then return deferrals.done(card('closing', WC.Host.say('closing'))) end
     -- (Not `a and done(x) or done()`: done returns nothing, so that form calls done twice.)
@@ -231,7 +269,7 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
         if banned then return deferrals.done(banned) end
         if closedLocally(src) then return deferrals.done(say('closed')) end
         if failClosed() then return deferrals.done(say('unavailable')) end
-        return deferrals.done()
+        return allow(deferrals, ask)
     end
 
     deferrals.update(JoinCard.line(joinMessage('checking')))
@@ -241,7 +279,7 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
         if banned then return deferrals.done(banned) end
         if closedLocally(src) then return deferrals.done(say('closed')) end
         if failClosed() then return deferrals.done(say('unavailable')) end
-        return deferrals.done()
+        return allow(deferrals, ask)
     end
     local priority = math.tointeger(tonumber(body.priority)) or 0
     if body.allow == false then
@@ -253,7 +291,7 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
         priority = approved
     end
 
-    if slotsFree() and #queue == 0 then return deferrals.done() end
+    if slotsFree() and #queue == 0 then return allow(deferrals, ask) end
 
     -- Full: wait in line. A player who closes the game leaves the line (GetPlayerName answers nil).
     queue[#queue + 1] = { src = src, prio = priority, at = GetGameTimer() }
@@ -262,7 +300,7 @@ AddEventHandler('playerConnecting', function(name, _, deferrals)
         local pos = position(src)
         if pos == 1 and slotsFree() then
             leave(src)
-            return deferrals.done()
+            return allow(deferrals, ask)
         end
         deferrals.update(JoinCard.line(joinMessage('queued', pos or 0, #queue)))
         Wait(2000)
