@@ -63,9 +63,14 @@ html[lang='en'] .dsh-desk-name { font: 600 var(--fs-22)/1.2 var(--f-title); }
   color: var(--paper); border-bottom-color: transparent;
 }
 .dsh-row.is-here::before { opacity: 1; }
-.dsh-row.is-picked { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--mark); }
-.dsh-row.is-picked::after { content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--mark); }
-.dsh-row.is-picked.is-here { background: transparent; box-shadow: none; }
+/* 2.7.0 the picked player (the shared kit's .wf-row.is-picked): the red mark band with light words, the lit mark under the cursor */
+.dsh-row.is-picked {
+  --band: var(--mark); --paper: var(--mark-ink); --paper-dim: rgba(242, 242, 242, .8); --paper-faint: rgba(242, 242, 242, .7);
+  --rule-2: rgba(242, 242, 242, .42); --ink: var(--w-ink, #0B0A0A);
+  color: var(--paper); border-bottom-color: transparent;
+}
+.dsh-row.is-picked::before { opacity: 1; }
+.dsh-row.is-picked.is-here { --band: var(--mark-lit); }
 .dsh-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .0625rem; }
 .dsh-row-name { font: 700 var(--fs-15)/1.25 var(--f-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dsh-row-meta { display: flex; gap: .625rem; font-size: var(--fs-12); color: var(--paper-faint); white-space: nowrap; overflow: hidden; }

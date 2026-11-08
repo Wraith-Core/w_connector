@@ -123,7 +123,8 @@ html.k-help-mode .k-tab-help, html.k-help-mode .k-chip-help, html.k-help-mode .k
 .k-note-cap { display: flex; align-items: baseline; gap: .5rem; }
 /* the handwritten caption: Aref Ruqaa needs room for its tails, never clipped */
 .k-note-hand { font: 1.375rem/1.4 var(--f-hand); color: var(--note-dim); }
-html[lang='en'] .k-note-hand { font: .8rem/1.2 var(--f-latin-caption); letter-spacing: .06em; text-transform: uppercase; }
+/* 2.7.0: the shared kit's label face (EB Garamond small caps), no more Hapna Slab */
+html[lang='en'] .k-note-hand { font: 500 var(--fs-15)/1.2 var(--f-title); font-variant-caps: all-small-caps; letter-spacing: .1em; }
 .k-note-pin {
   margin-inline-start: auto;
   font: 700 var(--fs-11)/1.4 var(--f-ui);

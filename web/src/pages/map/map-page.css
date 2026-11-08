@@ -12,9 +12,11 @@
 .mp-sep { align-self: stretch; width: 1px; margin: .25rem .125rem; background: var(--rule); }
 .mp-layer.k-btn { gap: .4375rem; }
 .mp-layer .k-shape-sq, .mp-layer .k-shape-hollow { margin-inline-end: .4375rem; vertical-align: .05em; }
-.mp-layer.k-btn.is-on { color: var(--paper); border-color: var(--rule-2); }
-/* under the cursor a shown layer takes the kit's band like any button: ink words */
-.mp-layer.k-btn.is-on:hover:not(:disabled), .mp-layer.k-btn.is-on:focus-visible { color: var(--ink); border-color: transparent; }
+/* 2.7.0 a shown layer is switched on: the red mark band with light words (the lit mark under the cursor) */
+.mp-layer.k-btn.is-on { --paper: var(--mark-ink); color: var(--mark-ink); border-color: transparent; }
+.mp-layer.k-btn.is-on::before { background: var(--mark); }
+.mp-layer.k-btn.is-on:hover:not(:disabled), .mp-layer.k-btn.is-on:focus-visible { color: var(--mark-ink); border-color: transparent; }
+.mp-layer.k-btn.is-on:hover:not(:disabled)::before, .mp-layer.k-btn.is-on:focus-visible::before { background: var(--mark-lit); }
 .mp-cursor { margin-inline-start: auto; display: inline-flex; align-items: center; gap: .375rem; font-size: var(--fs-13); color: var(--paper-faint); white-space: nowrap; }
 .mp-cursor .k-num { min-width: 9.5rem; text-align: end; }
 

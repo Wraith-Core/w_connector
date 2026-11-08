@@ -16,7 +16,8 @@
 html[lang='en'] .pm-you-level { font: 600 1.5rem/1.15 var(--f-title); }
 .pm-you-count { margin-top: .25rem; font-size: var(--fs-14); color: var(--paper-dim); }
 .pm-you-bar { margin-top: .5rem; margin-bottom: .125rem; height: 4px; background: var(--ink-4); position: relative; }
-.pm-you-bar > span { position: absolute; inset-block: 0; inset-inline-start: 0; background: var(--red); }
+/* 2.7.0: a gauge is paper on its thin track (red is kept for a critical state) */
+.pm-you-bar > span { position: absolute; inset-block: 0; inset-inline-start: 0; background: var(--paper); }
 
 .pm-role-list { margin: .625rem 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; }
 .pm-role {

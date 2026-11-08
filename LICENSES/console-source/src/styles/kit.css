@@ -1,8 +1,9 @@
 /* ════════════════════════════════════════════════════════════════════════════
  * w_admin · styles/kit.css
  * Every kit component. Square corners, one thin rule, paper text on ink, red only as a mark.
- * The states are the server theme's (w_lib/nui/theme/THEME.md): the cursor, the active page, the active
- * tab and the selected row are the game's brushed paper band with ink text.
+ * The states are the shared kit's (w_train web/src/kit.css): the cursor is the game's brushed paper band with
+ * ink text; the chosen item (the open page, the open tab, the selected row, a switch that is on) is the red
+ * mark band with light text (2.7.0, wave 4 of the UI unification).
  * ════════════════════════════════════════════════════════════════════════════ */
 
 /* ── the paper band ─────────────────────────────────────────────────────────
@@ -38,7 +39,12 @@
  * unselected item stays the paper band. Inside the mark the palette does NOT turn to ink. The board-look
  * marks that are not a band (the open tab's rule, the selected row's hairlines and tick) take the red too. */
 .sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn, .k-settings-item.is-active .k-settings-btn,
-.k-seg-btn.is-on, .k-switch.is-on .k-switch-opt.is-active, .k-chip.is-on, .sh-helpbtn.is-on {
+.k-seg-btn.is-on, .k-switch.is-on .k-switch-opt.is-active, .k-chip.is-on, .sh-helpbtn.is-on,
+/* 2.7.0 (wave 4, the shared kit's rule): the open tab, the selected table row and the chosen option of a list
+   are the red mark too (they were a red rule, two hairlines + a tick, and a bold word). Written after the
+   paper-band scopes with at least their weight, so the cursor on a selected item keeps the mark. */
+.k-tab-wrap > .k-tab.is-active:not(:disabled), .k-table-wrap .k-table tbody tr.is-selected > td,
+.k-pop-list > .k-pop-opt.is-selected {
   --band: var(--mark);
   --paper: var(--mark-ink);
   --paper-lit: var(--w-paper-lit, #FFFFFF);
@@ -56,7 +62,10 @@
 /* the mark under the cursor */
 .sh-nav-item.is-active:not(.is-parent) > .sh-nav-btn:hover, .k-settings-item.is-active .k-settings-btn:hover,
 .k-seg-btn.is-on:hover:not(:disabled), .k-switch.is-on:hover:not(:disabled) .k-switch-opt.is-active,
-.k-chip.is-on:hover:not(:disabled), .sh-helpbtn.is-on:hover { --band: var(--mark-lit); }
+.k-chip.is-on:hover:not(:disabled), .sh-helpbtn.is-on:hover,
+.k-tab-wrap:hover > .k-tab.is-active:not(:disabled), .k-table-wrap .k-table tbody tr.is-selected:hover > td,
+.k-pop-list > .k-pop-opt.is-selected.is-active { --band: var(--mark-lit); }
+.k-tab-wrap > .k-tab.is-active:active:not(:disabled), .k-table-wrap .k-table tbody tr.is-selected:active > td { --band: var(--mark-deep); }
 /* the band is a ::before behind the content (the content is never masked). A table cell takes the
    middle of the brush and the row's two end cells its torn ends, so a row reads as one stroke. */
 .sh-nav-btn, .k-settings-btn, .k-tab, .k-seg-btn, .k-switch-opt, .k-chip, .k-pop-opt, .sh-pal-item, .sh-helpbtn {
@@ -78,7 +87,8 @@
 .k-seg-btn.is-on::before, .k-switch.is-on .k-switch-opt.is-active::before, .k-chip.is-on::before,
 .k-table-wrap[tabindex] tbody tr:hover > td::before,
 .k-pop-opt.is-active::before, .sh-pal-item.is-active::before, .sh-helpbtn.is-on::before, .sh-helpbtn:hover::before,
-.sh-helpbtn:focus-visible::before { opacity: 1; }
+.sh-helpbtn:focus-visible::before, .k-tab.is-active:not(:disabled)::before, .k-table tbody tr.is-selected > td::before,
+.k-pop-opt.is-selected::before { opacity: 1; }
 /* the band is the focus mark: no second ring around it */
 .sh-nav-btn:focus-visible, .k-settings-btn:focus-visible, .k-tab:focus-visible, .sh-helpbtn:focus-visible { outline: none; }
 
@@ -91,7 +101,7 @@
   position: relative; isolation: isolate;
   display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
   height: var(--control); padding: 0 1rem; min-width: 0;
-  border: 1px solid transparent; background: transparent; color: var(--paper);
+  border: 1px solid transparent; background: transparent; color: var(--paper-dim);
   font: 700 var(--fs-14)/1 var(--f-ui); white-space: nowrap;
   transition: background var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
@@ -100,7 +110,7 @@
    ink band on the paper one instead of vanishing into it. */
 .k-btn::before {
   content: ''; position: absolute; inset: -1px; z-index: -1; pointer-events: none;
-  background: var(--ink-4); opacity: 1;
+  background: var(--ink-3); opacity: 1;
   -webkit-mask: var(--tex-band-sm) center / 100% 100% no-repeat; mask: var(--tex-band-sm) center / 100% 100% no-repeat;
   transition: opacity var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
 }
@@ -178,7 +188,9 @@
 .k-iconbtn--secondary { background: var(--ink-3); }
 /* danger: the red underline, like the danger button (never a red box) */
 .k-iconbtn--danger { color: var(--paper); box-shadow: inset 0 -2px 0 var(--red); }
-.k-iconbtn[aria-pressed='true'] { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+/* a pressed (switched on) icon button is a chosen item: the red mark */
+.k-iconbtn[aria-pressed='true'] { background: var(--mark); color: var(--mark-ink); border-color: var(--mark); box-shadow: none; }
+.k-iconbtn[aria-pressed='true']:hover:not(:disabled) { background: var(--mark-lit); color: var(--mark-ink); }
 .k-iconbtn:disabled { opacity: .45; }
 
 /* ── fields ─────────────────────────────────────────────────────────────── */
@@ -273,7 +285,7 @@
 .k-slider .k-ctlwrap { width: 6.5rem; flex: none; }
 .k-slider-track { position: relative; flex: 1; height: 1.5rem; display: flex; align-items: center; }
 .k-slider-track::before { content: ''; position: absolute; inset-inline: 0; height: 4px; background: var(--ink-4); }
-.k-slider-track::after { content: ''; position: absolute; left: 0; width: var(--pct, 0%); height: 4px; background: var(--red); pointer-events: none; }
+.k-slider-track::after { content: ''; position: absolute; left: 0; width: var(--pct, 0%); height: 4px; background: var(--paper); pointer-events: none; }
 .k-slider.is-low .k-slider-track::after { background: var(--red); }
 .k-slider-track input { position: relative; z-index: 1; width: 100%; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; height: 1.5rem; }
 .k-slider-track input::-webkit-slider-runnable-track { height: 4px; background: transparent; }
@@ -415,7 +427,8 @@ html[lang='en'] .k-section-title { font: 600 var(--fs-18)/1.25 var(--f-title); }
   content: ''; position: absolute; inset-inline: .75rem; bottom: -1px; height: 2px;
   background: var(--paper); opacity: 0; transition: opacity var(--t-fast) var(--ease); pointer-events: none;
 }
-.k-tab.is-active::after { opacity: 1; background: var(--mark); }
+/* 2.7.0: the open tab is the red mark band (the band section), no rule under it */
+.k-tab.is-active::after { opacity: 0; }
 .k-tabs--box .k-tab { border: 1px solid var(--rule); }
 .k-tabs--box .k-tab.is-active, .k-tabs--box .k-tab-wrap:hover > .k-tab:not(:disabled) { border-color: transparent; }
 .k-tab:disabled { opacity: .45; }
@@ -541,13 +554,11 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
    band on it, and the selected row keeps the band */
 .k-table tbody tr:hover td { background: var(--ink-2); }
 .k-table-wrap[tabindex] tbody tr:hover > td { background: transparent; border-bottom-color: transparent; }
-/* 2.3.0 the selected row (the board's .ws-row.is-picked): a darker plate between two paper hairlines and a
-   paper tick at its end - never a second band; a hover never moves it, a click or Enter does */
-.k-table tbody tr.is-selected > td { background: var(--ink-3); box-shadow: inset 0 1px 0 var(--mark), inset 0 -1px 0 var(--mark); }
-.k-table tbody tr.is-selected > td:last-child::after {
-  content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--mark);
-}
-.k-table-wrap[tabindex] tbody tr.is-selected:hover > td { box-shadow: none; }
+/* 2.7.0 the selected row (the shared kit's .wf-row.is-picked): the red mark band with light words (the band
+   section); the cursor elsewhere stays the paper band. A hover never moves it, a click or Enter does. */
+.k-table tbody tr.is-selected > td { background: transparent; border-bottom-color: transparent; color: var(--paper); }
+/* a low meter on the mark: ink, so it still reads as the odd one out */
+.k-table tbody tr.is-selected .k-meter.is-low .k-meter-fill { background: var(--w-ink, #0B0A0A); }
 /* each cell shows the middle of the brush; the row's two end cells show its torn ends */
 .k-table tbody td::before { -webkit-mask-size: 300% 100%; mask-size: 300% 100%; }
 .k-table tbody td:first-child::before { -webkit-mask-position: left center; mask-position: left center; }
@@ -589,7 +600,8 @@ html:not(.k-help-mode) .k-settings-item:not(.is-active):not(:hover) .k-settings-
 
 .k-meter { display: inline-flex; align-items: center; gap: .375rem; direction: ltr; }
 .k-meter-bar { position: relative; width: 3.375rem; height: 5px; background: var(--ink-4); }
-.k-meter-fill { position: absolute; inset: 0 auto 0 0; background: var(--red); }
+/* 2.7.0 (owner's rule for gauges): paper on the thin track, red only when it is low */
+.k-meter-fill { position: absolute; inset: 0 auto 0 0; background: var(--paper); }
 .k-meter.is-low .k-meter-fill { background: var(--red); }
 .k-meter b { font-weight: 700; font-size: var(--fs-14); min-width: 1.6rem; text-align: end; }
 .k-meter.is-none { color: var(--paper-faint); }

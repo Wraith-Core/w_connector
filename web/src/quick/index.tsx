@@ -273,7 +273,7 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
           </span>
           <HelpTip help="help.quick.active" label={t('label.quick.activeNone')} size="sm" />
         </div>
-        <Button help="help.quick.full" kind="primary" block kbd="F10" onClick={onFull}>{t('label.quick.full')}</Button>
+        <Button help="help.quick.full" kind="primary" kbd="F10" onClick={onFull}>{t('label.quick.full')}</Button>
         <div className="q-keys">
           <span><kbd>1</kbd>–<kbd>{Math.min(9, groups.length)}</kbd> {t('label.quick.keys.groups')}</span>
           <span><kbd>↑</kbd><kbd>↓</kbd> {t('label.quick.keys.move')}</span>

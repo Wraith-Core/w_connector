@@ -8,7 +8,8 @@
  * ════════════════════════════════════════════════════════════════════════════ */
 
 .q-panel {
-  position: fixed; top: 1.25rem; bottom: 1.25rem; right: calc(1.75rem + var(--ws-gutter));
+  /* 2.7.0: docked at the inline start like every board of the shared kit (the right in Arabic, the left in English) */
+  position: fixed; top: 1.25rem; bottom: 1.25rem; inset-inline-start: calc(1.75rem + var(--ws-gutter));
   width: 28rem; max-width: calc(100vw - 2 * var(--shell-inset));
   display: flex; flex-direction: column; gap: .75rem; min-height: 0;
 }
@@ -18,6 +19,7 @@
   background: linear-gradient(270deg, rgba(11, 10, 10, .82) 0%, rgba(11, 10, 10, .6) 22%, rgba(11, 10, 10, .2) 40%, rgba(11, 10, 10, 0) 55%);
   animation: q-fade 220ms var(--ease) both;
 }
+.q-panel[dir='ltr'] .q-scrim { background: linear-gradient(90deg, rgba(11, 10, 10, .82) 0%, rgba(11, 10, 10, .6) 22%, rgba(11, 10, 10, .2) 40%, rgba(11, 10, 10, 0) 55%); }
 @keyframes q-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes q-rise { from { opacity: 0; transform: translate3d(0, .6rem, 0); } to { opacity: 1; transform: none; } }
 
@@ -119,11 +121,15 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
   display: inline-flex; align-items: center; height: 1.5rem; padding: 0 .5rem;
   border: 1px solid rgba(242, 242, 242, .35); font: 700 var(--fs-12)/1 var(--f-ui); color: var(--paper-dim); white-space: nowrap;
 }
-.q-state.is-on { background: var(--green); border-color: var(--green); color: var(--ink); }
+/* 2.7.0: a mode that is on is a chosen item: the red mark band with light words (the shared kit's switch) */
+.q-state { position: relative; isolation: isolate; }
+.q-state.is-on { border-color: transparent; color: var(--mark-ink); }
+.q-state.is-on::before {
+  content: ''; position: absolute; inset: -1px; z-index: -1; pointer-events: none; background: var(--mark);
+  -webkit-mask: var(--tex-band-sm) center / 100% 100% no-repeat; mask: var(--tex-band-sm) center / 100% 100% no-repeat;
+}
 .q-chev { width: .9rem; height: .9rem; }
 [dir='rtl'] .q-chev { transform: scaleX(-1); }
-.q-panel .k-btn.q-tool.is-on { box-shadow: inset 2px 0 0 var(--green); }
-[dir='rtl'] .q-panel .k-btn.q-tool.is-on { box-shadow: inset -2px 0 0 var(--green); }
 .q-panel .k-btn.q-tool.is-danger { box-shadow: inset 2px 0 0 var(--red); }
 [dir='rtl'] .q-panel .k-btn.q-tool.is-danger { box-shadow: inset -2px 0 0 var(--red); }
 .q-panel .k-btn.q-tool:disabled { opacity: .5; }
@@ -145,10 +151,17 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
   background: transparent; border: 0; border-bottom: 1px solid var(--rule); color: var(--paper);
   font-weight: 400; white-space: normal; text-align: start;
 }
-/* the chosen target: the board's picked row (a darker plate, a frame, a paper tick); the band stays the cursor */
+/* 2.7.0 the chosen target: the shared kit's picked row, the red mark band with light words (the cursor elsewhere
+   stays the paper band; on the chosen row it is the lit mark) */
 .q-panel .k-btn.q-prow:active:not(:disabled) { transform: none; }
-.q-panel .k-btn.q-prow.is-on { background: var(--ink-3); box-shadow: inset 0 0 0 1px var(--mark); }
-.q-panel .k-btn.q-prow.is-on::after { content: ''; position: absolute; inset-inline-end: .15rem; top: 28%; bottom: 28%; width: 2px; background: var(--mark); }
+.q-panel .k-btn.q-prow.is-on, .q-panel .k-btn.q-prow.is-on:hover:not(:disabled), .q-panel .k-btn.q-prow.is-on:focus-visible {
+  --paper: var(--mark-ink); --paper-dim: rgba(242, 242, 242, .8); --paper-faint: rgba(242, 242, 242, .7);
+  color: var(--mark-ink); border-bottom-color: transparent;
+}
+.q-panel .k-btn.q-prow.is-on::before { opacity: 1; background: var(--mark); }
+.q-panel .k-btn.q-prow.is-on:hover:not(:disabled)::before, .q-panel .k-btn.q-prow.is-on:focus-visible::before { background: var(--mark-lit); }
+/* the main action of the strip is a band the size of its words, never a full-width red plate */
+.q-foot > .k-btnwrap { align-self: center; }
 .q-prow .k-btn-label { flex: 1; min-width: 0; display: flex; align-items: center; gap: .75rem; overflow: visible; }
 .q-prow-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .q-prow-name { font: 700 var(--fs-145)/1.3 var(--f-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -173,4 +186,4 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
 
 @media (prefers-reduced-motion: reduce) { .q-scrim, .q-wrap, .q-foot { animation: none; } }
 html.k-reduced-motion .q-scrim, html.k-reduced-motion .q-wrap, html.k-reduced-motion .q-foot { animation: none; }
-@media (max-width: 1500px) { .q-panel { top: .875rem; bottom: .875rem; right: 1.125rem; width: 27rem; } }
+@media (max-width: 1500px) { .q-panel { top: .875rem; bottom: .875rem; inset-inline-start: calc(1.125rem + var(--ws-gutter)); width: 27rem; } }
