@@ -66,6 +66,9 @@ export default function PermsPage() {
 
   return (
     <div className="pm-page">
+      <div className="k-story">
+        <p className="k-story-say" dir="auto">{t('label.perms.say', fmtNum(view.counts.web), fmtNum(view.counts.webTotal), fmtNum(view.counts.scripts), fmtNum(view.counts.scriptsTotal))}</p>
+      </div>
       <div className="pm-top">
         <YouCard view={view} />
         <RolesCard view={view} />

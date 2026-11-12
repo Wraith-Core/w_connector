@@ -123,6 +123,12 @@
         "c30": "Light red",
         "c31": "Cream",
         "c32": "White"
+      },
+      "need": {
+        "name": "the name",
+        "shorter": "a shorter name",
+        "sprite": "the marker look",
+        "pos": "the place (here or the map waypoint)"
       }
     }
   }

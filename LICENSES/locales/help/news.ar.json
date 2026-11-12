@@ -147,6 +147,11 @@
         "noText": "النص يظهر هنا.",
         "emptyAr": "لا أخبار الآن. تابِع هذه الورقة.",
         "emptyEn": "No news right now. Keep an eye on this sheet."
+      },
+      "need": {
+        "title": "العنوان",
+        "shorter": "نص أقصر",
+        "image": "رابط صورة صحيح"
       }
     }
   }

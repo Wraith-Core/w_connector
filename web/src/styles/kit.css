@@ -783,3 +783,9 @@ html[lang='en'] .k-dialog-title { font: 600 1.5rem/1.15 var(--f-title); }
 .k-where > svg { flex: none; width: .9rem; height: .9rem; opacity: .8; }
 .k-where > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .k-where.is-miss { color: #F09A9C; }
+
+/* the notebook story: one sentence that says what this thing is, then short lines (places in words) */
+.k-story { display: flex; flex-direction: column; gap: .35rem; padding: .25rem 0 .6rem; border-bottom: 1px solid var(--rule); margin-bottom: .5rem; }
+.k-story-say { margin: 0; font: 600 var(--fs-16)/1.45 var(--f-ui); color: var(--paper); }
+.k-story-line { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; font: 400 var(--fs-14)/1.35 var(--f-ui); color: var(--paper-dim); }
+.k-story-line.k-dim { color: var(--paper-faint); }

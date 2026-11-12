@@ -9,8 +9,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
-  Button, DataTable, Drawer, EmptyState, Field, FilterChips, KeyValue, KeyValueList, Section, SplitView, Tag, TextArea, TextInput,
-  Toolbar, fmtDate,
+  Button, DataTable, Drawer, EmptyState, Field, FilterChips, Fold, KeyValue, KeyValueList, ReadyLine, Section, SplitView, Tag, TextArea,
+  TextInput, Toolbar, Where, fmtAgo, fmtDate, useWhere,
 } from '../../kit';
 import type { ChipItem, Column } from '../../kit';
 import { post } from '../../nui';
@@ -38,6 +38,15 @@ interface ListAnswer { reports?: Report[]; totalReports?: number }
 /** oxmysql hands a TIMESTAMP back as epoch milliseconds; fmtDate takes seconds */
 const secs = (v: number | string | undefined): number | string | undefined =>
   typeof v === 'number' && v > 1e12 ? Math.floor(v / 1000) : v;
+
+/** a TIMESTAMP (epoch ms, seconds or a date string) -> unix seconds, or null */
+const unixOf = (v: number | string | undefined): number | null => {
+  const s = secs(v);
+  if (typeof s === 'number') return s > 0 ? s : null;
+  if (!s) return null;
+  const d = new Date(String(s).replace(' ', 'T')).getTime();
+  return Number.isFinite(d) ? Math.floor(d / 1000) : null;
+};
 
 function ReportsPage(_: PageProps) {
   const app = useApp();
@@ -148,7 +157,7 @@ function ReportDrawer({ r, statusTag, onClose, onChanged }: {
   r: Report; statusTag: (s: Status) => JSX.Element; onClose(): void; onChanged(): void;
 }) {
   const app = useApp();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [reply, setReply] = useState('');
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
@@ -184,11 +193,15 @@ function ReportDrawer({ r, statusTag, onClose, onChanged }: {
         </>
       )}
     >
-      <KeyValueList>
-        <KeyValue label={t('label.reports.col.by')} help="help.reports.col.by" value={r.claimed_by || '—'} />
-        <KeyValue label={t('label.reports.col.at')} help="help.reports.col.at" value={fmtDate(secs(r.created_at))} ltr />
-        {r.reported_player_username && <KeyValue label={t('label.reports.against')} help="help.reports.against" value={r.reported_player_username} />}
-      </KeyValueList>
+      <ReportStory r={r} t={t} lang={lang} />
+      <Fold>
+        <KeyValueList>
+          <KeyValue label={t('label.reports.col.id')} help="help.reports.col.id" value={String(r.id)} ltr />
+          <KeyValue label={t('label.reports.col.by')} help="help.reports.col.by" value={r.claimed_by || '—'} />
+          <KeyValue label={t('label.reports.col.at')} help="help.reports.col.at" value={fmtDate(secs(r.created_at))} ltr />
+          {r.reported_player_username && <KeyValue label={t('label.reports.against')} help="help.reports.against" value={r.reported_player_username} />}
+        </KeyValueList>
+      </Fold>
       <Section title={t('label.reports.thread')} help="help.reports.thread" tone="plain">
         {(r.messages?.length ? r.messages : [{ sender_name: r.reporter_username, sender_type: 'player', message: r.description }]).map((m, i) => (
           <p key={i} dir="auto" style={{ margin: '0 0 calc(8 * var(--ws-px))' }}>
@@ -201,6 +214,7 @@ function ReportDrawer({ r, statusTag, onClose, onChanged }: {
       {r.status !== 'resolved' && (
         <Section title={t('label.reports.reply')} help="help.reports.reply" tone="plain">
           <TextArea value={reply} onChange={setReply} rows={3} maxLength={2000} label={t('label.reports.reply')} help="help.reports.reply" />
+          <ReadyLine missing={reply.trim() ? [] : [t('label.reports.need.reply')]} />
           <Button help="help.reports.send" kind="primary" area="reports" busy={busy} disabled={!reply.trim()} onClick={() => act('message', { message: reply.trim() })}>{t('label.reports.send')}</Button>
           <Field label={t('label.reports.notes')} help="help.reports.notes">
             <TextArea value={notes} onChange={setNotes} rows={2} maxLength={1000} />
@@ -213,6 +227,32 @@ function ReportDrawer({ r, statusTag, onClose, onChanged }: {
         </Section>
       )}
     </Drawer>
+  );
+}
+
+type TF = ReturnType<typeof useI18n>['t'];
+
+/** the report in one sentence + where the two players are now (when they are on the server) */
+function ReportStory({ r, t, lang }: { r: Report; t: TF; lang: ReturnType<typeof useI18n>['lang'] }) {
+  const app = useApp();
+  const byName = (n?: string) => (n ? app.players.find((p) => p.name === n) ?? null : null);
+  const who = byName(r.reporter_username);
+  const against = byName(r.reported_player_username);
+  const where = useWhere([who?.coords, against?.coords]);
+  const at = unixOf(r.created_at);
+  const name = r.reporter_username || t('label.reports.unknown');
+  let say = at !== null ? t('label.reports.say.filed', name, fmtAgo(t, lang, at)) : t('label.reports.say.filedNoTime', name);
+  if (r.reported_player_username) say += t('label.reports.say.against', r.reported_player_username);
+  say += r.status === 'open' ? t('label.reports.say.open')
+    : r.status === 'claimed' ? t('label.reports.say.claimed', r.claimed_by || '—')
+      : t('label.reports.say.resolved');
+  return (
+    <div className="k-story">
+      <p className="k-story-say" dir="auto">{say}</p>
+      {who && <p className="k-story-line">{t('label.reports.say.whoNow', name)} <Where text={where(who.coords)} /></p>}
+      {against && <p className="k-story-line">{t('label.reports.say.whoNow', r.reported_player_username || '')} <Where text={where(against.coords)} /></p>}
+      {!who && r.reporter_username && <p className="k-story-line k-dim">{t('label.reports.say.offline', name)}</p>}
+    </div>
   );
 }
 

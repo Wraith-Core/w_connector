@@ -16,8 +16,8 @@ import type { PageProps } from '../../app/pages';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
-  Button, EmptyState, Field, HelpTip, IconButton, InlineAlert, Loading, PageActions, Section, Segmented, Tag, TextArea, TextInput,
-  cls, fmtNum,
+  Button, EmptyState, Field, HelpTip, IconButton, InlineAlert, Loading, PageActions, ReadyLine, Section, Segmented, Tag, TextArea,
+  TextInput, cls, fmtNum,
 } from '../../kit';
 import type { SegmentOption } from '../../kit';
 import { post } from '../../nui';
@@ -278,8 +278,12 @@ export default function NewsPage(_: PageProps) {
       return <span className={cls('k-num nw-count', c.over[k] && 'is-over')}>{fmtNum(c.used[k])} / {fmtNum(lim)}</span>;
     };
     const tooLong = (k: DraftKey) => (c.over[k] ? t('label.news.tooLong', fmtNum(st.limits[FIELD_OF[k]])) : null);
-    const why = c.noTitle ? t('label.news.needTitle') : Object.keys(c.over).length ? t('label.news.needShorter')
-      : c.image ? t('label.news.needImage') : null;
+    /* the readiness line: the same checks that enable «حفظ», all at once and in words */
+    const missing = [
+      ...(c.noTitle ? [t('label.news.need.title')] : []),
+      ...(Object.keys(c.over).length ? [t('label.news.need.shorter')] : []),
+      ...(c.image ? [t('label.news.need.image')] : []),
+    ];
     const plateOpts: SegmentOption<string>[] = [
       ...st.plates.map((p) => ({
         value: p,
@@ -349,12 +353,12 @@ export default function NewsPage(_: PageProps) {
             </Field>
           )}
           {saveErr && <InlineAlert tone="danger" title={saveErr} help="help.news.saveFailed" />}
+          <ReadyLine missing={missing} />
           <div className="nw-apply">
             <Button help="help.news.save" kind="primary" area="news" busy={busy === 'item'} disabled={!c.ok || (!dirty && edit.id !== null) || (edit.id === null && full) || locked} onClick={() => { void saveItem(); }}>
               {t(edit.id === null ? 'label.news.saveNew' : 'label.news.saveEdit')}
             </Button>
             <Button help="help.news.cancel" kind="ghost" disabled={locked} onClick={closeEditor}>{t('label.news.cancel')}</Button>
-            {why && <span className="nw-why">{why}</span>}
           </div>
         </div>
       </Section>

@@ -14,8 +14,8 @@ import type { PageProps } from '../../app/pages';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
-  Button, Combobox, CoordsInput, EmptyState, Field, HelpTip, InlineAlert, Loading, PageActions, Section, SliderNumber, Tag, TextInput,
-  cls, fmtNum,
+  Button, Combobox, CoordsInput, EmptyState, Field, Fold, HelpTip, InlineAlert, Loading, PageActions, ReadyLine, Section, SliderNumber, Tag,
+  TextInput, Where, cls, fmtNum, useWhere,
 } from '../../kit';
 import type { CoordsValue, Option } from '../../kit';
 import { post, useLuaMessage } from '../../nui';
@@ -81,6 +81,8 @@ export default function BlipsPage(_: PageProps) {
     if (!s) return all;
     return all.filter((b) => b.name.toLowerCase().includes(s) || b.sprite.includes(s) || spriteLabel(b.sprite).includes(s));
   }, [st, q]);
+  /* places in words: the list's blips + the one being edited */
+  const place = useWhere([...(st?.list ?? []), edit && edit.draft.x !== null && edit.draft.y !== null ? { x: edit.draft.x, y: edit.draft.y } : null]);
 
   /* ── the list ──────────────────────────────────────────────────────────── */
 
@@ -201,7 +203,7 @@ export default function BlipsPage(_: PageProps) {
                     <span className="bl-name"><bdi>{b.name}</bdi></span>
                     <span className="bl-sub">
                       <span className="bl-sprite">{spriteLabel(b.sprite)}</span>
-                      <span className="k-num bl-xy" dir="ltr">{b.x.toFixed(1)}, {b.y.toFixed(1)}{b.z !== undefined ? `, ${b.z.toFixed(1)}` : ''}</span>
+                      <Where className="bl-xy" text={place(b)} />
                     </span>
                     {b.by && <span className="bl-by">{t('label.blips.by', b.by)}</span>}
                   </span>
@@ -222,9 +224,13 @@ export default function BlipsPage(_: PageProps) {
   if (edit) {
     const c = checkDraft(edit.draft, st.limits);
     const dirty = !sameDraft(edit.draft, edit.start);
-    const why = c.name === 'empty' ? t('label.blips.needName') : c.name === 'long' ? t('label.blips.needLonger')
-      : !c.sprite ? t('label.blips.needSprite') : !c.pos ? t('label.blips.needPos') : null;
     const coords: CoordsValue = { x: edit.draft.x, y: edit.draft.y, z: edit.draft.z };
+    const hasPos = typeof edit.draft.x === 'number' && typeof edit.draft.y === 'number';
+    const missing = [
+      ...(c.name === 'empty' ? [t('label.blips.need.name')] : c.name === 'long' ? [t('label.blips.need.shorter')] : []),
+      ...(!c.sprite ? [t('label.blips.need.sprite')] : []),
+      ...(!c.pos ? [t('label.blips.need.pos')] : []),
+    ];
     const pvName = cleanName(edit.draft.name);
     editor = (
       <Section
@@ -266,9 +272,6 @@ export default function BlipsPage(_: PageProps) {
               />
             </Field>
           </div>
-          <Field label={t('label.blips.scale')} help="help.blips.scale">
-            <SliderNumber value={edit.draft.scale} onChange={(v) => set({ scale: v })} min={st.limits.scaleMin} max={st.limits.scaleMax} step={0.05} />
-          </Field>
           <Field
             label={t('label.blips.position')} help="help.blips.position" required
             aside={(
@@ -278,15 +281,23 @@ export default function BlipsPage(_: PageProps) {
               </span>
             )}
           >
-            <CoordsInput value={coords} onChange={(v) => set({ x: v.x, y: v.y, z: v.z })} />
+            <Where text={hasPos ? place({ x: edit.draft.x as number, y: edit.draft.y as number }) : t('label.blips.need.pos')} miss={!hasPos} />
           </Field>
+          <Fold>
+            <Field label={t('label.blips.scale')} help="help.blips.scale">
+              <SliderNumber value={edit.draft.scale} onChange={(v) => set({ scale: v })} min={st.limits.scaleMin} max={st.limits.scaleMax} step={0.05} />
+            </Field>
+            <Field label={t('label.blips.position')} help="help.blips.position">
+              <CoordsInput value={coords} onChange={(v) => set({ x: v.x, y: v.y, z: v.z })} />
+            </Field>
+          </Fold>
+          <ReadyLine missing={missing} />
           {saveErr && <InlineAlert tone="danger" title={saveErr} help="help.blips.saveFailed" />}
           <div className="bl-apply">
             <Button help="help.blips.save" kind="primary" area="blips" busy={busy === 'save'} disabled={!c.ok || (!dirty && edit.id !== null) || (edit.id === null && full) || locked} onClick={() => { void save(); }}>
               {t(edit.id === null ? 'label.blips.save' : 'label.blips.saveEdit')}
             </Button>
             <Button help="help.blips.cancel" kind="ghost" disabled={locked} onClick={closeEditor}>{t('label.blips.cancel')}</Button>
-            {why && <span className="bl-why">{why}</span>}
           </div>
         </div>
         <div className="bl-pv">

@@ -63,7 +63,7 @@
 .rk-node-top { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
 .rk-node-label { font: 700 var(--fs-14)/1.35 var(--f-ui); color: var(--paper-dim); }
 .rk-node.is-on .rk-node-label { color: var(--paper); }
-.rk-node-key { font-size: var(--fs-12); color: var(--paper-faint); }
+.rk-node-key { display: none; } /* the raw permission key: searchable, not shown (notebook look) */
 .rk-node-desc { font-size: var(--fs-13); line-height: 1.45; color: var(--paper-faint); }
 .rk-node.is-on.is-danger { border-inline-start: 3px solid var(--red); padding-inline-start: .625rem; }
 

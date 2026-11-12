@@ -15,7 +15,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
-  Button, ButtonRow, CitizenIdInput, DataTable, Drawer, EmptyState, Field, HelpTip, KeyValue, KeyValueList, PageActions, Section,
+  Button, ButtonRow, CitizenIdInput, DataTable, Drawer, EmptyState, Field, Fold, HelpTip, KeyValue, KeyValueList, PageActions, Section,
+  useWhere,
   Segmented, Select, SplitView, Tag, TextInput, copyText, fmtAgo, fmtDate, parseCitizen,
 } from '../../kit';
 import type { CitizenState, Column, Option } from '../../kit';
@@ -44,6 +45,10 @@ function useDebounced<T>(value: T, ms: number): T {
   useEffect(() => { const id = window.setTimeout(() => setV(value), ms); return () => window.clearTimeout(id); }, [value, ms]);
   return v;
 }
+
+/** a logged value that is a point ({x, y[, z]}) */
+const isPoint = (v: unknown): v is { x: number; y: number; z?: number } =>
+  !!v && typeof v === 'object' && typeof (v as { x?: unknown }).x === 'number' && typeof (v as { y?: unknown }).y === 'number';
 
 /** One detail value as text: numbers stay Latin, objects become short JSON */
 function show(v: unknown): string {
@@ -342,6 +347,10 @@ function LogDrawer({ e, sessionId, onClose, onSameAdmin, onSamePlayer }: {
   const data = e.data && typeof e.data === 'object' ? Object.entries(e.data) : [];
   const hasOldNew = data.some(([k]) => k === 'old') || data.some(([k]) => k === 'new');
   const resource = typeof e.data?.resource === 'string' ? e.data.resource : null;
+  const where = useWhere(data.map(([, v]) => (isPoint(v) ? v : null)));
+  const who = e.target ? (e.target.name || '—') : t('label.log.serverWide');
+  const say = t('label.log.say.line', e.admin?.name || t('label.log.say.someone'), actionLabel(t, e.action), who, fmtAgo(t, lang, e.at))
+    + (e.ok === false ? t('label.log.say.failed') : e.ok === true ? t('label.log.say.ok') : t('label.log.say.end'));
   return (
     <Drawer
       title={actionLabel(t, e.action)}
@@ -368,32 +377,37 @@ function LogDrawer({ e, sessionId, onClose, onSameAdmin, onSamePlayer }: {
         </>
       )}
     >
-      <KeyValueList>
-        <KeyValue
-          label={t('label.log.d.admin')}
-          help="help.log.col.admin"
-          value={(
-            <span className="lg-kvids">
-              <span>{e.admin?.name || '—'}</span>
-              {e.admin?.citizenid && <span className="k-dim">{t('label.log.cid', e.admin.citizenid)}</span>}
-            </span>
-          )}
-        />
-        <KeyValue
-          label={t('label.log.d.target')}
-          help="help.log.col.target"
-          value={e.target ? (
-            <span className="lg-kvids">
-              <span>{e.target.name || '—'}</span>
-              {cid && <span className="k-dim">{t('label.log.cid', cid)}</span>}
-              {sessionId !== null && <span className="k-num k-dim">#{sessionId}</span>}
-            </span>
-          ) : t('label.log.serverWide')}
-          copy={cid ?? undefined}
-        />
-        <KeyValue label={t('label.log.d.result')} help="help.log.col.result" value={e.ok === false ? t('label.log.failed') : e.ok === true ? t('label.log.ok') : '—'} />
-        <KeyValue label={t('label.log.d.id')} help="help.log.col.when" value={String(e.id)} ltr />
-      </KeyValueList>
+      <div className="k-story">
+        <p className="k-story-say" dir="auto">{say}</p>
+      </div>
+      <Fold>
+        <KeyValueList>
+          <KeyValue
+            label={t('label.log.d.admin')}
+            help="help.log.col.admin"
+            value={(
+              <span className="lg-kvids">
+                <span>{e.admin?.name || '—'}</span>
+                {e.admin?.citizenid && <span className="k-dim">{t('label.log.cid', e.admin.citizenid)}</span>}
+              </span>
+            )}
+          />
+          <KeyValue
+            label={t('label.log.d.target')}
+            help="help.log.col.target"
+            value={e.target ? (
+              <span className="lg-kvids">
+                <span>{e.target.name || '—'}</span>
+                {cid && <span className="k-dim">{t('label.log.cid', cid)}</span>}
+                {sessionId !== null && <span className="k-num k-dim">#{sessionId}</span>}
+              </span>
+            ) : t('label.log.serverWide')}
+            copy={cid ?? undefined}
+          />
+          <KeyValue label={t('label.log.d.result')} help="help.log.col.result" value={e.ok === false ? t('label.log.failed') : e.ok === true ? t('label.log.ok') : '—'} />
+          <KeyValue label={t('label.log.d.id')} help="help.log.col.when" value={String(e.id)} ltr />
+        </KeyValueList>
+      </Fold>
 
       <Section title={t('label.log.d.text')} help="help.log.col.details" tone="plain" actions={<LineCopy text={e.text} />}>
         <p className="lg-line"><ServerLine text={e.text || '—'} /></p>
@@ -412,7 +426,7 @@ function LogDrawer({ e, sessionId, onClose, onSameAdmin, onSamePlayer }: {
             {data.filter(([k]) => k !== 'old' && k !== 'new').map(([k, v]) => (
               <div key={k} className="lg-data-row">
                 <dt>{fieldLabel(t, k)}</dt>
-                <dd className={typeof v === 'number' ? 'k-num' : undefined}>{show(v)}</dd>
+                <dd className={typeof v === 'number' ? 'k-num' : undefined} title={isPoint(v) ? show(v) : undefined}>{isPoint(v) ? where(v) : show(v)}</dd>
               </div>
             ))}
           </dl>

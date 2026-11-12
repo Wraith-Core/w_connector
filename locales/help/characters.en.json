@@ -207,6 +207,14 @@
         "cheat": "Cheating investigation",
         "request": "At the owner's request",
         "rules": "Breaking the server rules"
+      },
+      "say": {
+        "job": "%s works as %s",
+        "noJob": "%s has no job",
+        "gang": ", in the %s gang",
+        "online": ", and is on the server now.",
+        "seen": ", last seen %s.",
+        "now": "Now at:"
       }
     }
   }

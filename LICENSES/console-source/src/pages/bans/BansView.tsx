@@ -10,7 +10,7 @@ import { useMemo, useState } from 'react';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
-  Button, DataTable, Drawer, EmptyState, FilterChips, KeyValue, KeyValueList, Section, SplitView, Tag, TextInput, Toolbar,
+  Button, DataTable, Drawer, EmptyState, FilterChips, Fold, KeyValue, KeyValueList, Section, SplitView, Tag, TextInput, Toolbar,
   fmtAgo, fmtDate, fmtDuration,
 } from '../../kit';
 import type { ChipItem, Column } from '../../kit';
@@ -108,7 +108,7 @@ export default function BansView() {
       render: (b) => (
         <>
           <span className="k-cell-main">{nameOf(b)}</span>
-          <span className="k-cell-sub bn-lic">{shortLicense(b.license)}</span>
+          <span className="k-cell-sub">{b.bannedby ? t('label.bans.say.byShort', b.bannedby) : shortLicense(b.license)}</span>
         </>
       ),
     },
@@ -222,22 +222,21 @@ function BanDrawer({ b, now, onClose, onUnban }: { b: BanEntry; now: number; onC
       onClose={onClose}
       footer={<Button help="help.bans.unban" kind="primary" area="bans" onClick={onUnban}>{t('label.bans.unban')}</Button>}
     >
-      <KeyValueList>
-        <KeyValue label={t('label.bans.d.license')} help="help.bans.license" value={b.license} copy={b.license || undefined} ltr />
-        <KeyValue label={t('label.bans.d.by')} help="help.bans.col.by" value={b.bannedby} />
-        <KeyValue
-          label={t('label.bans.d.ends')}
-          help="help.bans.col.ends"
-          value={s === 'permanent' ? t('label.bans.permanent') : fmtDate(b.expire)}
-          ltr={s !== 'permanent'}
-        />
-        {s === 'temporary' && (
-          <KeyValue label={t('label.bans.d.remaining')} help="help.bans.remaining" value={fmtDuration(t, lang, b.expire - now, 3)} />
-        )}
-        {s === 'expired' && (
-          <KeyValue label={t('label.bans.d.state')} help="help.bans.filter.expired" value={t('label.bans.endedAgo', fmtAgo(t, lang, b.expire, now))} />
-        )}
-      </KeyValueList>
+      <div className="k-story">
+        <p className="k-story-say" dir="auto">{banSay(b, s, now, t, lang)}</p>
+      </div>
+      <Fold>
+        <KeyValueList>
+          <KeyValue label={t('label.bans.d.id')} help="help.bans.col.id" value={String(b.id)} ltr />
+          <KeyValue label={t('label.bans.d.license')} help="help.bans.license" value={b.license} copy={b.license || undefined} ltr />
+          <KeyValue
+            label={t('label.bans.d.ends')}
+            help="help.bans.col.ends"
+            value={s === 'permanent' ? t('label.bans.permanent') : fmtDate(b.expire)}
+            ltr={s !== 'permanent'}
+          />
+        </KeyValueList>
+      </Fold>
       <Section title={t('label.bans.d.reason')} help="help.bans.col.reason" tone="plain">
         <p className="bn-reason-full" dir="auto">{b.reason || t('label.bans.noReason')}</p>
       </Section>
@@ -248,4 +247,16 @@ function BanDrawer({ b, now, onClose, onUnban }: { b: BanEntry; now: number; onC
       )}
     </Drawer>
   );
+}
+
+type TF = ReturnType<typeof useI18n>['t'];
+
+/** the ban in one sentence: who, until when, by whom */
+function banSay(b: BanEntry, s: BanState, now: number, t: TF, lang: ReturnType<typeof useI18n>['lang']): string {
+  const name = b.name || t('label.bans.unknownName');
+  let say = s === 'permanent' ? t('label.bans.say.permanent', name)
+    : s === 'expired' ? t('label.bans.say.ended', name, fmtAgo(t, lang, b.expire, now))
+      : t('label.bans.say.until', name, fmtDuration(t, lang, b.expire - now, 2));
+  if (b.bannedby) say += t('label.bans.say.by', b.bannedby);
+  return say + t('label.bans.say.end');
 }

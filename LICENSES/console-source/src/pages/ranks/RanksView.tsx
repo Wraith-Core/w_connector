@@ -13,8 +13,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
-  Button, DataTable, Drawer, EmptyState, Field, Glyph, HelpTip, IconButton, InlineAlert, KeyValue, KeyValueList, NumberInput,
-  Section, Select, SplitView, Switch, Tag, TextInput, Toolbar, cls, fmtNum,
+  Button, DataTable, Drawer, EmptyState, Field, Fold, Glyph, HelpTip, IconButton, InlineAlert, KeyValue, KeyValueList, NumberInput,
+  ReadyLine, Section, Select, SplitView, Switch, Tag, TextInput, Toolbar, cls, fmtNum,
 } from '../../kit';
 import type { Column, HelpProp } from '../../kit';
 import type { Send } from './RanksPage';
@@ -97,7 +97,6 @@ export default function RanksView({ st, send }: { st: RanksState; send: Send }) 
           <i className="rk-dot" style={{ background: safeColor(r.color) }} aria-hidden="true" />
           <span className="rk-rankcell-text">
             <span className="k-cell-main" dir="auto">{r.label || r.name}</span>
-            <span className="k-cell-sub k-mono">{r.name}</span>
           </span>
           {r.protected && <Tag tone="strong" className="rk-locktag"><Glyph name="lock" />{t('label.ranks.protected')}</Tag>}
         </span>
@@ -172,6 +171,16 @@ export default function RanksView({ st, send }: { st: RanksState; send: Send }) 
     const sortErr = !sortOk(d.sort) ? t('label.ranks.sortBad') : null;
     const tooMany = d.perms.length > MAX_PERMS;
     const valid = (!isNew || (nameOk(d.name) && !taken)) && labelOk(d.label) && !colorErr && !sortErr && !tooMany;
+    /* the readiness line: the same checks as «حفظ», in words */
+    const missing = [
+      ...(isNew && !nameOk(d.name) ? [t('label.ranks.need.name')] : []),
+      ...(taken ? [t('label.ranks.need.free')] : []),
+      ...(!labelOk(d.label) ? [t('label.ranks.need.label')] : []),
+      ...(colorErr ? [t('label.ranks.need.color')] : []),
+      ...(sortErr ? [t('label.ranks.need.sort')] : []),
+      ...(tooMany ? [t('label.ranks.need.fewer', MAX_PERMS)] : []),
+    ];
+    const say = t('label.ranks.say', d.label || d.name || t('label.ranks.sayNew'), fmtNum(row?.members ?? 0), fmtNum(d.perms.length));
 
     const save = async () => {
       if (!valid) return;
@@ -259,6 +268,11 @@ export default function RanksView({ st, send }: { st: RanksState; send: Send }) 
         footerNote={dirty && !valid ? t('label.ranks.needFix') : undefined}
       >
         {saveErr && <InlineAlert tone="danger" title={saveErr} help="help.ranks.saveFailed" onDismiss={() => setSaveErr(null)} />}
+
+        <div className="k-story">
+          <p className="k-story-say" dir="auto">{say}</p>
+        </div>
+        {(isNew || dirty) && <ReadyLine missing={missing} />}
 
         <div className="rk-form">
           <Field
@@ -367,36 +381,38 @@ export default function RanksView({ st, send }: { st: RanksState; send: Send }) 
           );
         })}
 
-        <Section title={t('label.ranks.custom')} help="help.ranks.custom" className="rk-group">
-          <div className="rk-custom-add">
-            <TextInput
-              value={custom}
-              onChange={setCustom}
-              dir="ltr"
-              mono
-              maxLength={64}
-              placeholder={t('label.ranks.customPh')}
-              label={t('label.ranks.custom')}
-              help="help.ranks.customInput"
-              invalid={!!customProblem}
-              onEnter={addCustom}
-              className="rk-custom-input"
-            />
-            <Button help="help.ranks.customAdd" icon="plus" disabled={!typed || !!customProblem || !!busy} onClick={addCustom}>{t('label.ranks.customAdd')}</Button>
-          </div>
-          {customProblem && <p className="rk-err">{customProblem}</p>}
-          {customs.length > 0 ? (
-            <div className="rk-ctags">
-              {customs.map((p) => (
-                <span className="rk-ctag" key={p}>
-                  <span className="k-mono">{p}</span>
-                  {p.startsWith('group.') && p.length > 6 && <span className="rk-ctag-sub">{t('label.ranks.customGroup', p.slice(6))}</span>}
-                  <IconButton icon="close" size="sm" aria-label={t('label.ranks.remove', p)} help="help.ranks.customRemove" helpQuiet disabled={!!busy} onClick={() => setPerm(p, false)} />
-                </span>
-              ))}
+        <Fold count={customs.length}>
+          <Section title={t('label.ranks.custom')} help="help.ranks.custom" className="rk-group">
+            <div className="rk-custom-add">
+              <TextInput
+                value={custom}
+                onChange={setCustom}
+                dir="ltr"
+                mono
+                maxLength={64}
+                placeholder={t('label.ranks.customPh')}
+                label={t('label.ranks.custom')}
+                help="help.ranks.customInput"
+                invalid={!!customProblem}
+                onEnter={addCustom}
+                className="rk-custom-input"
+              />
+              <Button help="help.ranks.customAdd" icon="plus" disabled={!typed || !!customProblem || !!busy} onClick={addCustom}>{t('label.ranks.customAdd')}</Button>
             </div>
-          ) : <p className="rk-hint">{t('label.ranks.customNone')}</p>}
-        </Section>
+            {customProblem && <p className="rk-err">{customProblem}</p>}
+            {customs.length > 0 ? (
+              <div className="rk-ctags">
+                {customs.map((p) => (
+                  <span className="rk-ctag" key={p}>
+                    <span className="k-mono">{p}</span>
+                    {p.startsWith('group.') && p.length > 6 && <span className="rk-ctag-sub">{t('label.ranks.customGroup', p.slice(6))}</span>}
+                    <IconButton icon="close" size="sm" aria-label={t('label.ranks.remove', p)} help="help.ranks.customRemove" helpQuiet disabled={!!busy} onClick={() => setPerm(p, false)} />
+                  </span>
+                ))}
+              </div>
+            ) : <p className="rk-hint">{t('label.ranks.customNone')}</p>}
+          </Section>
+        </Fold>
       </Drawer>
     );
   }

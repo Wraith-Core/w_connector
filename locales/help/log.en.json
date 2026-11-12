@@ -223,6 +223,13 @@
         "rankDelete": "Deleted a rank",
         "rankAssign": "Gave a rank",
         "rankRevoke": "Took a rank"
+      },
+      "say": {
+        "line": "%s: %s, on %s, %s",
+        "someone": "The system",
+        "ok": ", and it worked.",
+        "failed": ", and it failed.",
+        "end": "."
       }
     }
   }

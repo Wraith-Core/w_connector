@@ -2,7 +2,8 @@
 
 import type { HelpKey } from '../../../help/types';
 import { useI18n } from '../../../i18n';
-import { Button, InlineAlert, KeyValue, KeyValueList, Section } from '../../../kit';
+import { useApp } from '../../../ctx';
+import { Button, Fold, InlineAlert, KeyValue, KeyValueList, Section, Where, useWhere } from '../../../kit';
 import { accountKind } from '../model';
 import { OnlineChip, fmtBalance, fmtSeen } from '../shared';
 import type { TabProps } from '../shared';
@@ -17,25 +18,40 @@ const ACCOUNT_HELP: Record<string, HelpKey> = {
 
 export default function Overview({ detail, open }: TabProps) {
   const { t } = useI18n();
+  const app = useApp();
   const cid = detail.citizenid;
+  const live = detail.online ? app.players.find((p) => p.id === detail.online) ?? null : null;
+  const where = useWhere([live?.coords]);
+  const name = detail.name || cid;
+  let say = detail.job ? t('label.characters.say.job', name, detail.job) : t('label.characters.say.noJob', name);
+  if (detail.gang) say += t('label.characters.say.gang', detail.gang);
+  say += detail.online ? t('label.characters.say.online') : t('label.characters.say.seen', fmtSeen(detail.lastSeen));
   return (
     <div className="ch-tab">
+      <div className="k-story">
+        <p className="k-story-say" dir="auto">{say}</p>
+        {live && <p className="k-story-line">{t('label.characters.say.now')} <Where text={where(live.coords)} /></p>}
+      </div>
       {!detail.online && <InlineAlert tone="info" title={t('ui_ch_offline_note')} help="help.characters.offline" />}
 
       <Section title={t('ui_ch_details')} help="help.characters.tabOverview">
         <KeyValueList>
           <KeyValue label={t('ui_ch_col_id')} help="help.characters.kvCitizenId" value={cid} copy={cid} ltr />
           <KeyValue label={t('ui_ch_col_state')} help="help.characters.kvState" value={<OnlineChip online={detail.online} />} />
-          {detail.online ? (
-            <KeyValue label={t('label.characters.serverId')} help="help.common.serverId" value={`#${detail.online}`} copy={`#${detail.online}`} ltr />
-          ) : null}
-          <KeyValue label={t('ui_ch_col_account')} help="help.characters.kvAccount" value={detail.account} />
-          <KeyValue label={t('ui_ch_license')} help="help.characters.colLicense" value={detail.license ? <span className="k-mono ch-license">{detail.license}</span> : null} copy={detail.license || undefined} />
-          <KeyValue label={t('ui_ch_slot')} help="help.characters.colSlot" value={detail.slot ?? null} ltr />
           <KeyValue label={t('ui_ch_col_job')} help="help.characters.colJob" value={detail.job} />
           <KeyValue label={t('ui_ch_gang')} help="help.characters.kvGang" value={detail.gang} />
-          <KeyValue label={t('ui_ch_col_last')} help="help.characters.colLast" value={fmtSeen(detail.lastSeen)} ltr />
         </KeyValueList>
+        <Fold>
+          <KeyValueList>
+            {detail.online ? (
+              <KeyValue label={t('label.characters.serverId')} help="help.common.serverId" value={`#${detail.online}`} copy={`#${detail.online}`} ltr />
+            ) : null}
+            <KeyValue label={t('ui_ch_col_account')} help="help.characters.kvAccount" value={detail.account} />
+            <KeyValue label={t('ui_ch_license')} help="help.characters.colLicense" value={detail.license ? <span className="k-mono ch-license">{detail.license}</span> : null} copy={detail.license || undefined} />
+            <KeyValue label={t('ui_ch_slot')} help="help.characters.colSlot" value={detail.slot ?? null} ltr />
+            <KeyValue label={t('ui_ch_col_last')} help="help.characters.colLast" value={fmtSeen(detail.lastSeen)} ltr />
+          </KeyValueList>
+        </Fold>
       </Section>
 
       <Section title={t('ui_ch_money')} help="help.characters.balances">

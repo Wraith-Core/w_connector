@@ -223,6 +223,13 @@
         "rankDelete": "حذف رتبة",
         "rankAssign": "إعطاء رتبة",
         "rankRevoke": "سحب رتبة"
+      },
+      "say": {
+        "line": "%s: %s، على %s، %s",
+        "someone": "النظام",
+        "ok": "، ونجح.",
+        "failed": "، ولم ينجح.",
+        "end": "."
       }
     }
   }

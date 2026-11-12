@@ -55,7 +55,20 @@
       "system": "System",
       "reply": "Answer",
       "send": "Send answer",
-      "notes": "Closing note"
+      "notes": "Closing note",
+      "need": {
+        "reply": "the reply text"
+      },
+      "say": {
+        "filed": "%s reported %s",
+        "filedNoTime": "%s filed a report",
+        "against": " about %s",
+        "open": ", and nobody has taken it yet.",
+        "claimed": ", and %s took it.",
+        "resolved": ", and it is closed.",
+        "whoNow": "%s is now in",
+        "offline": "%s is not on the server now."
+      }
     }
   }
 }

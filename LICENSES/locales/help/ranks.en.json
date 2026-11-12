@@ -214,6 +214,16 @@
         "showing": "Showing %s of %s",
         "pick": "Rank…",
         "rowGive": "Give"
+      },
+      "say": "The «%s» rank: %s members and %s permissions.",
+      "sayNew": "a new rank",
+      "need": {
+        "name": "the fixed name (small English letters)",
+        "free": "a fixed name not in use",
+        "label": "the shown name",
+        "color": "a valid colour",
+        "sort": "the order",
+        "fewer": "fewer permissions (limit %s)"
       }
     }
   }

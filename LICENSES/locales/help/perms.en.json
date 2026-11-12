@@ -76,7 +76,8 @@
       "allowed": "Allowed",
       "locked": "Locked",
       "none": "No permission matches this search.",
-      "clear": "Clear search"
+      "clear": "Clear search",
+      "say": "You can use %s of %s website permissions and %s of %s script permissions."
     }
   }
 }
