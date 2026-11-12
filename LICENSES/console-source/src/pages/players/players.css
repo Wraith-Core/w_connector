@@ -84,3 +84,8 @@ html.k-help-mode .pl-mode .k-seg-help, html.k-help-mode .pl-seg .k-seg-help { vi
 
 /* a second, quieter line inside a confirm dialog (on paper) */
 .pl-dialog-sub { margin-top: .375rem; color: var(--note-dim); font-size: var(--fs-14); }
+
+/* 2.8.0 the distance column says where the player is («فالنتاين · 1.2 كم منك») */
+.pl-place { display: block; max-width: 16rem; font-size: var(--fs-13); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--paper-dim); }
+/* with the file open the table is narrow: the town stays, the distance steps back (it stays in the file) */
+.pl-page.has-drawer .pl-place-far { display: none; }

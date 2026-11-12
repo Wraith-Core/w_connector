@@ -4,7 +4,7 @@
 import { useApp } from '../../../ctx';
 import { useI18n } from '../../../i18n';
 import {
-  Button, KeyValue, KeyValueList, Meter, Section, distance, fmtCash, fmtCoords, fmtDist, fmtGold, fmtNum, vec3, vec4,
+  Button, Fold, KeyValue, KeyValueList, Meter, Section, distance, fmtCash, fmtCoords, fmtDist, fmtGold, fmtNum, useWhere, vec3, vec4,
 } from '../../../kit';
 import { fullName, groupLabel, healthPct, staminaOf } from '../shared';
 import type { TabProps } from './types';
@@ -14,6 +14,8 @@ export default function ProfileTab({ p, isMe }: TabProps) {
   const { t } = useI18n();
   const me = app.players.find((x) => x.id === app.selfId)?.coords ?? app.self?.coords ?? null;
   const dist = isMe ? null : distance(me, p.coords);
+  /* 2.8.0 the place in words; the numbers and the copy buttons sit under «خيارات متقدمة» */
+  const where = useWhere([p.coords]);
   const hasGang = !!p.gang?.name && p.gang.name !== 'none';
   const job = p.job?.label ? `${p.job.label}${p.job.gradeName ? ` · ${p.job.gradeName}` : ''}` : '—';
   const gang = hasGang ? `${p.gang.label}${p.gang.gradeName ? ` · ${p.gang.gradeName}` : ''}` : t('label.players.noGang');
@@ -67,10 +69,15 @@ export default function ProfileTab({ p, isMe }: TabProps) {
 
       <Section title={t('label.drawer.sec.location')} help="help.drawer.sec.location">
         <KeyValueList>
-          <KeyValue label={t('label.drawer.coords')} help="help.drawer.coords" value={fmtCoords(p.coords)} copy={p.coords ? vec3(p.coords) : undefined} ltr />
-          <KeyValue label={t('label.drawer.heading')} help="help.drawer.heading" value={p.coords ? `${fmtNum(p.coords.heading)}°` : '—'} copy={p.coords ? vec4(p.coords) : undefined} ltr />
-          <KeyValue label={t('label.players.col.distance')} help="help.players.col.distance" value={isMe ? '—' : fmtDist(dist)} ltr />
+          <KeyValue label={t('label.place.where')} help="help.place.where" value={isMe ? t('label.place.here') : where(p.coords)} />
         </KeyValueList>
+        <Fold>
+          <KeyValueList>
+            <KeyValue label={t('label.drawer.coords')} help="help.drawer.coords" value={fmtCoords(p.coords)} copy={p.coords ? vec3(p.coords) : undefined} ltr />
+            <KeyValue label={t('label.drawer.heading')} help="help.drawer.heading" value={p.coords ? `${fmtNum(p.coords.heading)}°` : '—'} copy={p.coords ? vec4(p.coords) : undefined} ltr />
+            <KeyValue label={t('label.players.col.distance')} help="help.players.col.distance" value={isMe ? '—' : fmtDist(dist)} ltr />
+          </KeyValueList>
+        </Fold>
       </Section>
     </>
   );

@@ -1,0 +1,52 @@
+{
+  "place": {
+    "where": "Where the thing is, by town or region, and how far it is from you now."
+  },
+  "label": {
+    "place": {
+      "advanced": "Advanced options",
+      "missing": "Still missing: %s",
+      "ready": "Ready",
+      "fix": "Fix it",
+      "you": "You are in %s",
+      "and": " and ",
+      "unknown": "unknown place",
+      "wild": "the wilds",
+      "here": "here",
+      "m": "%s m",
+      "km": "%s km",
+      "away": "%s away",
+      "sep": " · ",
+      "zone": {
+        "valentine": "Valentine",
+        "rhodes": "Rhodes",
+        "saint_denis": "Saint Denis",
+        "strawberry": "Strawberry",
+        "blackwater": "Blackwater",
+        "armadillo": "Armadillo",
+        "tumbleweed": "Tumbleweed",
+        "annesburg": "Annesburg",
+        "van_horn": "Van Horn",
+        "manicato": "Manicato",
+        "manzanita_post": "Manzanita Post",
+        "bayou_nwa": "Bayou Nwa",
+        "big_valley": "Big Valley",
+        "bluewater_marsh": "Bluewater Marsh",
+        "cumberland_forest": "Cumberland Forest",
+        "great_plains": "Great Plains",
+        "grizzlies": "The Grizzlies",
+        "guarma": "Guarma",
+        "heartlands": "The Heartlands",
+        "roanoke_ridge": "Roanoke Ridge",
+        "scarlett_meadows": "Scarlett Meadows",
+        "tall_trees": "Tall Trees",
+        "gaptooth_ridge": "Gaptooth Ridge",
+        "rio_bravo": "Rio Bravo",
+        "cholla_springs": "Cholla Springs",
+        "hennigans_stead": "Hennigan's Stead"
+      },
+      "comma": ", ",
+      "where": "Place"
+    }
+  }
+}

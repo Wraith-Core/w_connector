@@ -9,7 +9,7 @@
 import { useMemo, useState } from 'react';
 import { useApp } from '../../ctx';
 import { pluralForm, useI18n } from '../../i18n';
-import { Button, DataTable, EmptyState, FilterChips, Segmented, TextInput, distance, parseCitizen } from '../../kit';
+import { Button, DataTable, EmptyState, FilterChips, Segmented, TextInput, distance, parseCitizen, placeName, useWhere, zoneOf } from '../../kit';
 import type { ChipItem } from '../../kit';
 import type { AdminPlayer } from '../../types';
 import { playerColumns } from './columns';
@@ -35,10 +35,11 @@ export default function PlayerList({ selectedId, onSelect }: { selectedId: numbe
   const mode = app.prefs.tableMode === 'detail' ? 'detail' : 'essential';
 
   const me = app.players.find((p) => p.id === app.selfId)?.coords ?? app.self?.coords ?? null;
+  const where = useWhere(app.players.map((p) => p.coords));
   const all = useMemo<PlayerRow[]>(() => app.players.map((p) => {
     const isMe = p.id === app.selfId;
-    return { p, isMe, dist: isMe ? 0 : distance(me, p.coords) };
-  }), [app.players, app.selfId, me]);
+    return { p, isMe, dist: isMe ? 0 : distance(me, p.coords), place: isMe ? undefined : placeName(t, zoneOf(p.coords)) };
+  }), [app.players, app.selfId, me, where, t]);
 
   const parsed = useMemo(() => parseCitizen(q), [q]);
   const searched = useMemo<PlayerRow[]>(() => {

@@ -45,3 +45,7 @@ export type { CitizenParse } from './format';
 /* the help system, re-exported so a page imports everything from '../../kit' */
 export { HelpTip, useHelp, inlineHelp, pickText } from '../help';
 export type { HelpKey, HelpProp, HelpInline, HelpFacts } from '../help';
+
+/* 2.8.0 the notebook look: places in words, «خيارات متقدمة», the readiness line */
+export { Fold, ReadyLine, Where } from './notebook';
+export { useWhere, placeText, placeName, placeFar, missingLine, zoneOf } from './where';

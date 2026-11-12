@@ -15,6 +15,7 @@ import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
   Button, ButtonRow, Combobox, CoordsInput, Field, Glyph, NumberInput, Segmented, Switch, TextInput, cls,
+  Fold, ReadyLine,
 } from '../../kit';
 import type { CoordsValue, Option } from '../../kit';
 import type { Catalog } from '../../types';
@@ -137,6 +138,8 @@ export function CoordsJump({ runner }: { runner: ToolRunner }) {
         {locked && <LockNote tool={tool} />}
       </div>
       <CoordsInput value={c} onChange={setC} label={t('label.tools.coords')} help="help.common.coords" area={tool.area} />
+      {/* 2.8.0 the readiness line: what the jump still needs, in words */}
+      {!locked && <ReadyLine missing={[c.x === null && 'X', c.y === null && 'Y'].filter((x): x is string => !!x)} />}
       <ButtonRow>
         <Button help={tool.help} helpLabel={toolLabel(t, tool.id)} area={tool.area} size="sm" busy={runner.busy === 'tpCoords'} disabled={locked || !ready || (!!runner.busy && runner.busy !== 'tpCoords')} onClick={go}>
           {toolVerb(t, tool.id)}
@@ -182,8 +185,13 @@ export function SpawnForm({ runner, compact }: { runner: ToolRunner; compact?: b
       </Field>
       <Field label={t('label.tools.model')} help="help.tools.spawnModel" area={tool.area} aside={t('label.tools.modelCount', options.length)}>
         <Combobox value={model} onChange={setModel} options={options} placeholder={t('label.tools.pickModel')} searchPlaceholder={t('label.tools.searchModel')} />
-        <TextInput value={model} onChange={setModel} maxLength={64} placeholder={t('label.tools.searchModel')} />
       </Field>
+      {/* 2.8.0: picking by name is the way; typing a game model name is for experienced staff */}
+      <Fold className="tl-fold">
+        <Field label={t('label.tools.modelTyped')} help="help.tools.spawnModelTyped" area={tool.area}>
+          <TextInput value={model} onChange={setModel} maxLength={64} placeholder={t('label.tools.searchModel')} />
+        </Field>
+      </Fold>
       {mountable ? (
         <Field label={t('label.tools.mount')} help="help.tools.mount" area={tool.area} layout="inline">
           <Switch checked={mount} onChange={setMount} size="sm" />
@@ -198,6 +206,7 @@ export function SpawnForm({ runner, compact }: { runner: ToolRunner; compact?: b
           />
         </Field>
       )}
+      {!locked && <ReadyLine missing={model ? [] : [t('label.tools.model')]} />}
       <div className="tl-spawn-foot">
         <ButtonRow>
           <Button help={tool.help} helpLabel={toolLabel(t, tool.id)} area={tool.area} kind="primary" size="sm" busy={runner.busy === 'spawn'} disabled={locked || !app.canAction(`self.${SPAWN_ACTION[kind]}`) || !model || (!!runner.busy && runner.busy !== 'spawn')} onClick={spawn}>

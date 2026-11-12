@@ -186,3 +186,13 @@ html[lang='en'] .q-recent-head { font-variant-caps: all-small-caps; letter-spaci
 @media (prefers-reduced-motion: reduce) { .q-scrim, .q-wrap, .q-foot { animation: none; } }
 html.k-reduced-motion .q-scrim, html.k-reduced-motion .q-wrap, html.k-reduced-motion .q-foot { animation: none; }
 @media (max-width: 1500px) { .q-panel { top: .875rem; bottom: .875rem; right: calc(1.125rem + var(--ws-gutter)); width: 27rem; } }
+
+/* ── 2.8.0 the notebook look: where you are, where each player is, the folded coordinates ─────────── */
+.q-here { margin-top: .125rem; }
+.q-chosen { display: flex; align-items: baseline; flex-wrap: wrap; gap: .25rem .6rem; margin: .5rem 0 .25rem; font-size: var(--fs-14); color: var(--paper); }
+.q-chosen > b { font-weight: 700; }
+.q-prow .k-where.q-prow-where { margin-top: .125rem; font-size: var(--fs-12); }
+.q-prow:hover .k-where, .q-prow:focus-visible .k-where, .q-prow.is-on .k-where { color: inherit; }
+.q-fold { margin: .25rem 1rem 0; }
+.q-fold .q-form { margin: 0; }
+.q-form .k-ready, .tl-spawn .k-ready { margin-top: .5rem; }

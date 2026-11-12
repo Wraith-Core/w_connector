@@ -10,7 +10,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useApp } from '../ctx';
 import type { HelpKey } from '../help/types';
 import { useI18n } from '../i18n';
-import { Button, CitizenIdInput, Field, HelpTip, StatusChip, cls } from '../kit';
+import { Button, CitizenIdInput, Field, HelpTip, StatusChip, Where, cls, useWhere } from '../kit';
 import type { CitizenState } from '../kit';
 import type { AdminPlayer, Area } from '../types';
 
@@ -64,6 +64,8 @@ export default function QuickPlayers({ search }: { search: string }) {
   const player = preview?.source !== undefined ? app.players.find((p) => p.id === preview.source) ?? null : null;
   const isSelf = !!preview && preview.source === app.selfId;
   const acts = ACTS.filter((a) => app.can(a.area) && app.canAction(`player.${a.id}`));
+  /* 2.8.0 where each player is, in words («فالنتاين · 1.2 كم منك»), not coordinates */
+  const where = useWhere(list.map((p) => p.coords));
 
   const run = async (a: PlayerAct) => {
     if (busy || !ready) return;
@@ -84,6 +86,12 @@ export default function QuickPlayers({ search }: { search: string }) {
 
       {ready ? (
         <>
+          {player && (
+            <p className="q-chosen">
+              <b>{fullName(player)}</b>
+              <Where text={player.id === app.selfId ? t('label.place.here') : where(player.coords)} />
+            </p>
+          )}
           <div className="q-acts">
             {acts.map((a) => {
               const label = a.id === 'freeze' && player?.frozen ? t('label.quick.act.unfreeze') : t(`label.quick.act.${a.id}`);
@@ -135,6 +143,7 @@ export default function QuickPlayers({ search }: { search: string }) {
               <span className="q-prow-main">
                 <span className="q-prow-name">{fullName(p)}</span>
                 <span className="q-prow-sub">{p.name}{p.job?.label ? ` · ${p.job.label}` : ''}</span>
+                <Where text={p.id === app.selfId ? t('label.place.here') : where(p.coords)} className="q-prow-where" />
               </span>
               {p.dead && <StatusChip status="dead" />}
               <span className="q-prow-ids">

@@ -775,6 +775,10 @@ async function callback(name: string, data: Record<string, unknown>): Promise<un
       }
       return { ok: true };
     }
+    /* 2.8.0 'where' (client/cl_console.lua): a rough stand-in for the game's town / district map */
+    case 'where': return { ok: true, data: ((data.list as { x: number; y: number }[]) ?? []).map(({ x, y }) =>
+      (Math.hypot(x + 290, y - 760) < 600 ? 'valentine' : Math.hypot(x - 1300, y + 1300) < 500 ? 'rhodes' : Math.hypot(x - 2600, y + 1200) < 700 ? 'saint_denis'
+        : x < -1500 ? 'tall_trees' : y > 1200 ? 'grizzlies' : x > 1800 ? 'bayou_nwa' : 'heartlands')) };
     case 'map':
       if (data.action === 'players') send('mapPlayers', mapPlayers());
       return { ok: true };

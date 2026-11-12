@@ -104,7 +104,8 @@
       "example": "30"
     },
     "stopSpectate": "Stops watching the player and puts you back where you were before you started watching.",
-    "openQuick": "Opens the small quick menu at the side of the screen with these same tools, so you can use them while watching the game. Shortcut PgUp."
+    "openQuick": "Opens the small quick menu at the side of the screen with these same tools, so you can use them while watching the game. Shortcut PgUp.",
+    "spawnModelTyped": "If what you want is not in the list, type its game name exactly, like a_c_horse_arabian_white."
   },
   "label": {
     "tools": {
@@ -248,7 +249,8 @@
         "clearYes": "Clear the area",
         "deleteYes": "Delete the wagon",
         "cleanupYes": "Remove my spawns"
-      }
+      },
+      "modelTyped": "Game model name"
     }
   }
 }

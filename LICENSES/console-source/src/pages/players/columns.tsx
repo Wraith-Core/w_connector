@@ -5,7 +5,7 @@
  * ════════════════════════════════════════════════════════════════════════════ */
 
 import type { TFn } from '../../i18n';
-import { Meter, StatusChip, Tag, fmtCash, fmtDist, fmtNum } from '../../kit';
+import { Meter, StatusChip, Tag, fmtCash, fmtDist, fmtNum, placeFar } from '../../kit';
 import type { Column } from '../../kit';
 import type { AdminPlayer } from '../../types';
 import { displayName, groupLabel, healthPct, isStaff, rankOf, staminaOf, statusOf } from './shared';
@@ -14,6 +14,8 @@ export interface PlayerRow {
   p: AdminPlayer;
   /** metres from the admin (null = unknown, the admin's own row = 0) */
   dist: number | null;
+  /** the town / district the player is in, in words; the column adds «· 1.2 كم منك» (hidden while the file is open) */
+  place?: string;
   isMe: boolean;
 }
 
@@ -127,9 +129,11 @@ export function playerColumns(t: TFn, mode: 'essential' | 'detail'): Column<Play
       render: ({ p }) => <span className={(p.ping ?? 0) > 150 ? 'k-num pl-ping-bad' : 'k-num'}>{fmtNum(p.ping ?? 0)}</span>,
     },
     {
-      key: 'dist', label: t('label.players.col.distance'), help: 'help.players.col.distance', num: true, className: 'pl-col-dist',
+      key: 'dist', label: t('label.players.col.distance'), help: 'help.players.col.distance', className: 'pl-col-dist',
       sort: cmp((r) => (r.isMe ? -1 : r.dist ?? Number.MAX_SAFE_INTEGER)),
-      render: ({ dist, isMe }) => <span className="k-num">{isMe ? '—' : fmtDist(dist)}</span>,
+      render: ({ dist, isMe, place }) => (isMe ? <span className="k-faint">{t('label.place.here')}</span>
+        : place ? <span className="pl-place">{place}{dist !== null && dist !== undefined && <span className="pl-place-far">{t('label.place.sep')}{placeFar(t, dist)}</span>}</span>
+          : <span className="k-num">{fmtDist(dist)}</span>),
     },
     {
       key: 'group', label: t('label.players.col.group'), help: 'help.players.col.group', priority: 'detail',

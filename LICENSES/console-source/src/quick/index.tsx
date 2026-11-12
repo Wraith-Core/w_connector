@@ -15,7 +15,7 @@ import type { QuickProps } from '../app/quick';
 import { useApp } from '../ctx';
 import type { HelpKey } from '../help/types';
 import { useI18n } from '../i18n';
-import { Button, Glyph, HelpTip, IconButton, Tabs, TextInput, cls, isTypingTarget } from '../kit';
+import { Button, Fold, Glyph, HelpTip, IconButton, Tabs, TextInput, Where, cls, isTypingTarget, placeName, useWhere, zoneOf } from '../kit';
 import { ClearAreaForm, CoordsJump, NoclipSpeed, SpawnForm } from '../pages/tools/forms';
 import {
   TOOLS, activeTools, bundledT, canTool, isOn, toolHint, toolLabel, useToolRunner,
@@ -125,6 +125,10 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
 
   const runTool = useCallback((x: ToolDef) => { runner.run(x); }, [runner]);
 
+  /* 2.8.0 the notebook look: where the admin stands, in words (the town or district) */
+  useWhere([app.self?.coords]);
+  const hereName = placeName(t, zoneOf(app.self?.coords));
+
   /* 1-7 open the sections (never while typing) */
   const keysRef = useRef({ groups });
   keysRef.current = { groups };
@@ -189,7 +193,8 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
     body = (
       <div className="q-list">
         {list(inGroup('travel'))}
-        {has('tpCoords') && <div className="q-form"><CoordsJump runner={runner} /></div>}
+        {/* typing coordinates is for experienced staff: folded under «خيارات متقدمة» */}
+        {has('tpCoords') && <Fold className="q-fold"><div className="q-form"><CoordsJump runner={runner} /></div></Fold>}
       </div>
     );
   } else if (group === 'players') {
@@ -225,6 +230,7 @@ export default function QuickMenu({ onClose, onFull }: QuickProps) {
             {rank && <span> · {t(`label.common.level.${rank}`)}</span>}
             {app.admin?.citizenid && <span> · {t('label.common.citizen.label')} <b className="k-num">{app.admin.citizenid}</b></span>}
           </span>
+          {hereName && <Where text={t('label.place.you', hereName)} className="q-here" />}
         </div>
         <IconButton icon="close" aria-label={t('label.common.close')} help="help.quick.close" onClick={onClose} className="q-close" />
       </header>

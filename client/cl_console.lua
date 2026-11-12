@@ -300,6 +300,53 @@ RegisterNUICallback('map', function(data, cb)
     end)
 end)
 RegisterNUICallback('sound', function(_, cb) cb({ ok = true }) end)
+
+-- 2.8.0 (the notebook look): 'where' = the game's town / district keys for a list of points, so the page names a
+-- place («فالنتاين · 1.2 كم منك») instead of printing its coordinates. The same hashes as w_lib's lib.place
+-- (w_zonenotify's): GetMapZoneAtCoords type 1 = town, 10 = district. RedM only; elsewhere every point is nil and
+-- the page shows the distance alone. A zone is remembered per 8 m cell (at most 1024 cells).
+local WHERE_TOWNS = {
+    [459833523] = 'valentine', [2046780049] = 'rhodes', [-765540529] = 'saint_denis', [427683330] = 'strawberry',
+    [1053078005] = 'blackwater', [-744494798] = 'armadillo', [-1524959147] = 'tumbleweed', [7359335] = 'annesburg',
+    [2126321341] = 'van_horn', [201158410] = 'manicato', [1463094051] = 'manzanita_post',
+}
+local WHERE_DISTRICTS = {
+    [2025841068] = 'bayou_nwa', [822658194] = 'big_valley', [1308232528] = 'bluewater_marsh',
+    [1835499550] = 'cumberland_forest', [476637847] = 'great_plains', [1645618177] = 'grizzlies',
+    [-120156735] = 'grizzlies', [-512529193] = 'guarma', [131399519] = 'heartlands', [178647645] = 'roanoke_ridge',
+    [-864275692] = 'scarlett_meadows', [1684533001] = 'tall_trees', [-2066240242] = 'gaptooth_ridge',
+    [-2145992129] = 'rio_bravo', [-108848014] = 'cholla_springs', [892930832] = 'hennigans_stead',
+}
+local whereCells, whereCount = {}, 0
+local IS_RDR = GetGameName() == 'redm'
+
+local function whereZone(x, y, z)
+    local cell = ('%d:%d'):format(math.floor(x / 8), math.floor(y / 8))
+    local hit = whereCells[cell]
+    if hit then return hit end
+    local zone = 'wild'
+    local okT, town = pcall(GetMapZoneAtCoords, x + 0.0, y + 0.0, (z or 100.0) + 0.0, 1)
+    if okT and WHERE_TOWNS[town] then
+        zone = WHERE_TOWNS[town]
+    else
+        local okD, district = pcall(GetMapZoneAtCoords, x + 0.0, y + 0.0, (z or 100.0) + 0.0, 10)
+        if okD and WHERE_DISTRICTS[district] then zone = WHERE_DISTRICTS[district] end
+    end
+    if whereCount >= 1024 then whereCells, whereCount = {}, 0 end
+    whereCells[cell], whereCount = zone, whereCount + 1
+    return zone
+end
+
+RegisterNUICallback('where', function(data, cb)
+    local out = {}
+    local list = type(data) == 'table' and type(data.list) == 'table' and data.list or {}
+    for i = 1, math.min(#list, 64) do
+        local c = list[i]
+        local x, y = type(c) == 'table' and tonumber(c.x), type(c) == 'table' and tonumber(c.y)
+        out[i] = (IS_RDR and x and y) and whereZone(x, y, tonumber(c.z)) or false
+    end
+    cb({ ok = true, data = out })
+end)
 CreateThread(function()
     local nextRefresh = 0
     while true do

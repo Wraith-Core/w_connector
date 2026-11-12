@@ -1,0 +1,52 @@
+{
+  "place": {
+    "where": "مكان الشيء باسم المدينة أو المنطقة، وكم يبعد عنك الآن."
+  },
+  "label": {
+    "place": {
+      "advanced": "خيارات متقدمة",
+      "missing": "ينقصه: %s",
+      "ready": "جاهز",
+      "fix": "أصلحه",
+      "you": "أنت الآن في %s",
+      "and": " و",
+      "unknown": "مكان غير معروف",
+      "wild": "البرية",
+      "here": "هنا",
+      "m": "%s م",
+      "km": "%s كم",
+      "away": "%s منك",
+      "sep": " · ",
+      "zone": {
+        "valentine": "فالنتاين",
+        "rhodes": "رودس",
+        "saint_denis": "سانت دينيس",
+        "strawberry": "ستروبيري",
+        "blackwater": "بلاك ووتر",
+        "armadillo": "أرماديلو",
+        "tumbleweed": "تمبلويد",
+        "annesburg": "آنسبرغ",
+        "van_horn": "فان هورن",
+        "manicato": "مانيكاتو",
+        "manzanita_post": "مركز مانزانيتا",
+        "bayou_nwa": "بايو نوا",
+        "big_valley": "الوادي الكبير",
+        "bluewater_marsh": "مستنقع بلوووتر",
+        "cumberland_forest": "غابة كمبرلاند",
+        "great_plains": "السهول الكبرى",
+        "grizzlies": "الغريزلي",
+        "guarma": "قوارما",
+        "heartlands": "ذا هارتلاندز",
+        "roanoke_ridge": "روانوك ريدج",
+        "scarlett_meadows": "مروج سكارليت",
+        "tall_trees": "الأشجار العالية",
+        "gaptooth_ridge": "غابتوث ريدج",
+        "rio_bravo": "ريو برافو",
+        "cholla_springs": "تشولا سبرينغز",
+        "hennigans_stead": "مزرعة هينيغان"
+      },
+      "comma": "، ",
+      "where": "المكان"
+    }
+  }
+}

@@ -11,7 +11,7 @@ import type { PageProps } from '../../app/pages';
 import { useApp } from '../../ctx';
 import { useI18n } from '../../i18n';
 import {
-  Button, InlineAlert, KeyValue, KeyValueList, PageActions, Section, Tag, cls, fmtCoords, vec3,
+  Button, InlineAlert, KeyValue, KeyValueList, PageActions, Section, Tag, cls, placeName, useWhere, vec3, zoneOf,
 } from '../../kit';
 import { ClearAreaForm, CoordsJump, NoclipSpeed, SpawnForm, ToolRow } from './forms';
 import { SECTION_HELP, SPAWN_LIMIT, TOOLS, activeTools, toolLabel, useToolRunner } from './tools';
@@ -66,6 +66,9 @@ export default function ToolsPage({ route }: PageProps) {
   }, [focus, focusSection]);
 
   const sep = rtl ? '، ' : ', ';
+  /* 2.8.0 where you stand in words; the copy button still hands over the exact vector3 */
+  useWhere([self?.coords]);
+  const here = placeName(t, zoneOf(self?.coords));
   const spectating = self?.spectating ? self.spectating : 0;
   return (
     <div className="tl-page" ref={root}>
@@ -101,9 +104,8 @@ export default function ToolsPage({ route }: PageProps) {
           <KeyValue
             label={t('label.tools.position')}
             help="help.tools.position"
-            value={self?.coords ? fmtCoords(self.coords) : null}
+            value={self?.coords ? (here || t('label.place.unknown')) : null}
             copy={self?.coords ? vec3(self.coords) : undefined}
-            ltr
           />
           <KeyValue
             label={t('label.tools.spawned')}
