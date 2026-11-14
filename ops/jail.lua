@@ -25,7 +25,7 @@ WC.Jail = WC.Jail or {}
 local J = WC.Jail
 
 local KVP = 'w_connector:jail'
-local RADIUS = 30.0          -- metres from the jail place before he is brought back
+local RADIUS = 13.0          -- metres from the jail place before he is brought back (MajestyRP SS-Admin JailRadius)
 local FRESH = 60             -- seconds: a new stay is not released by an older heartbeat answer
 local MIN_ADD = 20           -- seconds: a stay this close to its end is not started from a heartbeat answer
 local MAX_SECONDS = 10080 * 60
