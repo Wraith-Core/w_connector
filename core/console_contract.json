@@ -99,6 +99,18 @@
     "permission": "bans.manage",
     "area": "ban"
   },
+  "player.jail": {
+    "permission": "players.kick",
+    "area": "kick"
+  },
+  "player.unjail": {
+    "permission": "players.kick",
+    "area": "kick"
+  },
+  "jail.setPlace": {
+    "permission": "settings.manage",
+    "area": "kick"
+  },
   "player.freeze": {
     "permission": "players.manage",
     "area": "players"

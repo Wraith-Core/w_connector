@@ -32,7 +32,8 @@
       "control": "Temporary actions: each one is lifted with the same button.",
       "kick": "Removes the player from the server now, with a reason they see.",
       "ban": "Keeps the player out of the server for a length you choose.",
-      "level": "The player's staff ranks decide what they may open and do in the admin panel. They are managed on the Ranks page."
+      "level": "The player's staff ranks decide what they may open and do in the admin panel. They are managed on the Ranks page.",
+      "jail": "Holds the player at the jail place for a length you choose, with a reason he sees. If he walks out he is brought back, and the time runs even while he is offline."
     },
     "account": "The player's RedM account name. One for all their characters, and different from the character name.",
     "character": "The first and last name of the character they are playing now.",
@@ -149,7 +150,16 @@
       "text": "Removes the player now and keeps them out for the chosen length; the ban is announced in chat to everyone.",
       "undo": "Yes, lift the ban on the Bans and suspensions page"
     },
-    "openRanks": "Opens the Ranks page on this player, to give them a rank or take one away."
+    "openRanks": "Opens the Ranks page on this player, to give them a rank or take one away.",
+    "jail": {
+      "text": "Sends the player to the jail place now and keeps him there until the time is up. He sees the time left and the reason on his screen.",
+      "undo": "Yes, with \"Release from jail\""
+    },
+    "unjail": "Ends his jail now and sends him to the release place.",
+    "jailReason": "The jail reason. The player sees it on his screen and it is kept in the log.",
+    "jailDuration": "How long the jail lasts. It counts real time, even while the player is offline.",
+    "jailPlace": "Stand where the jail should be, then press here. It is saved on the website too.",
+    "releasePlace": "Stand where a prisoner should come out when his time is up, then press here."
   },
   "label": {
     "drawer": {
@@ -188,7 +198,8 @@
         "control": "Temporary control",
         "kick": "Kick",
         "ban": "Ban",
-        "level": "Staff ranks"
+        "level": "Staff ranks",
+        "jail": "Admin jail"
       },
       "account": "Account",
       "character": "Character",
@@ -288,7 +299,24 @@
         "d": "Repeat offense after warnings"
       },
       "openRanks": "Ranks…",
-      "ranksLead": "Staff rights now come from ranks. Open the Ranks page to give this player a rank or take one away."
+      "ranksLead": "Staff rights now come from ranks. Open the Ranks page to give this player a rank or take one away.",
+      "jail": "Jail",
+      "unjail": "Release from jail",
+      "jailReason": "Jail reason",
+      "jailDuration": "Length",
+      "jailTitle": "Jail %s?",
+      "jailText": "Held for %s and sees this reason: %s",
+      "jailNow": "In jail now, %s left. Reason: %s",
+      "jailPlace": "Make my spot the jail",
+      "releasePlace": "Make my spot the release place",
+      "jailPlaceSaved": "Jail place saved",
+      "releasePlaceSaved": "Release place saved",
+      "jailTpl": {
+        "a": "Griefing other players",
+        "b": "Disrespecting staff",
+        "c": "Random killing",
+        "d": "Exploiting a bug"
+      }
     }
   }
 }

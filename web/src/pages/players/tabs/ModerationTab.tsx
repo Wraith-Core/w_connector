@@ -1,15 +1,20 @@
 /* Moderation: private message, freeze / spectate / seat on a horse (area players), kick with its
-   own reason (area kick), ban = reason + length (area ban), and a link to the player's staff ranks
+   own reason (area kick), the admin jail = reason + length, or the early release (area kick, 2.8.0),
+   ban = reason + length (area ban), and a link to the player's staff ranks
    (the Ranks page, area ranks: shown only to those who may open it). */
 
 import { useState } from 'react';
 import { useApp } from '../../../ctx';
 import { useI18n } from '../../../i18n';
 import {
-  Button, ButtonRow, DurationPicker, Field, Gate, ReasonField, Section, TextInput, fmtMinutes,
+  Button, ButtonRow, DurationPicker, Field, Gate, ReasonField, Section, TextInput, fmtDuration, fmtMinutes,
 } from '../../../kit';
 import { displayName, selfBlocked } from '../shared';
 import type { TabProps } from './types';
+
+/** the jail lengths offered, in minutes (the website takes 1 minute to 7 days) */
+const JAIL_PRESETS = [10, 30, 60, 120, 360, 1440];
+const JAIL_MAX = 10080;
 
 export default function ModerationTab({ p, run, busy, isMe }: TabProps) {
   const app = useApp();
@@ -19,6 +24,8 @@ export default function ModerationTab({ p, run, busy, isMe }: TabProps) {
   const [kickReason, setKickReason] = useState('');
   const [banReason, setBanReason] = useState('');
   const [duration, setDuration] = useState(1440);
+  const [jailReason, setJailReason] = useState('');
+  const [jailMinutes, setJailMinutes] = useState(30);
   const spectating = !!app.self?.spectating && app.self.spectating === p.id;
   const frozen = p.frozen === true;
 
@@ -30,6 +37,25 @@ export default function ModerationTab({ p, run, busy, isMe }: TabProps) {
   };
 
   const kickTpl = ['a', 'b', 'c', 'd'].map((k) => t(`label.drawer.kickTpl.${k}`));
+  const jailTpl = ['a', 'b', 'c', 'd'].map((k) => t(`label.drawer.jailTpl.${k}`));
+  const jailed = p.jail && p.jail.left > 0 ? p.jail : null;
+
+  const askJail = () => {
+    const reason = jailReason.trim();
+    if (!reason) return;
+    const minutes = Math.min(JAIL_MAX, Math.max(1, Math.round(jailMinutes)));
+    app.confirm({
+      title: t('label.drawer.jailTitle', name),
+      text: t('label.drawer.jailText', fmtMinutes(t, lang, minutes), reason),
+      help: 'help.drawer.jail',
+      danger: true,
+      confirmLabel: t('label.drawer.jail'),
+      onConfirm: async () => { const r = await run('jail', 'jail', { reason, minutes }); if (r.ok) setJailReason(''); },
+    });
+  };
+  const setPlace = (kind: 'jail' | 'release') => {
+    void app.act('jail', { action: 'setPlace', kind }, { okText: t(kind === 'jail' ? 'label.drawer.jailPlaceSaved' : 'label.drawer.releasePlaceSaved') });
+  };
   const banTpl = ['a', 'b', 'c', 'd'].map((k) => t(`label.drawer.banTpl.${k}`));
 
   const askKick = () => {
@@ -111,6 +137,42 @@ export default function ModerationTab({ p, run, busy, isMe }: TabProps) {
             </Button>
             {!isMe && !kickReason.trim() && <span className="pl-note">{t('label.drawer.reasonNeeded')}</span>}
           </ButtonRow>
+        </Section>
+      </Gate>
+
+      <Gate area="kick">
+        <Section title={t('label.drawer.sec.jail')} help="help.drawer.sec.jail" area="kick">
+          {jailed ? (
+            <>
+              <p className="pl-note">{t('label.drawer.jailNow', fmtDuration(t, lang, jailed.left, 2), jailed.reason || '—')}</p>
+              <ButtonRow>
+                <Button actionName="player.unjail" help="help.drawer.unjail" area="kick" kind="primary" busy={busy === 'unjail'} onClick={() => void run('unjail', 'unjail')}>
+                  {t('label.drawer.unjail')}
+                </Button>
+              </ButtonRow>
+            </>
+          ) : (
+            <>
+              <Field label={t('label.drawer.jailReason')} help="help.drawer.jailReason" required>
+                <ReasonField className="pl-jail-reason" value={jailReason} onChange={setJailReason} templates={jailTpl} maxLength={200} />
+              </Field>
+              <Field label={t('label.drawer.jailDuration')} help="help.drawer.jailDuration">
+                <DurationPicker value={jailMinutes} onChange={setJailMinutes} presets={JAIL_PRESETS} permanent={false} />
+              </Field>
+              <ButtonRow>
+                <Button actionName="player.jail" help="help.drawer.jail" area="kick" kind="danger" helpDanger={false} disabled={!jailReason.trim()} busy={busy === 'jail'} onClick={askJail}>
+                  {t('label.drawer.jail')}
+                </Button>
+                {!jailReason.trim() && <span className="pl-note">{t('label.drawer.reasonNeeded')}</span>}
+              </ButtonRow>
+            </>
+          )}
+          {app.canAction('jail.setPlace') && (
+            <ButtonRow>
+              <Button actionName="jail.setPlace" help="help.drawer.jailPlace" size="sm" onClick={() => setPlace('jail')}>{t('label.drawer.jailPlace')}</Button>
+              <Button actionName="jail.setPlace" help="help.drawer.releasePlace" size="sm" onClick={() => setPlace('release')}>{t('label.drawer.releasePlace')}</Button>
+            </ButtonRow>
+          )}
         </Section>
       </Gate>
 

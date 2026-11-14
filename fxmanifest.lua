@@ -30,7 +30,7 @@ dependencies { 'oxmysql' }
 ui_page 'web/build/index.html'
 files { 'web/build/**/*', 'nui/capture.html', 'nui/spectate.js', 'core/console_contract.json', 'core/console_models.json', 'locales/ar.json', 'locales/en.json' }
 
-client_scripts { 'client/cl_actions.lua', 'client/cl_death.lua', 'client/cl_spectate.lua', 'client/cl_map.lua', 'client/cl_console.lua', 'client/cl_menu_self.lua', 'client/cl_console_tools.lua', 'client/cl_blips.lua' }
+client_scripts { 'client/cl_actions.lua', 'client/cl_death.lua', 'client/cl_spectate.lua', 'client/cl_map.lua', 'client/cl_console.lua', 'client/cl_menu_self.lua', 'client/cl_console_tools.lua', 'client/cl_blips.lua', 'client/cl_jail.lua' }
 
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
@@ -64,6 +64,7 @@ server_scripts {
     'ops/wraith_admin.lua',
     'ops/live.lua',
     'ops/ingame.lua',
+    'ops/jail.lua',             -- 2.8.0: the admin jail (before the console: its actions read WC.Jail)
     'ops/console.lua',
     'ops/console_actions.lua',
     'ops/console_entities.lua',

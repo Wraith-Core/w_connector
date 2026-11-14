@@ -146,6 +146,8 @@ export interface AdminPlayer {
   discord?: string;
   frozen?: boolean;
   canReturn?: boolean;
+  /** 2.8.0 the admin jail (ops/jail.lua): seconds left and the reason; absent when he is not jailed */
+  jail?: { left: number; reason: string; by?: string } | null;
 }
 
 /**

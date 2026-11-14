@@ -196,3 +196,6 @@ html.k-reduced-motion .q-scrim, html.k-reduced-motion .q-wrap, html.k-reduced-mo
 .q-fold { margin: .25rem 1rem 0; }
 .q-fold .q-form { margin: 0; }
 .q-form .k-ready, .tl-spawn .k-ready { margin-top: .5rem; }
+
+/* 2.8.0 the admin jail under the player's actions */
+.q-jail { display: flex; flex-direction: column; gap: .5rem; margin-top: .75rem; padding-top: .5rem; border-top: 1px solid var(--rule); }

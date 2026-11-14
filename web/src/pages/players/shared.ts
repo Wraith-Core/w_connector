@@ -95,7 +95,7 @@ export const NO_SELF = new Set(['teleportTo', 'bring', 'bringBack', 'kick', 'ban
 export type PlayerAction =
   | 'teleportTo' | 'bring' | 'bringBack' | 'tpCoords' | 'revive' | 'heal' | 'needs' | 'setJob' | 'setGang' | 'setGroup'
   | 'money' | 'giveItem' | 'clearInventory' | 'openInventory' | 'kick' | 'ban' | 'freeze' | 'spectate' | 'notify'
-  | 'sitOnMount' | 'wardrobe';
+  | 'sitOnMount' | 'wardrobe' | 'jail' | 'unjail';
 
 /** The body of post('player', …) for this player */
 export function playerPayload(p: AdminPlayer, selfId: number, action: PlayerAction, args: Record<string, unknown> = {}) {

@@ -227,10 +227,12 @@ function WC.start()
     CreateThread(function()
         while true do
             if link.up then
-                local status, body = WC.request('POST', '/heartbeat', { players = WC.onlinePlayers(), uptime = GetGameTimer() // 1000, queue = WC.queueSize and WC.queueSize() or 0 })
+                -- 2.8.0: jail = 1 asks for the admin jail list in the answer (ops/jail.lua)
+                local status, body = WC.request('POST', '/heartbeat', { players = WC.onlinePlayers(), uptime = GetGameTimer() // 1000, queue = WC.queueSize and WC.queueSize() or 0, jail = 1 })
                 lost(status)
                 -- 2.2.0: the website's "server closed" switch rides on the answer (core/closed.lua)
                 if status == 200 and type(body) == 'table' and WC.Closed then WC.Closed.learn(body.closed, body.closedMessage) end
+                if status == 200 and type(body) == 'table' and type(body.jail) == 'table' and WC.Jail then pcall(WC.Jail.learn, body.jail) end
             end
             Wait(link.heartbeat * 1000)
         end

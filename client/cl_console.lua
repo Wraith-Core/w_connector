@@ -16,14 +16,18 @@ local ERRORS = {
         timeout = 'تأخر رد السيرفر. تحقق من النتيجة قبل إعادة المحاولة.', rate_limited = 'انتظر قليلًا ثم حاول مرة ثانية.',
         money_reason_required = 'اكتب سببًا واضحًا لإضافة المبلغ.', money_limit = 'المبلغ أكبر من الحد المسموح للإجراء الواحد.',
         failed = 'ما اكتملت العملية. راجع التفاصيل أو سجل السيرفر.', player_offline = 'اللاعب غير متصل الآن.',
-        no_discord = 'لازم يكون حساب ديسكورد مربوطًا بدخولك للسيرفر.', session_expired = 'انتهت صلاحية جلسة الإدارة.' },
+        no_discord = 'لازم يكون حساب ديسكورد مربوطًا بدخولك للسيرفر.', session_expired = 'انتهت صلاحية جلسة الإدارة.',
+        jail_not_set = 'حدّد مكان السجن أولًا: قف في المكان واضغط «اجعل مكاني مكان السجن»، أو حدّده في الموقع.',
+        not_jailed = 'هذا اللاعب ليس في السجن.', no_license = 'تعذر التعرف على حساب اللاعب.' },
     en = { no_access = 'You do not have access to the admin console. Check your website role.', no_permission = 'You do not have permission for this action.',
         no_session = 'Your admin session ended. Open the console again.', offline = 'The website panel is unavailable. Try again shortly.',
         capability_missing = 'This feature needs a compatible, running server integration.', target_changed = 'The player session or character changed. Refresh and try again.',
         timeout = 'The server response timed out. Check the result before retrying.', rate_limited = 'Please wait and try again.',
         money_reason_required = 'Enter a clear reason for the money grant.', money_limit = 'This amount exceeds the per-action limit.',
         failed = 'The action did not complete. Check the details or server log.', player_offline = 'The player is offline.',
-        no_discord = 'Your game connection needs a linked Discord account.', session_expired = 'Your admin session expired.' },
+        no_discord = 'Your game connection needs a linked Discord account.', session_expired = 'Your admin session expired.',
+        jail_not_set = 'Set the jail place first: stand there and press "Make my spot the jail", or set it on the website.',
+        not_jailed = 'This player is not in jail.', no_license = 'The player account could not be identified.' },
 }
 local function send(action, data) SendNUIMessage({ action = action, data = data or {} }) end
 local function foreign() local inv = GetInvokingResource(); return inv ~= nil and inv ~= GetCurrentResourceName() end
@@ -284,7 +288,7 @@ local function forward(kind, data, cb)
     end)
 end
 -- 2.4.0: 'blips' (ops/native_blips.lua, the page in web/src/pages/blips)
-for _, kind in ipairs({ 'player', 'self', 'server', 'hud', 'characters', 'scripts', 'settings', 'news', 'reports', 'ranks', 'bans', 'blips' }) do
+for _, kind in ipairs({ 'player', 'self', 'server', 'hud', 'characters', 'scripts', 'settings', 'news', 'reports', 'ranks', 'bans', 'blips', 'jail' }) do
     RegisterNUICallback(kind, function(data, cb) forward(kind, data, cb) end)
 end
 RegisterNUICallback('citizen', function(data, cb) C.ask('citizen.lookup', { input = data.input }, cb) end)

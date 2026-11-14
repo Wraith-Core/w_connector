@@ -357,6 +357,12 @@ function C.dispatch(src, s, name, data, answer)
         if name == 'map.teleport' then data.target, data.citizenid = target, nil
         else data.id, data.citizenid = target, nil end
     end
+    -- 2.8.0: the jail place is where the admin stands, read here (never a coordinate from the page)
+    if name == 'jail.setPlace' then
+        local at = WC.Jail and WC.Jail.position(src)
+        if not at then answer({ ok = false, error = 'no_ped' }); return end
+        data.at = { x = at.x, y = at.y, z = at.z }
+    end
     local t = nonce()
     local issue = { session = s, name = name, target = target, targetIdentity = targetIdentity, at = now() }
     C.issued[t] = issue

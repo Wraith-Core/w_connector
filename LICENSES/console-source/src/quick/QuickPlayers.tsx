@@ -10,7 +10,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useApp } from '../ctx';
 import type { HelpKey } from '../help/types';
 import { useI18n } from '../i18n';
-import { Button, CitizenIdInput, Field, HelpTip, StatusChip, Where, cls, useWhere } from '../kit';
+import { Button, CitizenIdInput, Field, HelpTip, ReasonField, Segmented, StatusChip, Where, cls, fmtDuration, fmtMinutes, useWhere } from '../kit';
 import type { CitizenState } from '../kit';
 import type { AdminPlayer, Area } from '../types';
 
@@ -36,6 +36,9 @@ const ACTS: PlayerAct[] = [
   { id: 'wardrobe', area: 'items', help: 'help.map.player.wardrobe' },
 ];
 
+/** 2.8.0 the admin jail lengths of the quick menu, in minutes (the full panel offers more) */
+const JAIL_MINUTES = [10, 30, 60, 120];
+
 const fullName = (p: AdminPlayer) => `${p.firstname ?? ''} ${p.lastname ?? ''}`.trim() || p.name;
 
 /* useCitizenPreview hands back a new object on every render ({ kind: 'empty' } …); keeping the old
@@ -49,8 +52,10 @@ const sameState = (a: CitizenState, b: CitizenState): boolean => {
 
 export default function QuickPlayers({ search }: { search: string }) {
   const app = useApp();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [target, setTarget] = useState('');
+  const [jailReason, setJailReason] = useState('');
+  const [jailMinutes, setJailMinutes] = useState(30);
   const [state, setState] = useState<CitizenState>({ kind: 'empty' });
   const [busy, setBusy] = useState<string | null>(null);
   const onResolved = useCallback((s: CitizenState) => setState((prev) => (sameState(prev, s) ? prev : s)), []);
@@ -77,6 +82,36 @@ export default function QuickPlayers({ search }: { search: string }) {
       setBusy(null);
     }
   };
+
+  /* 2.8.0 the admin jail: reason + length, asked once more; or the early release */
+  const who = () => (isSelf ? { id: app.selfId } : { citizenid: target.trim() });
+  const canJail = app.can('kick') && app.canAction('player.jail');
+  const jailed = player?.jail && player.jail.left > 0 ? player.jail : null;
+  const jail = () => {
+    const reason = jailReason.trim();
+    if (!reason || busy || !ready) return;
+    const name = player ? fullName(player) : target.trim();
+    app.confirm({
+      title: t('label.drawer.jailTitle', name),
+      text: t('label.drawer.jailText', fmtMinutes(t, lang, jailMinutes), reason),
+      help: 'help.drawer.jail',
+      danger: true,
+      confirmLabel: t('label.drawer.jail'),
+      onConfirm: async () => {
+        setBusy('jail');
+        try {
+          const r = await app.act('player', { ...who(), action: 'jail', args: { reason, minutes: jailMinutes } }, { okText: t('label.map.done') });
+          if (r.ok) setJailReason('');
+        } finally { setBusy(null); }
+      },
+    });
+  };
+  const unjail = async () => {
+    if (busy || !ready) return;
+    setBusy('unjail');
+    try { await app.act('player', { ...who(), action: 'unjail', args: {} }, { okText: t('label.map.done') }); } finally { setBusy(null); }
+  };
+  const jailTpl = ['a', 'b', 'c', 'd'].map((k) => t(`label.drawer.jailTpl.${k}`));
 
   return (
     <div className="q-players">
@@ -114,6 +149,37 @@ export default function QuickPlayers({ search }: { search: string }) {
               );
             })}
           </div>
+          {canJail && (
+            <div className="q-jail">
+              <div className="q-subhead">
+                <span>{t('label.drawer.sec.jail')}</span>
+                <HelpTip help="help.drawer.sec.jail" label={t('label.drawer.sec.jail')} size="sm" />
+              </div>
+              {jailed ? (
+                <>
+                  <p className="q-note">{t('label.drawer.jailNow', fmtDuration(t, lang, jailed.left, 2), jailed.reason || '—')}</p>
+                  <Button help="help.drawer.unjail" area="kick" actionName="player.unjail" size="sm" block className="q-act"
+                    busy={busy === 'unjail'} disabled={!!busy && busy !== 'unjail'} onClick={() => { void unjail(); }}>
+                    {t('label.drawer.unjail')}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Field label={t('label.drawer.jailReason')} help="help.drawer.jailReason" required>
+                    <ReasonField value={jailReason} onChange={setJailReason} templates={jailTpl} maxLength={200} />
+                  </Field>
+                  <Field label={t('label.drawer.jailDuration')} help="help.drawer.jailDuration">
+                    <Segmented value={jailMinutes} onChange={setJailMinutes} size="sm"
+                      options={JAIL_MINUTES.map((m) => ({ value: m, label: fmtMinutes(t, lang, m) }))} />
+                  </Field>
+                  <Button help="help.drawer.jail" area="kick" actionName="player.jail" kind="danger" helpDanger={false} size="sm" block className="q-act"
+                    busy={busy === 'jail'} disabled={!jailReason.trim() || (!!busy && busy !== 'jail')} onClick={jail}>
+                    {t('label.drawer.jail')}
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
           {player?.frozen && <p className="q-note">{t('label.quick.frozen')}</p>}
           {isSelf && <p className="q-note">{t('label.quick.selfNote')}</p>}
         </>

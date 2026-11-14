@@ -34,7 +34,8 @@ local function normalize(src, session)
     local view = { id = src, name = p.name, citizenid = tostring(p.charId or ''), firstname = first or '', lastname = last or '',
         job = p.job or {}, gang = p.gang or {}, money = {}, ping = p.ping, health = health,
         maxHealth = maxHealth, dead = dead, needs = p.status and p.status.needs,
-        coords = c or {}, group = '', frozen = frozen[src] ~= nil and frozen[src] == C.identity(src), canReturn = returned[src] and returned[src].identity == C.identity(src) or false }
+        coords = c or {}, group = '', frozen = frozen[src] ~= nil and frozen[src] == C.identity(src), canReturn = returned[src] and returned[src].identity == C.identity(src) or false,
+        jail = WC.Jail and WC.Jail.view(src) or nil }
     for _, permission in ipairs(session.permissions or {}) do if permission == 'players.view' then view.money = p.money or {} end end
     if session.allowed['player.money'] then view.money = p.money or {} end
     if view.money.money ~= nil and view.money.cash == nil then
@@ -194,6 +195,26 @@ C.define('player.freeze', nil, function(data, ctx)
     local ok, err = op('player.freeze', { source = ctx.target, frozen = on })
     if ok then frozen[ctx.target] = on and C.identity(ctx.target) or nil end
     return ok, err
+end)
+-- 2.8.0 (owner 2026-11-14): the admin jail (ops/jail.lua). The website stored the stay against the bound target and
+-- added its two places to the arguments before this runs; the jail itself holds him from here on.
+C.define('player.jail', nil, function(data, ctx)
+    local a = data.args or {}
+    if not ctx.valid() then return false, 'target_changed' end
+    return op('player.jail', { source = ctx.target, minutes = a.minutes, reason = a.reason, by = GetPlayerName(ctx.source),
+        place = a.place, release = a.release })
+end)
+C.define('player.unjail', nil, function(_, ctx)
+    if not ctx.valid() then return false, 'target_changed' end
+    local license = WC.Jail.licenseOf(ctx.target)
+    -- the website already ended its record: a player this server does not hold is simply done
+    if not license or not WC.Jail.stays[license] then return true end
+    return op('player.unjail', { source = ctx.target })
+end)
+-- the place where the admin stands becomes the jail (or the release) place; the website saved it already
+C.define('jail.setPlace', nil, function(data)
+    local ok = WC.Jail.setPlace(data.kind == 'release' and 'release' or 'jail', data.at)
+    return ok, ok and nil or 'invalid_args'
 end)
 C.define('player.money', available('money.adjust'), function(data, ctx)
     local a, target = data.args, ctx.target

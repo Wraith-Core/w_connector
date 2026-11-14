@@ -72,6 +72,13 @@
       "recentEmpty": "The tools you use show up here.",
       "pin": "Pin the tool",
       "unpin": "Unpin"
+    },
+    "jail": {
+      "title": "Admin jail",
+      "left": "%s left",
+      "reason": "Reason: %s",
+      "hint": "You cannot leave this place until the time is up.",
+      "freed": "Your jail time is over. You are free."
     }
   }
 }
