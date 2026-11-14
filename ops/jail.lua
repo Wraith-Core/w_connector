@@ -5,7 +5,8 @@
 --- only teleported the player there once and nothing held him. This file HOLDS him:
 ---   * every second each jailed player who is online, alive and has a character is put back at the jail place
 ---     when he is farther than RADIUS from it (w_guard is told first: our own teleport is not a cheat);
----   * the time runs on the wall clock (the website's `until`), online or not, like the website's list says;
+---   * the time runs only while he is on the server (owner 2026-11-14, choice 2): away, or the server down, it
+---     stops and goes on when he is back (the website pauses its `until` the same way, jail.ts pauseOfflineJail);
 ---   * when it ends he is put at the release place (or where he stood before the jail); a player who is offline
 ---     then is moved out when he next has a character on this server;
 ---   * his screen shows «سجن إداري», the time left and the reason (client/cl_jail.lua -> the NUI banner).
@@ -62,7 +63,7 @@ J.licenseOf = licenseOf
 -- ── storage ──────────────────────────────────────────────────────────────────────────────────────────
 local function save()
     if type(SetResourceKvp) ~= 'function' then return end
-    local ok, raw = pcall(json.encode, { stays = J.stays, out = J.out, place = J.place, release = J.release })
+    local ok, raw = pcall(json.encode, { stays = J.stays, out = J.out, place = J.place, release = J.release, savedAt = now() })
     if ok and type(raw) == 'string' then SetResourceKvp(KVP, raw) end
 end
 
@@ -72,9 +73,11 @@ local function load()
     if type(raw) ~= 'string' or raw == '' then return end
     local ok, data = pcall(json.decode, raw)
     if not ok or type(data) ~= 'table' then return end
+    -- the server was down since the last save: nobody was on it, so no stay ran
+    local down = math.max(0, now() - (tonumber(data.savedAt) or now()))
     for license, s in pairs(type(data.stays) == 'table' and data.stays or {}) do
         if type(license) == 'string' and type(s) == 'table' and tonumber(s.ends) then
-            J.stays[license] = { ends = math.floor(tonumber(s.ends)), reason = text(s.reason), by = text(s.by, 60),
+            J.stays[license] = { ends = math.floor(tonumber(s.ends)) + down, reason = text(s.reason), by = text(s.by, 60),
                 name = text(s.name, 100), since = tonumber(s.since) or now(), back = point(s.back) }
         end
     end
@@ -232,12 +235,23 @@ end
 
 -- ── the watch: every second ─────────────────────────────────────────────────────────────────────────
 CreateThread(function()
+    local last, lastSave = now(), now()
     while true do
         Wait(1000)
         local t = now()
+        -- away = his time stands still (pushed on by the seconds that passed)
+        local step = math.max(0, t - last)
+        last = t
+        if step > 0 then
+            for license, stay in pairs(J.stays) do
+                if not onlineByLicense(license) then stay.ends = stay.ends + step end
+            end
+        end
         for license, stay in pairs(J.stays) do
             if stay.ends <= t then J.free(license, 'time') end
         end
+        -- kept fresh so a restart knows how long the server was down
+        if next(J.stays) and t - lastSave >= 30 then save(); lastSave = t end
         for _, id in ipairs(GetPlayers()) do
             local src = tonumber(id)
             local license = src and licenseOf(src)
