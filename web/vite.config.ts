@@ -28,12 +28,12 @@ const mockEntry = (mode: string): Plugin => ({
 });
 
 export default defineConfig(({ mode }) => ({
-  define: { __DEV_MAP_TILES__: JSON.stringify('/@fs/' + fileURLToPath(new URL('../../w_map/web/tiles', import.meta.url)).replace(/\\/g, '/')) },
+  define: { __DEV_MAP_TILES__: JSON.stringify('/@fs/' + fileURLToPath(new URL('../../w_map_tiles/tiles', import.meta.url)).replace(/\\/g, '/')) },
   plugins: [react(), mockEntry(mode), stripCrossorigin()],
   css: { postcss: { plugins: [uiScale()] } },
   base: './',
   // dev only: the mock reads the resource's own locales one folder up
-  server: { fs: { allow: ['..', '../../w_map/web/tiles'] } },
+  server: { fs: { allow: ['..', '../../w_map_tiles/tiles'] } },
   build: {
     /* the resource build writes web/build; a mock build must be given --outDir (default: build-mock) */
     outDir: mode === 'mock' ? 'build-mock' : 'build',

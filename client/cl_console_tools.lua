@@ -150,7 +150,8 @@ function T.execute(name, a, target)
         local cfg = exports.w_map:GetMapConfig()
         if type(cfg) ~= 'table' then return fail('capability_missing') end
         local data = exports.w_map:GetMapData()
-        return ok({ tilesBase = 'https://cfx-nui-w_map/web/tiles', theme = cfg.theme or 'light', projection = cfg.projection,
+        -- 2.7.8: tiles live in w_map_tiles since w_map 2.1.0; only a fallback, the page prefers cfg.tiles.styles
+        return ok({ tilesBase = 'nui://w_map_tiles/tiles', theme = cfg.theme or 'light', projection = cfg.projection,
             tiles = cfg.tiles, mapData = data })
     end
     if name:sub(1, 4) == 'map.' then

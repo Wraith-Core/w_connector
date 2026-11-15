@@ -4,8 +4,8 @@
  *
  * * An image is requested once however many times it is asked for in the same frame, and a failed tile
  *   (off the paper) is recorded so it is never requested again nor fills the console with errors.
- * * Tiles come from nui://w_map/web/tiles/<set>/<z>/<x>/<y>.webp - w_map's manifest exposes them, so
- *   the admin page needs no copy of the pyramid.
+ * * Tiles come from nui://w_map_tiles/tiles/<set>/<z>/<x>/<y>.webp (w_map's Config.Tiles.styles) - the
+ *   w_map_tiles manifest exposes them, so the admin page needs no copy of the pyramid.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 export interface TileEntry {

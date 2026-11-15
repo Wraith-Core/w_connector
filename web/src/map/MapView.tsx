@@ -39,7 +39,7 @@ function tilesOf(cfg: MapCfg): EngineTiles {
   const theme = cfg.theme || 'light';
   const set = theme === 'light' ? 'clean' : theme;
   const styles = (t.styles ?? {}) as Record<string, string>;
-  const root = (cfg.tilesBase || 'nui://w_map/web/tiles').replace(/\/+$/, '');
+  const root = (cfg.tilesBase || 'nui://w_map_tiles/tiles').replace(/\/+$/, '');
   return { base: styles[set] || `${root}/${set}/{z}/{x}/{y}.webp`, theme,
     size: numeric(t.size, 512), minZoom: numeric(t.minZoom, 2), maxZoom: numeric(t.maxZoom, 7),
     maxView: numeric(t.maxView, numeric(t.maxZoom, 7) + 0.6) };

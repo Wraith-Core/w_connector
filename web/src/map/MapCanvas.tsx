@@ -69,7 +69,7 @@ function tilesOf(cfg: MapCfg, theme: string): EngineTiles {
   const t = (cfg.tiles ?? {}) as Record<string, unknown>;
   const set = theme === 'light' ? 'clean' : theme;
   const styles = (t.styles ?? {}) as Record<string, string>;
-  const root = (cfg.tilesBase || 'nui://w_map/web/tiles').replace(/\/+$/, '');
+  const root = (cfg.tilesBase || 'nui://w_map_tiles/tiles').replace(/\/+$/, '');
   return {
     base: styles[set] || `${root}/${set}/{z}/{x}/{y}.webp`,
     theme,
