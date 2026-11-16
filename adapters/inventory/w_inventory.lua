@@ -17,7 +17,7 @@ end
 
 function WInv.items(src)
     local slots = inv():GetInventoryItems(src)
-    if slots == nil then return nil, 'no_character' end
+    if type(slots) ~= 'table' then return nil, 'no_character' end
     local out = {}
     for _, it in pairs(slots) do
         if type(it) == 'table' and it.name then
