@@ -27,13 +27,22 @@ end
 local labels = {}
 local function labelOf(name)
     if labels[name] ~= nil then return labels[name] or nil end
-    local ok, item = pcall(function() return exports.w_inventory:Items(name) end)
+    local ok, item
+    if started('w_lib') then
+        ok, item = pcall(function() return exports.w_lib:InvItems(name) end)
+    elseif started('w_inventory') then
+        ok, item = pcall(function() return exports.w_inventory:Items(name) end)
+    end
     labels[name] = ok and type(item) == 'table' and type(item.label) == 'string' and item.label or false
     return labels[name] or nil
 end
 
--- the character's server id while he is in play (the inventory knows every loaded bag)
+-- the character's server id while he is in play (via w_lib or w_inventory)
 local function onlineOf(cid)
+    if started('w_lib') then
+        local ok, src = pcall(function() return exports.w_lib:FwGetSource(cid) end)
+        if ok and tonumber(src) then return tonumber(src) end
+    end
     if not started('w_inventory') then return nil end
     local ok, src = pcall(function() return exports.w_inventory:SourceOfCitizen(cid) end)
     return ok and tonumber(src) or nil
