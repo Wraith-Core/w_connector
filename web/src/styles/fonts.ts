@@ -27,6 +27,13 @@ export function injectFonts(): void {
       @font-face { font-family: "Tajawal"; font-weight: 700; src: url("${F}tajawal-latin-700-normal.woff2") format("woff2"); unicode-range: ${LATIN}; font-display: swap; }
       @font-face { font-family: "Lalezar"; font-weight: 400; src: url("${F}Lalezar-400-arabic.woff2") format("woff2"); unicode-range: ${AR}; font-display: swap; }
       @font-face { font-family: "Aref Ruqaa"; font-weight: 400; src: url("${F}Lalezar-400-arabic.woff2") format("woff2"); unicode-range: ${AR}; font-display: swap; }
+      @font-face { font-family: "RDR Lino"; src: url("${F}RDRCatalogueBold-Bold.woff2") format("woff2"); unicode-range: U+0030-0039; font-display: swap; }
+      @font-face { font-family: "Hapna Slab"; src: url("${F}RDRCatalogueBold-Bold.woff2") format("woff2"); unicode-range: U+0030-0039; font-display: swap; }
+      @font-face { font-family: "Noto Sans Arabic"; src: url("${F}RDRCatalogueBold-Bold.woff2") format("woff2"); font-weight: 100 900; unicode-range: U+0030-0039; font-display: swap; }
+      @font-face { font-family: "Tajawal"; font-weight: 400; src: url("${F}RDRCatalogueBold-Bold.woff2") format("woff2"); unicode-range: U+0030-0039; font-display: swap; }
+      @font-face { font-family: "Tajawal"; font-weight: 700; src: url("${F}RDRCatalogueBold-Bold.woff2") format("woff2"); unicode-range: U+0030-0039; font-display: swap; }
+      @font-face { font-family: "Lalezar"; font-weight: 400; src: url("${F}RDRCatalogueBold-Bold.woff2") format("woff2"); unicode-range: U+0030-0039; font-display: swap; }
+      @font-face { font-family: "Aref Ruqaa"; font-weight: 400; src: url("${F}RDRCatalogueBold-Bold.woff2") format("woff2"); unicode-range: U+0030-0039; font-display: swap; }
     `;
     document.head.appendChild(style);
   } catch {

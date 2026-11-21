@@ -114,3 +114,18 @@
   src: url('fonts/NotoSansArabic.woff2') format('woff2');
   ascent-override: 100%; descent-override: 45%; line-gap-override: 0%;
 }
+
+/* ── Unified digits server-wide (owner, 2026-11-21): RDR Catalogue for 0-9 in every text face ── */
+@font-face { font-family: 'EB Garamond'; font-style: normal; font-weight: 400 800; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'EB Garamond'; font-style: italic; font-weight: 400 800; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Lalezar'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Amiri'; font-weight: 400; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Amiri'; font-weight: 700; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Aref Ruqaa'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Tajawal'; font-weight: 400; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Tajawal'; font-weight: 500; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Tajawal'; font-weight: 700; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Noto Sans Arabic'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'W Noto Arabic'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'Hapna Slab'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
+@font-face { font-family: 'RDR Lino'; font-weight: 100 900; font-display: swap; src: url('fonts/RDRCatalogueBold-Bold.woff2') format('woff2'); unicode-range: U+0030-0039; }
